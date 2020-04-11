@@ -1,8 +1,10 @@
 import React, {useContext} from 'react';
 import {Col} from "react-bootstrap";
+import {FaDiscord} from "react-icons/fa";
+import Attribution from "../util/Attribution";
 import {increaseBrightness, isHexDark} from "../util/Utils";
 import AppContext from "../../context/AppContext";
-import {FaAt, FaColumns, FaRegEnvelope, FaSlidersH, FaTags, FaUsersCog} from "react-icons/all";
+import {FaAt, FaColumns, FaQuestionCircle, FaRegCommentDots, FaRegEnvelope, FaSlidersH, FaTags, FaUsersCog} from "react-icons/all";
 
 const AdminSidebar = (props) => {
     const context = useContext(AppContext);
@@ -53,7 +55,24 @@ const AdminSidebar = (props) => {
                     <FaRegEnvelope className="fa-sm mr-1 move-top-2px" style={invitationsIcon}/> Invitations
                 </a>
             </li>
+            <li className="my-4"/>
+            <li>
+                <a href="https://app.feedbacky.net/b/feedbacky-official">
+                    <FaRegCommentDots className="fa-sm mr-1 text-black-50 move-top-2px"/> Feedback
+                </a>
+            </li>
+            <li>
+                <a href="https://docs.feedbacky.net">
+                    <FaQuestionCircle className="fa-sm mr-1 text-black-50 move-top-2px"/> FAQ
+                </a>
+            </li>
+            <li>
+                <a href="https://discordapp.com/invite/6qCnKh5">
+                    <FaDiscord className="fa-sm mr-1 text-black-50 move-top-2px"/> Discord Support
+                </a>
+            </li>
         </ul>
+        <Attribution/>
     </Col>
 };
 
