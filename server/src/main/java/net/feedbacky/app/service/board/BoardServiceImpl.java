@@ -19,7 +19,9 @@ import net.feedbacky.app.repository.board.BoardRepository;
 import net.feedbacky.app.repository.board.TagRepository;
 import net.feedbacky.app.repository.idea.IdeaRepository;
 import net.feedbacky.app.service.ServiceUser;
+import net.feedbacky.app.service.board.featured.FeaturedBoardsServiceImpl;
 import net.feedbacky.app.util.Base64Util;
+import net.feedbacky.app.util.Constants;
 import net.feedbacky.app.util.PaginableRequest;
 import net.feedbacky.app.util.RequestValidator;
 import net.feedbacky.app.util.mailservice.MailHandler;
@@ -55,17 +57,19 @@ public class BoardServiceImpl implements BoardService {
   private TagRepository tagRepository;
   private ObjectStorage objectStorage;
   private MailHandler mailHandler;
+  private FeaturedBoardsServiceImpl featuredBoardsServiceImpl;
 
   @Autowired
   //todo too big constuctor
   public BoardServiceImpl(BoardRepository boardRepository, UserRepository userRepository, IdeaRepository ideaRepository, TagRepository tagRepository,
-                          ObjectStorage objectStorage, MailHandler mailHandler) {
+                          ObjectStorage objectStorage, MailHandler mailHandler, FeaturedBoardsServiceImpl featuredBoardsServiceImpl) {
     this.boardRepository = boardRepository;
     this.userRepository = userRepository;
     this.ideaRepository = ideaRepository;
     this.tagRepository = tagRepository;
     this.objectStorage = objectStorage;
     this.mailHandler = mailHandler;
+    this.featuredBoardsServiceImpl = featuredBoardsServiceImpl;
   }
 
   @Override
@@ -101,14 +105,8 @@ public class BoardServiceImpl implements BoardService {
     UserAuthenticationToken auth = RequestValidator.getContextAuthentication();
     User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
             .orElseThrow(() -> new InvalidAuthenticationException("User session not found. Try again with new token."));
-    if(!user.isServiceStaff()) {
-      throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "You don't have permission to create boards.");
-    }
     if(boardRepository.findByDiscriminator(dto.getDiscriminator()).isPresent()) {
       throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "Board with that discriminator already exists.");
-    }
-    if(dto.getBanner() == null || dto.getLogo() == null) {
-      throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "Banner and logo for board must be set.");
     }
     Board board = dto.convertToEntity();
 
@@ -119,16 +117,24 @@ public class BoardServiceImpl implements BoardService {
     board.setCreator(user);
 
     //after save board id is set, so now we can set banners and logos that require board id
-    String logoUrl = objectStorage.storeImage(Base64Util.extractBase64Data(dto.getLogo()), ObjectStorage.ImageType.PROJECT_LOGO);
-    if(logoUrl.equals("")) {
-      throw new FeedbackyRestException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to handle board logo due to server side error.");
+    if(dto.getLogo() != null) {
+      String logoUrl = objectStorage.storeImage(Base64Util.extractBase64Data(dto.getLogo()), ObjectStorage.ImageType.PROJECT_LOGO);
+      if(logoUrl.equals("")) {
+        throw new FeedbackyRestException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to handle board logo due to server side error.");
+      }
+      board.setLogo(logoUrl);
+    } else {
+      board.setLogo(Constants.DEFAULT_LOGO_URL);
     }
-    board.setLogo(logoUrl);
-    String bannerUrl = objectStorage.storeImage(Base64Util.extractBase64Data(dto.getBanner()), ObjectStorage.ImageType.PROJECT_BANNER);
-    if(bannerUrl.equals("")) {
-      throw new FeedbackyRestException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to handle board banner due to server side error.");
+    if(dto.getBanner() != null) {
+      String bannerUrl = objectStorage.storeImage(Base64Util.extractBase64Data(dto.getBanner()), ObjectStorage.ImageType.PROJECT_BANNER);
+      if(bannerUrl.equals("")) {
+        throw new FeedbackyRestException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to handle board banner due to server side error.");
+      }
+      board.setBanner(bannerUrl);
+    } else {
+      board.setBanner(Constants.DEFAULT_BANNER_URL);
     }
-    board.setBanner(bannerUrl);
     board = boardRepository.save(board);
 
     Moderator node = new Moderator();
@@ -209,6 +215,8 @@ public class BoardServiceImpl implements BoardService {
     objectStorage.deleteImage(board.getBanner());
     objectStorage.deleteImage(board.getLogo());
     boardRepository.delete(board);
+    //call explicitly to update boards if featured boards contained deleted board
+    featuredBoardsServiceImpl.scheduleFeaturedBoardsSelectionTask();
     return ResponseEntity.noContent().build();
   }
 

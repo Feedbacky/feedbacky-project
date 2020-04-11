@@ -201,13 +201,3 @@ export const htmlDecode = (input) => {
         .replace(/&gt;/g, ">")
         .replace(/&quot;/g, '"');
 };
-
-export const isServiceAdmin = (context) => {
-    let isAdmin = false;
-    context.serviceData.serviceAdmins.forEach(admin => {
-        if (admin.id === context.user.data.id) {
-            isAdmin = true;
-        }
-    });
-    return isAdmin;
-};

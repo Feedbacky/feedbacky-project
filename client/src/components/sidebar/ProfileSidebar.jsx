@@ -1,14 +1,17 @@
 import React, {useContext} from 'react';
 import {Col} from "react-bootstrap";
+import Attribution from "../util/Attribution";
 import AppContext from "../../context/AppContext";
 import Badge from "react-bootstrap/Badge";
-import {FaRegAddressCard, FaRegBell} from "react-icons/all";
+import {FaRegAddressCard, FaRegBell, FaSearch} from "react-icons/all";
 
 const ProfileSidebar = (props) => {
     const context = useContext(AppContext);
     const themeColor = context.user.darkMode ? "#00c851" : "#00a040";
     const settings = props.currentNode === "settings" ? {color: themeColor} : {};
     const settingsIcon = props.currentNode === "settings" ? {color: themeColor} : {color: "rgba(0,0,0,.5) !important"};
+    const explore = props.currentNode === "explore" ? {color: themeColor} : {};
+    const exploreIcon = props.currentNode === "explore" ? {color: themeColor} : {color: "rgba(0,0,0,.5) !important"};
     const notifications = props.currentNode === "notifications" ? {color: themeColor} : {};
     const notificationsIcon = props.currentNode === "notifications" ? {color: themeColor} : {color: "rgba(0,0,0,.5) !important"};
 
@@ -21,11 +24,17 @@ const ProfileSidebar = (props) => {
                 </a>
             </li>
             <li>
+                <a href="#!" onClick={() => props.reRouteTo("explore")} style={explore}>
+                    <FaSearch className="fa-sm mr-1 move-top-2px" style={exploreIcon}/> Explore
+                </a>
+            </li>
+            <li>
                 <a href="#!" onClick={() => props.reRouteTo("notifications")} style={notifications}>
                     <FaRegBell className="fa-sm mr-1 move-top-2px" style={notificationsIcon}/> Notifications <Badge variant="warning" className="move-top-2px">Soon</Badge>
                 </a>
             </li>
         </ul>
+        <Attribution/>
     </Col>
 };
 
