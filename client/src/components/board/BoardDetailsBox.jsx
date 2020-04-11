@@ -7,6 +7,7 @@ import {Link} from "react-router-dom";
 import snarkdown from "../util/snarkdown";
 import {FaListAlt} from "react-icons/all";
 import {parseEmojis} from "../util/EmojiFilter";
+import Attribution from "../util/Attribution";
 
 const BoardDetailsBox = (props) => {
     const context = useContext(AppContext);
@@ -52,6 +53,7 @@ const BoardDetailsBox = (props) => {
                     {renderEditButton()}
                 </Card.Body>
             </Card>
+            <Attribution/>
         </Col>
     </React.Fragment>
 };
