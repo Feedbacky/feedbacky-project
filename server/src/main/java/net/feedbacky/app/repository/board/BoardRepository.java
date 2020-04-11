@@ -18,4 +18,6 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
   Optional<Board> findByDiscriminator(String discriminator);
 
+  List<Board> findByPrivatePageFalse();
+
 }
