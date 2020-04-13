@@ -16,6 +16,12 @@
     <img src="https://cdn.feedbacky.net/static/img/main_banner_ideas.png">
 </p>
 
+### Changes in this Fork
+This fork is an official fork of https://app.feedbacky.net website and contains some changes from original version:
+* Everyone can create up to 5 boards
+* Features boards section at profile page exists
+* Help sections in board admin sidebar are here
+
 ### Minimum requirements
 * ~300 MB ram for runtime (at least 1.5 GB for source compilation purposes)
 
