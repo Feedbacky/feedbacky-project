@@ -105,8 +105,14 @@ public class BoardServiceImpl implements BoardService {
     UserAuthenticationToken auth = RequestValidator.getContextAuthentication();
     User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
             .orElseThrow(() -> new InvalidAuthenticationException("User session not found. Try again with new token."));
+    if(!user.isServiceStaff()) {
+      throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "You don't have permission to create boards.");
+    }
     if(boardRepository.findByDiscriminator(dto.getDiscriminator()).isPresent()) {
       throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "Board with that discriminator already exists.");
+    }
+    if(dto.getBanner() == null || dto.getLogo() == null) {
+      throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "Banner and logo for board must be set.");
     }
     Board board = dto.convertToEntity();
 
