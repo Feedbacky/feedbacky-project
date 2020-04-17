@@ -6,6 +6,7 @@ import net.feedbacky.app.data.board.dto.FetchBoardDto;
 import net.feedbacky.app.data.board.dto.PatchBoardDto;
 import net.feedbacky.app.data.board.dto.PostBoardDto;
 import net.feedbacky.app.data.board.moderator.Moderator;
+import net.feedbacky.app.data.idea.Idea;
 import net.feedbacky.app.data.tag.Tag;
 import net.feedbacky.app.data.tag.dto.FetchTagDto;
 import net.feedbacky.app.data.tag.dto.PatchTagDto;
@@ -40,7 +41,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -143,7 +146,43 @@ public class BoardServiceImpl implements BoardService {
     node.setUser(user);
     user.getPermissions().add(node);
     userRepository.save(user);
+    populateBoardWithExamples(board);
     return ResponseEntity.status(HttpStatus.CREATED).body(board.convertToDto().ensureViewExplicit());
+  }
+
+
+  private void populateBoardWithExamples(Board board) {
+    Tag tag = new Tag();
+    tag.setBoard(board);
+    tag.setColor("#2d2d2d");
+    tag.setName("Example");
+    tag = tagRepository.save(tag);
+
+    User admin = userRepository.findByServiceStaffTrue().get(0);
+    Idea welcome = new Idea();
+    welcome.setTitle("Welcome to Feedbacky");
+    welcome.setDescription("This is your personal board for your project, feel free to edit it's settings in admin panel. You can also remove this idea via moderation tools icon above.\n"
+            + "\n"
+            + "**TIP:** You can use *markdown* and emojis here :)");
+    welcome.setCreator(admin);
+    welcome.setVoters(new HashSet<>());
+    welcome.setStatus(Idea.IdeaStatus.OPENED);
+    Set<Tag> tags = new HashSet<>();
+    tags.add(tag);
+    welcome.setTags(tags);
+    welcome.setAttachments(new HashSet<>());
+    ideaRepository.save(welcome);
+
+    Idea connect = new Idea();
+    connect.setTitle("Connect the board with your project");
+    connect.setDescription("Create social links to refer to your page, Discord server or Patreon in admin panel.\n"
+            + "You can create Discord webhook as well to receive notifications about new feedback being posted here at your Discord server.");
+    connect.setCreator(admin);
+    connect.setVoters(new HashSet<>());
+    connect.setStatus(Idea.IdeaStatus.OPENED);
+    connect.setTags(new HashSet<>());
+    connect.setAttachments(new HashSet<>());
+    ideaRepository.save(connect);
   }
 
   @Override
