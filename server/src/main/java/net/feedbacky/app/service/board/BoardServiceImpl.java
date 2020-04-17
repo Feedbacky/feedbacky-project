@@ -160,6 +160,7 @@ public class BoardServiceImpl implements BoardService {
 
     User admin = userRepository.findByServiceStaffTrue().get(0);
     Idea welcome = new Idea();
+    welcome.setBoard(board);
     welcome.setTitle("Welcome to Feedbacky");
     welcome.setDescription("This is your personal board for your project, feel free to edit it's settings in admin panel. You can also remove this idea via moderation tools icon above.\n"
             + "\n"
@@ -174,6 +175,7 @@ public class BoardServiceImpl implements BoardService {
     ideaRepository.save(welcome);
 
     Idea connect = new Idea();
+    connect.setBoard(board);
     connect.setTitle("Connect the board with your project");
     connect.setDescription("Create social links to refer to your page, Discord server or Patreon in admin panel.\n"
             + "You can create Discord webhook as well to receive notifications about new feedback being posted here at your Discord server.");
