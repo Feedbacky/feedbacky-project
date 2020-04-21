@@ -29,4 +29,6 @@ public interface IdeaRepository extends JpaRepository<Idea, Long> {
 
   Page<Idea> findByBoardAndTitleIgnoreCaseContaining(Board board, String title, Pageable pageable);
 
+  List<Idea> findByTrendScoreEquals(double num);
+
 }
