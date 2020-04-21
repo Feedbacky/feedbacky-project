@@ -41,6 +41,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -166,6 +167,7 @@ public class BoardServiceImpl implements BoardService {
             + "\n"
             + "**TIP:** You can use *markdown* and emojis here :)");
     welcome.setCreator(admin);
+    welcome.setCreationDate(Calendar.getInstance().getTime());
     welcome.setVoters(new HashSet<>());
     welcome.setStatus(Idea.IdeaStatus.OPENED);
     Set<Tag> tags = new HashSet<>();
@@ -180,6 +182,7 @@ public class BoardServiceImpl implements BoardService {
     connect.setDescription("Create social links to refer to your page, Discord server or Patreon in admin panel.\n"
             + "You can create Discord webhook as well to receive notifications about new feedback being posted here at your Discord server.");
     connect.setCreator(admin);
+    connect.setCreationDate(Calendar.getInstance().getTime());
     connect.setVoters(new HashSet<>());
     connect.setStatus(Idea.IdeaStatus.OPENED);
     connect.setTags(new HashSet<>());
