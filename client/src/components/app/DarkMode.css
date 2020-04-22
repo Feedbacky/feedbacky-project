@@ -106,7 +106,7 @@
     color: rgba(255,255,255,.6) !important;
 }
 
-.dark textarea, .dark .form-control {
+.dark textarea, .dark .form-control, .dark .swal2-input {
     background-color: rgba(40, 40, 40, 0.98) !important;
     color: rgba(255,255,255,.6) !important;
     box-shadow: none !important;
@@ -127,6 +127,10 @@
 
 .dark .card *:not(.badge):not(.btn):not(svg):not(.bg-transparent):not(.dark-mask):not(.dropdown-item) {
     background-color: rgba(40, 40, 40, 0.98) !important;
+}
+
+.dark .badge-warning {
+    background-color: #e5a82d !important;
 }
 
 .dark button:not(.btn-attachment) {
@@ -208,7 +212,7 @@
     background-color: #f2f2f2 !important;
 }
 
-.dark .markdown-box a, .dark .markdown-box a *, .dark .snarkdown-box a {
+.dark .markdown-box a:not(.pre-href), .dark .markdown-box a *, .dark .snarkdown-box a:not(.pre-href) {
     color: #3ea6ff !important;
 }
 
@@ -257,7 +261,7 @@
 }
 
 .dark kbd {
-    background-color: rgba(40, 40, 40, 0.98) !important;
+    background-color: #343434 !important;
 }
 
 .dark .modal-header {
@@ -275,4 +279,12 @@
 
 .dark .popover  {
     background: transparent !important;
+}
+
+.dark .jumbotron h3, .dark .jumbotron h5 {
+    color: white !important;
+}
+
+.dark .profile-card .text-truncate {
+    color: white !important;
 }
