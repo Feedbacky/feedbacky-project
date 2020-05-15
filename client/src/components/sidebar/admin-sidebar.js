@@ -24,17 +24,17 @@ const AdminSidebar = (props) => {
             <li className="my-4"/>
             <li>
                 <a href="https://app.feedbacky.net/b/feedbacky-official" className="text-black-75">
-                    <FaRegCommentDots className="mr-1 text-black-50 move-top-1px"/> Feedback
+                    <FaRegCommentDots className="mr-1 text-black-75 move-top-1px"/> Feedback
                 </a>
             </li>
             <li>
                 <a href="https://docs.feedbacky.net" className="text-black-75">
-                    <FaQuestionCircle className="mr-1 text-black-50 move-top-1px"/> FAQ
+                    <FaQuestionCircle className="mr-1 text-black-75 move-top-1px"/> FAQ
                 </a>
             </li>
             <li>
                 <a href="https://discordapp.com/invite/6qCnKh5" className="text-black-75">
-                    <FaDiscord className="mr-1 text-black-50 move-top-1px"/> Discord Support
+                    <FaDiscord className="mr-1 text-black-75 move-top-1px"/> Discord Support
                 </a>
             </li>
         </ul>
