@@ -1,12 +1,10 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {CardDeck, Container, Row} from "react-bootstrap";
 import axios from "axios";
 import ExploreBox from "components/profile/explore-box";
 import LoadingSpinner from "components/util/loading-spinner";
-import AppContext from "context/app-context";
 
 const ExploreElement = () => {
-    const context = useContext(AppContext);
     const [featuredBoards, setFeaturedBoards] = useState([]);
     const [loaded, setLoaded] = useState(false);
 
@@ -18,7 +16,7 @@ const ExploreElement = () => {
             setLoaded(true);
             return;
         }
-        axios.get(context.apiRoute + "/featuredBoards")
+        axios.get("/featuredBoards")
             .then(res => {
                 const data = res.data;
                 sessionStorage.setItem("featuredBoards", JSON.stringify(data));
