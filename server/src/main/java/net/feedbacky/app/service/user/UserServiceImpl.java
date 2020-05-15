@@ -1,6 +1,9 @@
 package net.feedbacky.app.service.user;
 
 import net.feedbacky.app.config.UserAuthenticationToken;
+import net.feedbacky.app.data.user.MailPreferences;
+import net.feedbacky.app.data.user.dto.PatchMailPreferences;
+import net.feedbacky.app.exception.FeedbackyRestException;
 import net.feedbacky.app.exception.types.InvalidAuthenticationException;
 import net.feedbacky.app.exception.types.ResourceNotFoundException;
 import net.feedbacky.app.repository.UserRepository;
@@ -24,6 +27,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -67,20 +71,6 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public List<FetchUserPermissionDto> getSelfPermissions() {
-    UserAuthenticationToken auth = RequestValidator.getContextAuthentication();
-    User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
-            .orElseThrow(() -> new InvalidAuthenticationException("User session not found. Try again with new token"));
-    return user.getPermissions().stream().map(Moderator::convertToUserPermissionDto).collect(Collectors.toList());
-  }
-
-  @Override
-  public List<FetchUserPermissionDto> getPermissions(long id) {
-    User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User does not exist of id " + id));
-    return user.getPermissions().stream().map(Moderator::convertToUserPermissionDto).collect(Collectors.toList());
-  }
-
-  @Override
   public FetchUserDto get(long id) {
     User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User does not exist of id " + id));
     TypeReference<HashMap<String, Object>> ref = new TypeReference<HashMap<String, Object>>() {};
@@ -102,6 +92,36 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
+  public FetchUserDto patchSelfMailPreferences(PatchMailPreferences dto) {
+    UserAuthenticationToken auth = RequestValidator.getContextAuthentication();
+    User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
+            .orElseThrow(() -> new InvalidAuthenticationException("User session not found. Try again with new token"));
+
+    MailPreferences preferences = user.getMailPreferences();
+    ModelMapper mapper = new ModelMapper();
+    mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
+    mapper.map(dto, preferences);
+    user.setMailPreferences(preferences);
+    userRepository.save(user);
+    return user.convertToDto().exposeSensitiveData(true);
+  }
+
+  @Override
+  public ResponseEntity unsubscribe(long id, String code) {
+    User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User does not exist of id " + id));
+    MailPreferences preferences = user.getMailPreferences();
+    if(!preferences.getUnsubscribeToken().equals(code)) {
+      throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "Invalid unsubscribe token.");
+    }
+    user.getMailPreferences().setNotifyFromModeratorsComments(false);
+    user.getMailPreferences().setNotifyFromStatusChange(false);
+    user.getMailPreferences().setNotifyFromTagsChange(false);
+    user.getMailPreferences().setUnsubscribeToken(RandomStringUtils.randomAlphanumeric(6));
+    userRepository.save(user);
+    return ResponseEntity.noContent().build();
+  }
+
+  @Override
   public ResponseEntity deactivateSelf() {
     UserAuthenticationToken auth = RequestValidator.getContextAuthentication();
     User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
@@ -116,6 +136,10 @@ public class UserServiceImpl implements UserService {
     user.setAvatar("https://cdn.feedbacky.net/static/img/default_avatar.png");
     user.setUsername("Anonymous");
     user.setConnectedAccounts(new HashSet<>());
+    MailPreferences mailPreferences = user.getMailPreferences();
+    mailPreferences.setNotifyFromTagsChange(false);
+    mailPreferences.setNotifyFromStatusChange(false);
+    mailPreferences.setNotifyFromModeratorsComments(false);
     userRepository.save(user);
     return ResponseEntity.noContent().build();
   }

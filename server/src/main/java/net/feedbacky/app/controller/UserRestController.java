@@ -3,6 +3,7 @@ package net.feedbacky.app.controller;
 import net.feedbacky.app.data.board.dto.moderator.FetchUserPermissionDto;
 import net.feedbacky.app.data.user.dto.FetchConnectedAccount;
 import net.feedbacky.app.data.user.dto.FetchUserDto;
+import net.feedbacky.app.data.user.dto.PatchMailPreferences;
 import net.feedbacky.app.data.user.dto.PatchUserDto;
 import net.feedbacky.app.service.user.UserService;
 
@@ -41,16 +42,6 @@ public class UserRestController {
     return userService.getSelfConnectedAccounts();
   }
 
-  @GetMapping("v1/users/@me/permissions")
-  public List<FetchUserPermissionDto> getSelfPermissions() {
-    return userService.getSelfPermissions();
-  }
-
-  @GetMapping("v1/users/{id}/permissions")
-  public List<FetchUserPermissionDto> getPermissions(@PathVariable long id) {
-    return userService.getPermissions(id);
-  }
-
   @GetMapping("v1/users/@me")
   public FetchUserDto getSelf() {
     return userService.getSelf();
@@ -64,6 +55,16 @@ public class UserRestController {
   @PatchMapping("v1/users/@me")
   public FetchUserDto patchSelf(@Valid @RequestBody PatchUserDto dto) {
     return userService.patchSelf(dto);
+  }
+
+  @PatchMapping("v1/users/@me/mailPreferences")
+  public FetchUserDto patchSelfMailPreferences(@Valid @RequestBody PatchMailPreferences dto) {
+    return userService.patchSelfMailPreferences(dto);
+  }
+
+  @DeleteMapping("v1/users/{id}/unsubscribe/{code}")
+  public ResponseEntity unsubscribe(@PathVariable long id, @PathVariable String code) {
+    return userService.unsubscribe(id, code);
   }
 
   @DeleteMapping("v1/users/@me")
