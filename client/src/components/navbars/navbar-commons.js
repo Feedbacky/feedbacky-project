@@ -1,6 +1,6 @@
 import {Dropdown, DropdownItem, NavItem} from "react-bootstrap";
 import DropdownToggle from "react-bootstrap/DropdownToggle";
-import {getSizedAvatarByUrl, isServiceAdmin} from "components/util/utils";
+import {getSizedAvatarByUrl} from "components/util/utils";
 import DropdownMenu from "react-bootstrap/DropdownMenu";
 import React from "react";
 import {Link} from "react-router-dom";
@@ -39,7 +39,9 @@ export const renderLogIn = (onNotLoggedClick, context) => {
                 </DropdownItem>
                 {renderModeratedBoards(context)}
                 <div className="my-1"/>
-                {renderCreateBoardSection(context)}
+                <DropdownItem as={Link} to="/create">
+                    <strong>Create Own Board</strong>
+                </DropdownItem>
             </DropdownMenu>
         </Dropdown>
     </NavItem>
@@ -60,13 +62,4 @@ const renderModeratedBoards = (context) => {
             return <DropdownItem key={data.boardDiscriminator} as={Link} to={"/brdr/" + data.boardDiscriminator}>{data.boardName}</DropdownItem>
         })}
     </React.Fragment>
-};
-
-const renderCreateBoardSection = (context) => {
-    if (!isServiceAdmin(context)) {
-        return <React.Fragment/>
-    }
-    return <DropdownItem as={Link} to="/admin/create">
-        <strong>Create Own Board</strong>
-    </DropdownItem>
 };

@@ -3,7 +3,7 @@ import React, {Component} from 'react';
 import "views/Steps.css";
 
 import AppContext from "context/app-context";
-import {isServiceAdmin, toastAwait, toastError, toastSuccess, toastWarning} from "components/util/utils";
+import {toastAwait, toastError, toastSuccess, toastWarning} from "components/util/utils";
 import {Button, Col, Container, ProgressBar, Row} from "react-bootstrap";
 import Steps, {Step} from "rc-steps";
 import ProfileNavbar from "components/navbars/profile-navbar";
@@ -33,7 +33,7 @@ class CreateBoardView extends Component {
     }
 
     render() {
-        if (!this.context.user.loggedIn || !isServiceAdmin(this.context)) {
+        if (!this.context.user.loggedIn) {
             this.props.history.push("/me");
             return <React.Fragment/>
         }
@@ -48,6 +48,15 @@ class CreateBoardView extends Component {
     }
 
     renderContent() {
+        if (this.calculateOwnedBoards() >= 5) {
+            return <Col xs={12} className="mt-4 text-center">
+                <img alt="" src="https://cdn.feedbacky.net/static/svg/undraw_project_limit.svg" className="my-2" width={150} height={150}/>
+                <h2 className="text-danger">Boards Limit Reached</h2>
+                <span className="text-black-60">
+                    Cannot create any more boards.
+                </span>
+            </Col>
+        }
         return <React.Fragment>
             <Col xs={12} className="d-none d-sm-block">
                 <Steps direction="horizontal" size="small" progressDot current={this.state.step}>
@@ -179,6 +188,16 @@ class CreateBoardView extends Component {
     async checkBoardAvailability() {
         return axios.get("/boards/" + this.state.discriminator).then(res => res.status === 200).catch(() => false);
     }
+
+    calculateOwnedBoards = () => {
+        let owned = 0;
+        this.context.user.data.permissions.forEach(board => {
+            if (board.role.toLowerCase() === "owner") {
+                owned++;
+            }
+        });
+        return owned;
+    };
 }
 
 export default CreateBoardView;

@@ -2,8 +2,9 @@ import React, {useContext} from 'react';
 import {Col} from "react-bootstrap";
 import {increaseBrightness, isHexDark} from "components/util/utils";
 import AppContext from "context/app-context";
-import {FaAt, FaColumns, FaRegEnvelope, FaSlidersH, FaTags, FaUsersCog} from "react-icons/all";
+import {FaAt, FaColumns, FaDiscord, FaQuestionCircle, FaRegCommentDots, FaRegEnvelope, FaSlidersH, FaTags, FaUsersCog} from "react-icons/all";
 import {renderSidebarRoutes} from "components/sidebar/sidebar-commons";
+import Attribution from "components/util/attribution";
 
 const AdminSidebar = (props) => {
     const routes = [
@@ -20,7 +21,24 @@ const AdminSidebar = (props) => {
     return <Col xs={12} md={3} className="mt-4" id="sidebar">
         <ul className="pl-0 mb-1" style={{listStyle: "none", fontSize: "1.1rem", fontWeight: 500, lineHeight: "2rem"}}>
             {renderSidebarRoutes(routes, themeColor, props.currentNode, props.reRouteTo)}
+            <li className="my-4"/>
+            <li>
+                <a href="https://app.feedbacky.net/b/feedbacky-official" style={{color: "black"}}>
+                    <FaRegCommentDots className="mr-1 text-black-50 move-top-1px"/> Feedback
+                </a>
+            </li>
+            <li>
+                <a href="https://docs.feedbacky.net" style={{color: "black"}}>
+                    <FaQuestionCircle className="mr-1 text-black-50 move-top-1px"/> FAQ
+                </a>
+            </li>
+            <li>
+                <a href="https://discordapp.com/invite/6qCnKh5" style={{color: "black"}}>
+                    <FaDiscord className="mr-1 text-black-50 move-top-1px"/> Discord Support
+                </a>
+            </li>
         </ul>
+        <Attribution/>
     </Col>
 };
 

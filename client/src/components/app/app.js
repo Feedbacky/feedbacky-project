@@ -166,7 +166,7 @@ class App extends Component {
             <Suspense fallback={<Row className="justify-content-center vertical-center"><LoadingSpinner/></Row>}>
                 <Switch>
                     <Route exact path="/" component={ProfileView}/>
-                    <Route exact path="/admin/create" component={CreateBoardView}/>
+                    <Route exact path="/create" component={CreateBoardView}/>
                     <Route path="/merdr/:section" render={(props) =>
                         <Redirect to={{
                             pathname: "/me/" + props.match.params.section,

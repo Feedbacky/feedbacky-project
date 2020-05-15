@@ -1,9 +1,9 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {CardDeck, Container, Row} from "react-bootstrap";
 import axios from "axios";
-import ExploreBox from "./ExploreBox";
-import LoadingSpinner from "../util/LoadingSpinner";
-import AppContext from "../../context/AppContext";
+import ExploreBox from "components/profile/explore-box";
+import LoadingSpinner from "components/util/loading-spinner";
+import AppContext from "context/app-context";
 
 const ExploreElement = () => {
     const context = useContext(AppContext);

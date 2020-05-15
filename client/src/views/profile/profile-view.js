@@ -7,6 +7,7 @@ import {Route, Switch, useHistory} from "react-router-dom";
 import SettingsSubview from "views/profile/subviews/settings-subview";
 import ServiceLogo from "assets/img/service-logo.png";
 import NotificationsSubview from "views/profile/subviews/notifications-subview";
+import ExploreView from "views/profile/subviews/explore-view";
 
 const ProfileView = () => {
     const [loginModalOpen, setLoginModalOpen] = useState(false);
@@ -31,6 +32,7 @@ const ProfileView = () => {
             <Row className="justify-content-center pb-4">
                 <Switch>
                     <Route path="/me/settings" render={() => <SettingsSubview reRouteTo={reRouteTo}/>}/>
+                    <Route path="/me/explore" render={() => <ExploreView reRouteTo={reRouteTo}/>}/>
                     <Route path="/me/notifications" render={() => <NotificationsSubview reRouteTo={reRouteTo}/>}/>
                     <Route render={() => <SettingsSubview reRouteTo={reRouteTo}/>}/>
                 </Switch>
