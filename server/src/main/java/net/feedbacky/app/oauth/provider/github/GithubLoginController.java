@@ -167,14 +167,14 @@ public class GithubLoginController implements AbstractLoginProvider {
       if(userRepository.count() == 0) {
         user.setServiceStaff(true);
       }
-      optional = Optional.of(userRepository.save(user));
+      userRepository.save(user);
     } else {
       User user = optional.get();
       if(user.getConnectedAccounts().stream().noneMatch(acc -> acc.getType() == ConnectedAccount.AccountType.GITHUB)) {
         Set<ConnectedAccount> accounts = new HashSet<>(user.getConnectedAccounts());
         accounts.add(generateConnectedAccount(githubUser, user));
         user.setConnectedAccounts(accounts);
-        optional = Optional.of(userRepository.save(user));
+        userRepository.save(user);
       }
     }
     conn.disconnect();

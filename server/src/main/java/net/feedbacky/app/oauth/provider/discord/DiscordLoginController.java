@@ -1,14 +1,14 @@
 package net.feedbacky.app.oauth.provider.discord;
 
-import net.feedbacky.app.data.user.MailPreferences;
-import net.feedbacky.app.exception.types.LoginFailedException;
-import net.feedbacky.app.repository.UserRepository;
 import net.feedbacky.app.data.user.ConnectedAccount;
+import net.feedbacky.app.data.user.MailPreferences;
 import net.feedbacky.app.data.user.User;
+import net.feedbacky.app.exception.types.LoginFailedException;
+import net.feedbacky.app.oauth.LoginProviderRegistry;
 import net.feedbacky.app.oauth.provider.AbstractLoginProvider;
 import net.feedbacky.app.oauth.provider.AuthGrant;
-import net.feedbacky.app.oauth.LoginProviderRegistry;
 import net.feedbacky.app.oauth.provider.AuthProviderData;
+import net.feedbacky.app.repository.UserRepository;
 import net.feedbacky.app.util.JwtTokenUtil;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -148,14 +148,14 @@ public class DiscordLoginController implements AbstractLoginProvider {
       if(userRepository.count() == 0) {
         user.setServiceStaff(true);
       }
-      optional = Optional.of(userRepository.save(user));
+      userRepository.save(user);
     } else {
       User user = optional.get();
       if(user.getConnectedAccounts().stream().noneMatch(acc -> acc.getType() == ConnectedAccount.AccountType.DISCORD)) {
         Set<ConnectedAccount> accounts = new HashSet<>(user.getConnectedAccounts());
         accounts.add(generateConnectedAccount(discordUser, user));
         user.setConnectedAccounts(accounts);
-        optional = Optional.of(userRepository.save(user));
+        userRepository.save(user);
       }
       updateAvatarIfNeeded(user, discordUser);
     }

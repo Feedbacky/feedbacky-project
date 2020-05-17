@@ -148,14 +148,14 @@ public class GoogleLoginController implements AbstractLoginProvider {
       if(userRepository.count() == 0) {
         user.setServiceStaff(true);
       }
-      optional = Optional.of(userRepository.save(user));
+      userRepository.save(user);
     } else {
       User user = optional.get();
       if(user.getConnectedAccounts().stream().noneMatch(acc -> acc.getType() == ConnectedAccount.AccountType.GOOGLE)) {
         Set<ConnectedAccount> accounts = new HashSet<>(user.getConnectedAccounts());
         accounts.add(generateConnectedAccount(googleUser, user));
         user.setConnectedAccounts(accounts);
-        optional = Optional.of(userRepository.save(user));
+        userRepository.save(user);
       }
     }
     conn.disconnect();
