@@ -147,14 +147,14 @@ public class DiscordLoginController implements AbstractLoginProvider {
       if(userRepository.count() == 0) {
         user.setServiceStaff(true);
       }
-      userRepository.save(user);
+      optional = Optional.of(userRepository.save(user));
     } else {
       User user = optional.get();
       if(user.getConnectedAccounts().stream().noneMatch(acc -> acc.getType() == ConnectedAccount.AccountType.DISCORD)) {
         Set<ConnectedAccount> accounts = new HashSet<>(user.getConnectedAccounts());
         accounts.add(generateConnectedAccount(discordUser, user));
         user.setConnectedAccounts(accounts);
-        userRepository.save(user);
+        optional = Optional.of(userRepository.save(user));
       }
       updateAvatarIfNeeded(user, discordUser);
     }
