@@ -16,7 +16,7 @@ const CreateBoardView = () => {
     const context = useContext(AppContext);
     const history = useHistory();
     const [settings, setSettings] = useState({step: 1, name: "", discriminator: "", banner: null, logo: null, themeColor: "#2d3436"});
-    if (!context.user.loggedIn || !isServiceAdmin(context)) {
+    if (!context.user.loggedIn) {
         history.push("/me");
         return <React.Fragment/>
     }
