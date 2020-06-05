@@ -1,7 +1,6 @@
-import React, {Component} from 'react';
-import {Badge, Button, Col, OverlayTrigger, Tooltip} from "react-bootstrap";
+import React, {useContext, useEffect, useState} from 'react';
+import {Button, Col, OverlayTrigger, Tooltip} from "react-bootstrap";
 import axios from "axios";
-import LoadingSpinner from "components/util/loading-spinner";
 import {FaExclamation, FaTrashAlt} from "react-icons/fa";
 import {toastError, toastSuccess} from "components/util/utils";
 import AppContext from "context/app-context";
@@ -10,128 +9,118 @@ import AdminSidebar from "components/sidebar/admin-sidebar";
 import {popupSwal} from "components/util/sweetalert-utils";
 import ClickableTip from "components/util/clickable-tip";
 import ViewBox from "components/viewbox/view-box";
+import PageBadge from "components/app/page-badge";
+import tinycolor from "tinycolor2";
+import ComponentLoader from "components/app/component-loader";
+import BoardContext from "context/board-context";
+import {FaEyeSlash, FaPen} from "react-icons/all";
+import TagEditModal from "components/modal/tag-edit-modal";
+import {SvgNotice} from "components/app/svg-notice";
+import {ReactComponent as UndrawNoData} from "assets/svg/undraw/no_data.svg";
 
-class TagsSettings extends Component {
-
-    static contextType = AppContext;
-
-    state = {
-        tags: [],
-        loaded: false,
-        error: false,
-        quotaReached: false,
-        tagCreatorModalOpened: false,
-    };
-
-    componentDidMount() {
-        axios.get("/boards/" + this.props.data.discriminator + "/tags").then(res => {
+const TagsSettings = ({reRouteTo}) => {
+    const context = useContext(AppContext);
+    const boardData = useContext(BoardContext).data;
+    const [tags, setTags] = useState({data: [], loaded: false, error: false});
+    const [modalOpen, setModalOpen] = useState(false);
+    const [editModalOpen, setEditModalOpen] = useState(false);
+    const [editData, setEditData] = useState({});
+    const getQuota = () => 10 - tags.data.length;
+    useEffect(() => {
+        axios.get("/boards/" + boardData.discriminator + "/tags").then(res => {
             if (res.status !== 200) {
-                this.setState({error: true});
+                setTags({...tags, error: true});
                 return;
             }
-            const tags = res.data;
-            let quotaReached = this.quotaTagsLimitReached(tags);
-            this.setState({tags, loaded: true, quotaReached});
-        }).catch(() => this.setState({error: true}));
-    }
-
-    quotaTagsLimitReached(tags) {
-        return 10 - tags.length <= 0;
-    }
-
-    onTagCreateModalClick = () => {
-        this.setState({tagCreatorModalOpened: true});
+            setTags({...tags, data: res.data, loaded: true});
+        }).catch(() => setTags({...tags, error: true}));
+        // eslint-disable-next-line
+    }, []);
+    const onTagCreateModalClick = () => setModalOpen(true);
+    const onTagCreateModalClose = () => setModalOpen(false);
+    const onTagCreate = (name, color, roadmapIgnored) => {
+        const data = tags.data.concat({name, color, roadmapIgnored});
+        setTags({...tags, data});
     };
-
-    onTagCreateModalClose = () => {
-        this.setState({tagCreatorModalOpened: false});
-    };
-
-    onTagCreate = (name, color) => {
-        const tags = this.state.tags.concat({name, color});
-        this.setState({
-            tags, quotaReached: this.quotaTagsLimitReached(tags)
-        });
-    };
-
-    render() {
-        return <React.Fragment>
-            <AdminSidebar currentNode="tags" reRouteTo={this.props.reRouteTo} data={this.props.data}/>
-            <TagCreateModal onTagCreate={this.onTagCreate} onTagCreateModalClose={this.onTagCreateModalClose}
-                            data={this.props.data} open={this.state.tagCreatorModalOpened}/>
-            <Col xs={12} md={9}>
-                <ViewBox theme={this.context.theme} title="Tags Management" description="Edit your board tags here.">
-                    {this.renderContent()}
-                </ViewBox>
-            </Col>
-        </React.Fragment>
-    }
-
-    renderContent() {
-        if (this.state.error) {
+    const renderContent = () => {
+        if (tags.error) {
             return <span className="text-danger">Failed to obtain tags data</span>
         }
-        if (!this.state.loaded) {
-            return <LoadingSpinner/>
-        }
-        return <Col xs={12}>
-            <span className="mr-1 text-black-60">Tags Quota ({this.renderTagsQuota()} left)</span>
-            <ClickableTip id="quota" title="Tags Quota"
-                          description="Amount of tags your board can have, you're limited to 10 tags per board."/>
-            {this.renderTags()}
-            <br/>
-            {this.renderNewTagButton()}
-        </Col>
-    }
-
-    renderTagsQuota() {
-        return 10 - this.state.tags.length;
-    }
-
-    renderTags() {
-        return this.state.tags.map((tag, i) => {
-            return <React.Fragment key={i}>
+        return <ComponentLoader loaded={tags.loaded} component={
+            <Col xs={12}>
+                <span className="mr-1 text-black-60">Tags Quota ({getQuota()} left)</span>
+                <ClickableTip id="quota" title="Tags Quota" description="Amount of tags your board can have, you're limited to 10 tags per board."/>
+                {renderTags()}
                 <br/>
-                <Badge color="" style={{
-                    backgroundColor: tag.color
-                }}>{tag.name}</Badge>
-                <OverlayTrigger overlay={<Tooltip id={"deleteTag" + i + "-tooltip"}>Delete Tag</Tooltip>}>
-                    <FaTrashAlt className="fa-xs ml-1" onClick={() => this.onTagDelete(tag.name)}/>
+                {renderNewTagButton()}
+            </Col>
+        }/>
+    };
+    const renderTags = () => {
+        if(tags.data.length === 0) {
+            return <SvgNotice Component={UndrawNoData} title="No tags yet." description="How about creating one?"/>
+        }
+        return tags.data.map((tag, i) => {
+            return <div key={i}>
+                <PageBadge color={tinycolor(tag.color)} text={tag.name}/>
+                {!tag.roadmapIgnored ||
+                <OverlayTrigger overlay={<Tooltip id={"infoTag" + i + "-tooltip"}>Ignores Roadmap</Tooltip>}>
+                    <FaEyeSlash className="fa-xs ml-1"/>
+                </OverlayTrigger>}
+                <OverlayTrigger overlay={<Tooltip id={"deleteTag" + i + "-tooltip"}>Edit Tag</Tooltip>}>
+                    <FaPen className="fa-xs ml-1" onClick={() => onTagEdit(tag)}/>
                 </OverlayTrigger>
-            </React.Fragment>
+                <OverlayTrigger overlay={<Tooltip id={"deleteTag" + i + "-tooltip"}>Delete Tag</Tooltip>}>
+                    <FaTrashAlt className="fa-xs ml-1" onClick={() => onTagDelete(tag.name)}/>
+                </OverlayTrigger>
+            </div>
         });
-    }
-
-    renderNewTagButton() {
-        if (this.state.quotaReached) {
+    };
+    const renderNewTagButton = () => {
+        if (getQuota() <= 0) {
             return <OverlayTrigger overlay={<Tooltip id="quota-tooltip">Quota Limit Reached</Tooltip>}>
-                <Button className="text-white m-0 mt-3 float-right" variant=""
-                        style={{backgroundColor: this.context.theme}}><FaExclamation/> Add new Tag</Button>
+                <Button className="m-0 mt-3 float-right" variant="" style={{backgroundColor: context.getTheme()}}><FaExclamation/> Add New</Button>
             </OverlayTrigger>
         }
-        return <Button className="text-white m-0 mt-3 float-right" variant="" style={{backgroundColor: this.context.theme}}
-                       onClick={this.onTagCreateModalClick}>Add new Tag</Button>
-    }
-
-    onTagDelete = (name) => {
+        return <Button className="m-0 mt-3 float-right" variant="" style={{backgroundColor: context.getTheme()}} onClick={onTagCreateModalClick}>Add New</Button>
+    };
+    const onTagEdit = (tag) => {
+        setEditData(tag);
+        setEditModalOpen(true);
+    };
+    const onEdit = (oldTag, tag) => {
+        const data = tags.data;
+        const i = data.indexOf(oldTag);
+        data[i] = tag;
+        setTags({...tags, data});
+    };
+    const onTagDelete = (name) => {
         popupSwal("warning", "Dangerous action", "This action is <strong>irreversible</strong> and will delete tag from all ideas, please confirm your action.",
             "Delete Tag", "#d33", willClose => {
                 if (!willClose.value) {
                     return;
                 }
-                axios.delete("/boards/" + this.props.data.discriminator + "/tags/" + name).then(res => {
+                axios.delete("/boards/" + boardData.discriminator + "/tags/" + name).then(res => {
                     if (res.status !== 204) {
                         toastError();
                         return;
                     }
-                    const tags = this.state.tags.filter(item => item.name !== name);
-                    this.setState({
-                        tags, quotaReached: this.quotaTagsLimitReached(tags)
-                    });
+                    const data = tags.data.filter(item => item.name !== name);
+                    setTags({...tags, data});
                     toastSuccess("Tag permanently deleted.");
                 }).catch(err => toastError(err.response.data.errors[0]));
             });
     };
-}
+    return <React.Fragment>
+        <AdminSidebar currentNode="tags" reRouteTo={reRouteTo} data={boardData}/>
+        <TagCreateModal onTagCreate={onTagCreate} onTagCreateModalClose={onTagCreateModalClose} data={boardData} open={modalOpen}/>
+        <TagEditModal open={editModalOpen} onClose={() => setEditModalOpen(false)} boardData={boardData} tag={editData} onEdit={onEdit}/>
+        <Col xs={12} md={9}>
+            <ViewBox theme={context.getTheme()} title="Tags Management" description="Edit your board tags here.">
+                {renderContent()}
+            </ViewBox>
+        </Col>
+    </React.Fragment>
+};
 
 export default TagsSettings;

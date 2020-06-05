@@ -8,11 +8,11 @@ import PageNavbar from "components/navbars/page-navbar";
 
 const ProfileNavbar = (props) => {
     const context = useContext(AppContext);
-    const theme = context.user.darkMode ? context.theme + "D9" : context.theme;
+    const theme = context.getTheme();
 
     return <PageNavbar theme={theme}>
         <Container className="d-flex">
-            <NavbarBrand className="mr-0 text-truncate text-left flex-on" as={Link} to="/me">
+            <NavbarBrand as={Link} to="/me">
                 {renderHello(context)}
             </NavbarBrand>
             <div className="ml-auto py-0 text-nowrap">

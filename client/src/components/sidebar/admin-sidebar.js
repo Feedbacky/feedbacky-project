@@ -1,6 +1,5 @@
 import React, {useContext} from 'react';
 import {Col} from "react-bootstrap";
-import {increaseBrightness, isHexDark} from "components/util/utils";
 import AppContext from "context/app-context";
 import {FaAt, FaColumns, FaDiscord, FaQuestionCircle, FaRegCommentDots, FaRegEnvelope, FaSlidersH, FaTags, FaUsersCog} from "react-icons/all";
 import {renderSidebarRoutes} from "components/sidebar/sidebar-commons";
@@ -16,9 +15,9 @@ const AdminSidebar = (props) => {
         {invitations: (data) => <React.Fragment><FaRegEnvelope className="mr-1 move-top-1px" style={data}/> Invitations</React.Fragment>}
     ];
     const context = useContext(AppContext);
-    const themeColor = isHexDark(context.theme) && context.user.darkMode ? increaseBrightness(context.theme, 40) : context.theme;
+    const themeColor = context.getTheme();
 
-    return <Col xs={12} md={3} className="mt-4" id="sidebar">
+    return <Col xs={12} md={3} id="sidebar">
         <ul className="pl-0 mb-1" style={{listStyle: "none", fontSize: "1.1rem", fontWeight: 500, lineHeight: "2rem"}}>
             {renderSidebarRoutes(routes, themeColor, props.currentNode, props.reRouteTo)}
             <li className="my-4"/>

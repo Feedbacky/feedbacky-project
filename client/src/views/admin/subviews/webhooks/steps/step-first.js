@@ -1,29 +1,32 @@
 import React from 'react';
-import {Card, CardDeck, Col, Row} from "react-bootstrap";
+import {CardDeck, Col, Row} from "react-bootstrap";
 import {FaDiscord, FaGlobe} from "react-icons/fa";
 import UndrawCreateProject from "assets/svg/undraw/create_project.svg";
+import SetupCard from "components/app/setup-card";
+import {toastWarning} from "components/util/utils";
 
 const type = ["DISCORD", "CUSTOM_ENDPOINT"];
 const typeName = ["Discord", "Custom Endpoint"];
 const typeIcon = [<FaDiscord className="fa-lg"/>, <FaGlobe className="fa-lg"/>];
 
-const StepFirst = (props) => {
+const StepFirst = ({updateSettings, settings}) => {
+    const onChoose = (item) => {
+        if(item === "CUSTOM_ENDPOINT") {
+            toastWarning("Option not yet available.");
+            return;
+        }
+        updateSettings({...settings, type: item});
+    };
     const renderCards = () => {
         return type.map((item, i) => {
             let name = typeName[i];
             let classes = "rounded-xl mb-3";
-            if (props.type === item) {
+            if (settings.type === item) {
                 classes += " border-chosen";
             } else {
                 classes += " border-invisible";
             }
-            return <Card key={i} className={classes} style={{minWidth: 175}} onClick={() => props.onSetupMethodCall("type", item)}>
-                <Card.Body className="text-center">
-                    {typeIcon[i]}
-                    <br className="my-3"/>
-                    <strong style={{fontSize: "1.5rem"}}>{name}</strong>
-                </Card.Body>
-            </Card>
+            return <SetupCard key={i} icon={typeIcon[i]} text={name} onClick={() => onChoose(item)} className={classes}/>
         });
     };
 

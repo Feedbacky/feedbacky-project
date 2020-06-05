@@ -14,13 +14,15 @@ import javax.annotation.PostConstruct;
 @Component
 public class MailHandler {
 
-  private String mailServiceType = System.getenv("MAIL_SERVICE_TYPE");
+  private final String mailServiceType = System.getenv("MAIL_SERVICE_TYPE");
   @Getter private MailService mailService;
 
   @PostConstruct
   public void init() {
     if(mailServiceType.equalsIgnoreCase("mailgun")) {
       mailService = new MailgunMailService();
+    } else if(mailServiceType.equalsIgnoreCase("sendgrid")){
+      mailService = new SendGridMailService();
     } else {
       mailService = new SmtpMailService();
     }

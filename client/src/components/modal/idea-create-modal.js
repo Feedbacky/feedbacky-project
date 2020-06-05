@@ -2,24 +2,18 @@ import React, {useContext, useState} from 'react';
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import {FaRegImage} from "react-icons/fa";
-import {
-    formatRemainingCharacters,
-    getBase64FromFile,
-    toastAwait,
-    toastError,
-    toastSuccess,
-    toastWarning,
-    validateImageWithWarning
-} from "components/util/utils";
+import {formatRemainingCharacters, getBase64FromFile, toastAwait, toastError, toastSuccess, toastWarning, validateImageWithWarning} from "components/util/utils";
 import AppContext from "context/app-context";
 import axios from "axios";
 import TextareaAutosize from "react-autosize-textarea";
 import PageModal from "components/modal/page-modal";
 import ClickableTip from "components/util/clickable-tip";
 import DeleteButton from "components/util/delete-button";
+import BoardContext from "context/board-context";
 
-const IdeaCreateModal = (props) => {
-    const context = useContext(AppContext);
+const IdeaCreateModal = ({open, onCreateIdeaModalClose, onIdeaCreation}) => {
+    const {getTheme} = useContext(AppContext);
+    const {discriminator} = useContext(BoardContext).data;
     const [title, setTitle] = useState("");
     const [attachment, setAttachment] = useState(null);
     const [attachmentName, setAttachmentName] = useState("No Attachment");
@@ -28,10 +22,7 @@ const IdeaCreateModal = (props) => {
         const description = document.getElementById("descriptionTextarea").value;
         let toastId = toastAwait("Posting idea...");
         axios.post("/ideas/", {
-            discriminator: props.discriminator,
-            title,
-            description: description,
-            attachment: attachment,
+            discriminator, title, description, attachment
         }).then(res => {
             if (res.status !== 200 && res.status !== 201) {
                 toastError();
@@ -39,20 +30,14 @@ const IdeaCreateModal = (props) => {
             }
             toastSuccess("Successfully posted new idea!", toastId);
             setTitle("");
-            props.onCreateIdeaModalClose();
-            props.onIdeaCreation(res.data);
+            onCreateIdeaModalClose();
+            onIdeaCreation(res.data);
         }).catch(err => {
             if (err.response === undefined) {
                 return;
             }
             err.response.data.errors.forEach(data => {
-                if (data.includes("Field 'title' cannot be shorter")) {
-                    toastWarning("Title must be longer than 10 characters.", toastId);
-                } else if (data.includes("Field 'description' cannot be shorter")) {
-                    toastWarning("Description must be longer than 20 characters.", toastId);
-                } else {
-                    toastWarning(data, toastId);
-                }
+                toastWarning(data, toastId);
             });
         });
     };
@@ -82,9 +67,9 @@ const IdeaCreateModal = (props) => {
         });
     };
 
-    return <PageModal id="ideaPost" isOpen={props.open} onHide={props.onCreateIdeaModalClose} title="Post Feedback"
-                      applyButton={<Button variant="" style={{backgroundColor: context.theme}} onClick={handleSubmit}
-                                           className="text-white mx-0">Post Idea</Button>}>
+    return <PageModal id="ideaPost" isOpen={open} onHide={onCreateIdeaModalClose} title="Post Feedback"
+                      applyButton={<Button variant="" style={{backgroundColor: getTheme()}} onClick={handleSubmit}
+                                           className="mx-0">Post Idea</Button>}>
         <Form noValidate onSubmit={e => e.preventDefault()}>
             <Form.Group className="mt-2 mb-1">
                 <Form.Label className="mr-1">Title</Form.Label>

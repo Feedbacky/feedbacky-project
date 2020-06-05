@@ -1,40 +1,47 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {Col, Jumbotron} from "react-bootstrap";
+import SafeAnchor from "components/app/safe-anchor";
+import BoardContext from "context/board-context";
+import {FaMap} from "react-icons/all";
+import {Link} from "react-router-dom";
+import AppContext from "context/app-context";
 
-const BoardBanner = (props) => {
+const BoardBanner = ({customName}) => {
+    const context = useContext(AppContext);
+    const {socialLinks, name, shortDescription, banner, discriminator} = useContext(BoardContext).data;
     const renderSocialLinks = () => {
-        if (props.socialLinks.length === 0) {
-            return <React.Fragment/>
-        }
         let offset = 0;
         return <div className="d-none d-sm-block" style={{position: "relative", bottom: "-72px"}}>
-            {props.socialLinks.map(link => {
+            {socialLinks.map(link => {
                 offset += 50;
-                return <div key={link.id} className="social-link p-2 px-3" style={{position: "absolute", bottom: "8px", left: (offset - 50) + "px", backgroundColor: "rgba(0,0,0,.4)"}}>
-                    <a href={link.url} target="_blank" rel="noopener noreferrer"><img src={link.logoUrl} alt="Social Icon" width={18} height={18}/></a>
+                return <div key={link.id} className="social-link" style={{position: "absolute", bottom: "8px", left: (offset - 50) + "px"}}>
+                    <SafeAnchor url={link.url}><img src={link.logoUrl} alt="Social Icon" width={18} height={18}/></SafeAnchor>
                 </div>
             })}
+            <div className="d-inline social-link" style={{position: "absolute", bottom: "8px", left: (offset) + "px", backgroundColor: context.getTheme().setAlpha(.4)}}>
+                <Link to={"/b/" + discriminator + "/roadmap"}><FaMap style={{color: "white"}}/></Link>
+            </div>
         </div>
     };
 
     const renderSocialLinksMobile = () => {
-        if (props.socialLinks.length === 0) {
-            return <React.Fragment/>
-        }
         return <div className="d-inline-block d-sm-none" style={{position: "relative", bottom: "-26px", height: 0}}>
-            {props.socialLinks.map(link => {
-                return <div key={link.id} className="d-inline social-link p-2 px-3" style={{backgroundColor: "rgba(0,0,0,.4)"}}>
-                    <a href={link.url} target="_blank" rel="noopener noreferrer"><img src={link.logoUrl} alt="Social Icon" width={18} className="img-fluid"/></a>
+            {socialLinks.map(link => {
+                return <div key={link.id} className="d-inline social-link">
+                    <SafeAnchor url={link.url}><img src={link.logoUrl} alt="Social Icon" width={18} height={18} className="img-fluid"/></SafeAnchor>
                 </div>
             })}
+            <div className="d-inline social-link" style={{backgroundColor: context.getTheme().setAlpha(.4)}}>
+                <Link to={"/b/" + discriminator + "/roadmap"}><FaMap style={{color: "white"}}/></Link>
+            </div>
         </div>
     };
 
     return <Col sm={12} className="mt-3">
         <Jumbotron className="mb-2 small-text-shadow dark-mask"
-                   style={{backgroundImage: `url("` + props.bannerUrl + `")`}}>
-            <h3 className="h3-responsive" style={{fontWeight: 500}}>{props.name}</h3>
-            <h5 className="h5-responsive" style={{fontWeight: 300}} dangerouslySetInnerHTML={{__html: props.description}}/>
+                   style={{backgroundImage: `url("` + banner + `")`}}>
+            <h3 style={{fontWeight: 500}}>{customName || name}</h3>
+            <h5 style={{fontWeight: 300}} dangerouslySetInnerHTML={{__html: shortDescription}}/>
             {renderSocialLinks()}
             {renderSocialLinksMobile()}
         </Jumbotron>

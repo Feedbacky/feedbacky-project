@@ -30,9 +30,9 @@ import java.util.logging.Logger;
 public class StartupMigrator {
 
   public static final int FILE_VERSION = 2;
+  private final Logger logger = Logger.getLogger("Migrator");
+  private final UserRepository userRepository;
   private int version = -1;
-  private Logger logger = Logger.getLogger("Migrator");
-  private UserRepository userRepository;
   private File versionFile;
 
   @Autowired
@@ -54,7 +54,7 @@ public class StartupMigrator {
       String content = new String(Files.readAllBytes(versionFile.toPath()), StandardCharsets.UTF_8);
       version = Integer.parseInt(content);
     } catch(IOException e) {
-      logger.log(Level.WARNING, "Failed to get version file contents! Migrator won't run.");
+      logger.log(Level.WARNING, "Failed to get version file contents! Migrator will not run.");
       e.printStackTrace();
     }
     if(version == FILE_VERSION) {
@@ -69,6 +69,9 @@ public class StartupMigrator {
         case 1:
           logger.log(Level.INFO, "Migrating Feedbacky from version 1 to 2...");
           for(User user : userRepository.findAll()) {
+            if(user.getMailPreferences() != null) {
+              continue;
+            }
             MailPreferences defaultPreferences = new MailPreferences();
             defaultPreferences.setNotifyFromModeratorsComments(true);
             defaultPreferences.setNotifyFromStatusChange(true);

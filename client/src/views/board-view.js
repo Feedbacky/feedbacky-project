@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import BoardNavbar from "components/navbars/board-navbar";
 import BoardSearchBar from "components/board/searchbar/board-search-bar";
 import BoardContainer from "components/board/ideas/board-container";
@@ -11,103 +11,57 @@ import BoardBanner from "components/board/board-banner";
 import LoadingSpinner from "components/util/loading-spinner";
 import AppContext from "context/app-context";
 import {FaEyeSlash} from "react-icons/all";
+import BoardContext from "context/board-context";
+import {useLocation, useParams} from "react-router-dom";
 
-class BoardView extends Component {
-
-    static contextType = AppContext;
-
-    state = {
-        id: this.props.match.params.id,
-        board: {
-            data: [],
-            loaded: false,
-            error: false
-        },
-        loginModalOpened: false,
-        privatePage: false
-    };
-
-    //workaround for refs that don't properly work with react router links...
-    onNotLoggedClick = () => {
-        this.setState({loginModalOpened: true});
-    };
-
-    onLoginModalClose = () => {
-        this.setState({loginModalOpened: false});
-    };
-
-    componentDidMount() {
-        if (this.props.location.state != null) {
-            if (this.resolvePassedData()) {
-                return;
-            }
+const BoardView = () => {
+    const context = useContext(AppContext);
+    const [board, setBoard] = useState({data: [], loaded: false, error: false});
+    const [modalOpen, setModalOpen] = useState(false);
+    const location = useLocation();
+    const {id} = useParams();
+    useEffect(() => {
+        if (location.state == null || location.state._boardData === undefined) {
+            axios.get("/boards/" + id).then(res => {
+                if (res.status !== 200) {
+                    setBoard({...board, error: true});
+                    return;
+                }
+                const data = res.data;
+                if (data.privatePage && data.name === null) {
+                    setBoard({...board, loaded: true});
+                    return;
+                }
+                data.socialLinks.sort((a, b) => (a.id > b.id) ? 1 : -1);
+                context.onThemeChange(data.themeColor || "#343a40");
+                setBoard({...board, data, loaded: true});
+            }).catch(() => setBoard({...board, error: true}));
+        } else {
+            context.onThemeChange(location.state._boardData.themeColor || "#343a40");
+            setBoard({...board, data: location.state._boardData, loaded: true});
         }
-        if (this.state.board.loaded) {
-            return;
-        }
-        axios.get("/boards/" + this.state.id).then(res => {
-            if (res.status !== 200) {
-                this.setState({
-                    board: {...this.state.board, error: true}
-                });
-                return;
-            }
-            const data = res.data;
-            if (data.privatePage && data.name === null) {
-                this.setState({
-                    board: {...this.state.board, loaded: true},
-                    privatePage: true
-                });
-                return;
-            }
-            data.socialLinks.sort((a, b) => (a.id > b.id) ? 1 : -1);
-            this.context.onThemeChange(data.themeColor || "#343a40");
-            this.setState({
-                board: {...this.state.board, data, loaded: true}
-            });
-        }).catch(() => this.setState({
-            board: {...this.state.board, error: true}
-        }));
+        // eslint-disable-next-line
+    }, []);
+    if (board.error) {
+        return <ErrorView icon={<FaExclamationCircle className="error-icon"/>} message="Content Not Found"/>
     }
-
-    resolvePassedData() {
-        const state = this.props.location.state;
-        if (state._boardData !== undefined) {
-            this.context.onThemeChange(state._boardData.themeColor || "#343a40");
-            this.setState({
-                board: {...this.state.board, data: state._boardData, loaded: true}
-            });
-            return true;
-        }
-        return false;
+    if (!board.loaded) {
+        return <Row className="justify-content-center vertical-center"><LoadingSpinner/></Row>
     }
-
-    render() {
-        if (this.state.board.error) {
-            return <ErrorView icon={<FaExclamationCircle className="error-icon"/>} message="Content Not Found"/>
-        }
-        if (!this.state.board.loaded) {
-            return <Row className="justify-content-center vertical-center"><LoadingSpinner/></Row>
-        }
-
-        if (this.state.privatePage) {
-            return <ErrorView icon={<FaEyeSlash className="error-icon"/>} message="This Board Is Private"/>
-        }
-        return <React.Fragment>
-            <LoginModal open={this.state.loginModalOpened} image={this.state.board.data.logo}
-                        boardName={this.state.board.data.name} redirectUrl={"b/" + this.state.board.data.discriminator}
-                        onLoginModalClose={this.onLoginModalClose}/>
-            <BoardNavbar name={this.state.board.data.name} logoUrl={this.state.board.data.logo} onNotLoggedClick={this.onNotLoggedClick}/>
-            <Container className="pb-5">
-                <Row className="pb-4">
-                    <BoardBanner name={this.state.board.data.name} description={this.state.board.data.shortDescription}
-                                 bannerUrl={this.state.board.data.banner} socialLinks={this.state.board.data.socialLinks}/>
-                    <BoardSearchBar history={this.props.history} discriminator={this.state.board.data.discriminator} boardData={this.state.board.data} moderators={this.state.board.data.moderators}/>
-                    <BoardContainer boardData={this.state.board.data} id={this.state.id} onNotLoggedClick={this.onNotLoggedClick} moderators={this.state.board.data.moderators}/>
-                </Row>
-            </Container>
-        </React.Fragment>
+    if (board.data.privatePage && board.data.name === null) {
+        return <ErrorView icon={<FaEyeSlash className="error-icon"/>} message="This Board Is Private"/>
     }
-}
+    return <BoardContext.Provider value={{data: board.data, loaded: board.loaded, error: board.error}}>
+        <LoginModal open={modalOpen} image={board.data.logo} boardName={board.data.name} redirectUrl={"b/" + board.data.discriminator} onLoginModalClose={() => setModalOpen(false)}/>
+        <BoardNavbar onNotLoggedClick={() => setModalOpen(true)}/>
+        <Container className="pb-5">
+            <Row className="pb-4">
+                <BoardBanner/>
+                <BoardSearchBar/>
+                <BoardContainer id={id} onNotLoggedClick={() => setModalOpen(true)}/>
+            </Row>
+        </Container>
+    </BoardContext.Provider>
+};
 
 export default BoardView;

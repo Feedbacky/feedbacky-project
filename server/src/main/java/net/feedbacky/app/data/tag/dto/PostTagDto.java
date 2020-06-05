@@ -25,12 +25,14 @@ import javax.validation.constraints.NotNull;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PostTagDto {
 
-  @NotNull(message = "Field 'name' cannot be null.")
-  @Length(min = 3, max = 20, message = "Field 'name' cannot be shorter than 3 or longer than 20 characters.")
+  @NotNull(message = "Tag name cannot be empty.")
+  @Length(min = 3, max = 20, message = "Tag name cannot be shorter than 3 or longer than 20 characters.")
   private String name;
-  @NotNull(message = "Field 'color' cannot be null.")
-  @HexValue(allowEmpty = true, message = "Field 'color' must be a valid Hex color value.")
+  @NotNull(message = "Color cannot be empty.")
+  @HexValue(allowEmpty = true, message = "Color must be a valid Hex value.")
   private String color;
+  @NotNull(message = "Please specify if tag should be ignored in roadmap.")
+  private Boolean roadmapIgnored;
 
   public Tag convertToEntity(Board board) {
     Tag tag = new ModelMapper().map(this, Tag.class);
