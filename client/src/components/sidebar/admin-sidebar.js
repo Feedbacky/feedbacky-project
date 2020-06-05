@@ -17,8 +17,8 @@ const AdminSidebar = (props) => {
     const context = useContext(AppContext);
     const themeColor = context.getTheme();
 
-    return <Col xs={12} md={3} id="sidebar">
-        <ul className="pl-0 mb-1" style={{listStyle: "none", fontSize: "1.1rem", fontWeight: 500, lineHeight: "2rem"}}>
+    return <Col xs={12} md={3} className="sidebar">
+        <ul>
             {renderSidebarRoutes(routes, themeColor, props.currentNode, props.reRouteTo)}
             <li className="my-4"/>
             <li>

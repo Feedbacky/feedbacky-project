@@ -16,6 +16,7 @@ const ProfileSidebar = (props) => {
 
     return <Col xs={12} md={3} className="sidebar">
         <ul>{renderSidebarRoutes(routes, themeColor, props.currentNode, props.reRouteTo)}</ul>
+        <Attribution/>
     </Col>
 };
 
