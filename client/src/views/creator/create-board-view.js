@@ -110,13 +110,18 @@ const CreateBoardView = () => {
         return owned;
     };
     if (calculateOwnedBoards() >= 5) {
-        return <Col xs={12} className="mt-4 text-center">
-            <img alt="" src="https://cdn.feedbacky.net/static/svg/undraw_project_limit.svg" className="my-2" width={150} height={150}/>
-            <h2 className="text-danger">Boards Limit Reached</h2>
-            <span className="text-black-60">
-                Cannot create any more boards.
-            </span>
-        </Col>
+        return <React.Fragment>
+            <ProfileNavbar/>
+            <Container>
+                <Col xs={12} className="mt-4 text-center">
+                    <img alt="" src="https://cdn.feedbacky.net/static/svg/undraw_project_limit.svg" className="my-2" width={150} height={150}/>
+                    <h2 className="text-danger">Boards Limit Reached</h2>
+                    <span className="text-black-60">
+                        Cannot create any more boards.
+                    </span>
+                </Col>
+            </Container>
+        </React.Fragment>
     }
     return <React.Fragment>
         <ProfileNavbar/>
