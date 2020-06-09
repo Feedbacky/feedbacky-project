@@ -16,7 +16,6 @@ import ComponentLoader from "components/app/component-loader";
 const ProfileView = lazy(() => retry(() => import("views/profile/profile-view")));
 const CreateBoardView = lazy(() => retry(() => import("views/creator/create-board-view")));
 const ModeratorInvitation = lazy(() => retry(() => import("components/board/moderator-invitation")));
-const BoardInvitation = lazy(() => retry(() => import("components/board/board-invitation")));
 const BoardView = lazy(() => retry(() => import("views/board-view")));
 const RoadmapView = lazy(() => retry(() => import("views/roadmap-view")));
 const AdminPanelView = lazy(() => retry(() => import("views/admin/admin-panel-view")));
@@ -26,7 +25,7 @@ const UnsubscribeView = lazy(() => retry(() => import("views/unsubscribe-view"))
 
 toast.configure();
 
-const CLIENT_VERSION = "0.2.1-beta";
+const CLIENT_VERSION = "0.3.0-beta";
 const API_ROUTE = (process.env.REACT_APP_SERVER_IP_ADDRESS || "https://app.feedbacky.net") + "/api/v1";
 
 const App = () => {
@@ -101,10 +100,7 @@ const App = () => {
         boardRedirect(history, boardData);
     };
     const boardRedirect = (history, boardData) => {
-        history.push({
-            pathname: "/brdr/" + boardData.discriminator,
-            state: {_boardData: boardData},
-        });
+
     };
     const getTheme = () => {
         let color = tinycolor(theme);
@@ -120,12 +116,12 @@ const App = () => {
     const onDarkModeToggle = () => {
         let darkModeEnabled = (localStorage.getItem("darkMode") === 'true');
         localStorage.setItem("darkMode", (!darkModeEnabled).toString());
-        setDarkMode(darkModeEnabled);
-        if (darkModeEnabled) {
+        if (darkMode) {
             document.body.classList.remove("dark");
         } else {
             document.body.classList.add("dark");
         }
+        setDarkMode(!darkMode);
     };
     if (serviceData.error) {
         return <BrowserRouter><ErrorView icon={<FaDizzy className="error-icon"/>} message="Service Is Temporarily Unavailable"/></BrowserRouter>
@@ -147,30 +143,18 @@ const App = () => {
             onDarkModeToggle: onDarkModeToggle,
             getTheme: getTheme,
             theme: theme,
-            onThemeChange: theme => setTheme(theme),
+            onThemeChange: newTheme => setTheme(newTheme),
             clientVersion: CLIENT_VERSION
         }}>
             <Suspense fallback={<Row className="justify-content-center vertical-center"><LoadingSpinner/></Row>}>
                 <Switch>
                     <Route exact path="/" component={ProfileView}/>
                     <Route exact path="/create" component={CreateBoardView}/>
-                    <Route path="/merdr/:section" render={(props) =>
-                        <Redirect to={{
-                            pathname: "/me/" + props.match.params.section,
-                            state: props.location.state,
-                        }}/>}/>
                     <Route path="/me/:section" component={ProfileView}/>
                     <Route path="/me/" component={ProfileView}/>
                     <Route path="/moderator_invitation/:code" component={ModeratorInvitation}/>
-                    <Route path="/invitation/:code" component={BoardInvitation}/>
-                    <Route path={"/b/:id/roadmap"} component={RoadmapView}/>
+                    <Route path="/b/:id/roadmap" component={RoadmapView}/>
                     <Route path="/b/:id" component={BoardView}/>
-                    {/* sneaky way to redirect from /b/ to /b/ but with different :id parameters, because it doesn't work */}
-                    <Route path="/brdr/:id" render={props =>
-                        <Redirect to={{
-                            pathname: "/b/" + props.match.params.id,
-                            state: props.location.state,
-                        }}/>}/>
                     <Route path="/ba/:id" component={AdminPanelView}/>
                     <Route path="/i/:id" component={IdeaView}/>
                     <Route path="/unsubscribe/:id/:code" component={UnsubscribeView}/>

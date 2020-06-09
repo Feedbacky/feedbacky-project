@@ -14,6 +14,7 @@ import BoardContext from "context/board-context";
 import {FaExclamation} from "react-icons/all";
 import {SvgNotice} from "components/app/svg-notice";
 import {ReactComponent as UndrawNoData} from "assets/svg/undraw/no_data.svg";
+import PageBadge from "components/app/page-badge";
 
 const SocialLinksSettings = ({reRouteTo}) => {
     const context = useContext(AppContext);
@@ -26,6 +27,7 @@ const SocialLinksSettings = ({reRouteTo}) => {
                 setSocialLinks({...socialLinks, error: true});
                 return;
             }
+            res.data.sort((a, b) => (a.id > b.id) ? 1 : -1);
             setSocialLinks({...socialLinks, data: res.data, loaded: true});
         }).catch(() => setSocialLinks({...socialLinks, error: true}));
         // eslint-disable-next-line
@@ -42,7 +44,7 @@ const SocialLinksSettings = ({reRouteTo}) => {
                     <DeleteButton tooltipName="Delete" onClick={() => onSocialLinkDelete(link.id)}
                                   id={"social-" + link.id + "-del"}/>
                     <br/>
-                    <SafeAnchor url={link.url}>{extractHostname(link.url)}</SafeAnchor>
+                    <SafeAnchor url={link.url}><PageBadge color={context.getTheme()} text={extractHostname(link.url)}/></SafeAnchor>
                 </div>
             </div>
         })
