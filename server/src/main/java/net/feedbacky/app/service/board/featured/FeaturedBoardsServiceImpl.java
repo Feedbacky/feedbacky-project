@@ -32,7 +32,7 @@ public class FeaturedBoardsServiceImpl implements FeaturedBoardsService {
   @Scheduled(fixedDelay = 86_400_000)
   public void scheduleFeaturedBoardsSelectionTask() {
     featuredBoards.clear();
-    List<Board> boards = boardRepository.findByPrivatePageFalse();
+    List<Board> boards = boardRepository.findAll();
     Collections.shuffle(boards);
     int i = 6;
     for(Board board : boards) {
