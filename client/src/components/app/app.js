@@ -1,5 +1,5 @@
 import React, {lazy, Suspense, useEffect, useState} from 'react';
-import {BrowserRouter, Redirect, Route, Switch} from "react-router-dom";
+import {BrowserRouter, Route, Switch} from "react-router-dom";
 import axios from "axios";
 import {toast} from "react-toastify";
 import Cookies from "js-cookie";
@@ -49,7 +49,7 @@ const App = () => {
         // eslint-disable-next-line
     }, []);
     useEffect(() => {
-        if(serviceData.loaded) {
+        if (serviceData.loaded) {
             return;
         }
         axios.get("/service/about").then(res => {
@@ -89,18 +89,13 @@ const App = () => {
         setSession(null);
         setUserData({...userData, data: [], loaded: true, loggedIn: false});
     };
-    const onFilteringUpdate = (filter, boardData, history) => {
+    const onFilteringUpdate = (filter) => {
         localStorage.setItem("searchFilter", filter);
         setSearchPrefs({...searchPrefs, filter});
-        boardRedirect(history, boardData);
     };
-    const onSortingUpdate = (sort, boardData, history) => {
+    const onSortingUpdate = (sort) => {
         localStorage.setItem("searchSort", sort);
         setSearchPrefs({...searchPrefs, sort});
-        boardRedirect(history, boardData);
-    };
-    const boardRedirect = (history, boardData) => {
-
     };
     const getTheme = () => {
         let color = tinycolor(theme);
