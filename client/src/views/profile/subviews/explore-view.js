@@ -10,7 +10,7 @@ const ExploreView = (props) => {
     return <React.Fragment>
         <ProfileSidebar currentNode="explore" reRouteTo={props.reRouteTo}/>
         <Col xs={12} md={9}>
-            <ViewBox theme={context.theme} title="Explore More Boards" description="Discover other Feedbacky boards here.">
+            <ViewBox theme={context.getTheme(false)} title="Explore More Boards" description="Discover other Feedbacky boards here.">
                 <ExploreElement/>
             </ViewBox>
         </Col>
