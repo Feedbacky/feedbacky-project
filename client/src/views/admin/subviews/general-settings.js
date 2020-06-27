@@ -55,7 +55,7 @@ const GeneralSettings = ({reRouteTo, updateState}) => {
             <Col xs={12} lg={6}>
                 <Form.Label className="mr-1 text-black-60 mt-2">Full Description</Form.Label>
                 <ClickableTip id="boardDescription" title="Set Description" description={<React.Fragment>
-                    Full description visible at your Feedbacky board, markdown supported. Keep it under 2500
+                    Full description visible at your board, markdown supported. Keep it under 2500
                     characters long.
                     <br/>
                     <strong>Markdown Tips:</strong>
@@ -91,7 +91,7 @@ const GeneralSettings = ({reRouteTo, updateState}) => {
                 <ClickableTip id="banner" title="Set Board Banner" description="Suggested size: 1120x400. Maximum size 500 kb, PNG and JPG only."/>
                 <br/>
                 <div className="cursor-click" onClick={() => document.getElementById("bannerInput").click()}>
-                    <div className="text-white row justify-content-center text-center" style={{position: "absolute", top: "40%", left: 0, right: 0}}>
+                    <div className="text-white row justify-content-center text-center hoverable-option" style={{position: "absolute", top: "40%", left: 0, right: 0}}>
                         <div className="p-3 rounded-circle" style={{backgroundColor: context.getTheme().setAlpha(.8), width: "90px", height: "90px"}}>
                             <FaUpload className="mb-1" style={{width: "1.8em", height: "1.8em"}}/>
                             <div className="text-tight">Update</div>
@@ -121,7 +121,7 @@ const GeneralSettings = ({reRouteTo, updateState}) => {
     };
     const renderDangerContent = () => {
         return <div className="mb-3 view-box-bg px-1 py-3 rounded mt-2 danger-shadow rounded-bottom">
-            <Row noGutters className="m-0 p-0 px-4 mb-2">
+            <Row noGutters className="m-0 p-0 px-4 my-2">
                 <Col sm={9} xs={12}>
                     <h4 className="mb-1 text-danger">Delete Board</h4>
                     <span className="text-black-50" style={{fontSize: ".9em"}}>

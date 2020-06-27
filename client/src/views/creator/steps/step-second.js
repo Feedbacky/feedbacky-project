@@ -51,7 +51,7 @@ const StepSecond = ({updateSettings, settings}) => {
                 Upload your board banner.
                 <br/>
                 <strong>
-                    Maximum size 500 kb, png and jpg only.
+                    Maximum size 650 kb, png and jpg only.
                     <br/>
                     Suggested size: 1120x400
                 </strong>
@@ -70,7 +70,7 @@ const StepSecond = ({updateSettings, settings}) => {
                 Upload your board logo.
                 <br/>
                 <strong>
-                    Maximum size 150 kb, png and jpg only.
+                    Maximum size 250 kb, png and jpg only.
                     <br/>
                     Suggested size: 100x100
                 </strong>

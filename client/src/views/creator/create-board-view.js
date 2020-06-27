@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import AppContext from "context/app-context";
 import {toastAwait, toastError, toastSuccess, toastWarning} from "components/util/utils";
 import {Button, Col, Container, ProgressBar, Row} from "react-bootstrap";
@@ -16,8 +16,11 @@ const CreateBoardView = () => {
     const context = useContext(AppContext);
     const history = useHistory();
     const [settings, setSettings] = useState({step: 1, name: "", discriminator: "", banner: null, logo: null, themeColor: "#2d3436"});
+    useEffect(() => context.onThemeChange("343a40"),
+        //eslint-disable-next-line
+        []);
     if (!context.user.loggedIn) {
-        history.push("/me");
+         history.push("/me");
         return <React.Fragment/>
     }
     const updateSettings = (data) => {
@@ -64,7 +67,7 @@ const CreateBoardView = () => {
         return <PreviousStepButton previousStep={previousStep}/>
     };
     const renderNextButton = () => {
-        if (settings.step === 3) {
+        if (settings.step >= 3) {
             return <Button variant="success" className="ml-2" onClick={nextStep}>Create Board</Button>
         }
         return <NextStepButton nextStep={nextStep}/>

@@ -25,7 +25,7 @@ const UnsubscribeView = lazy(() => retry(() => import("views/unsubscribe-view"))
 
 toast.configure();
 
-const CLIENT_VERSION = "0.3.0-beta";
+const CLIENT_VERSION = "0.3.1-beta";
 const API_ROUTE = (process.env.REACT_APP_SERVER_IP_ADDRESS || "https://app.feedbacky.net") + "/api/v1";
 
 const App = () => {
@@ -97,9 +97,9 @@ const App = () => {
         localStorage.setItem("searchSort", sort);
         setSearchPrefs({...searchPrefs, sort});
     };
-    const getTheme = () => {
+    const getTheme = (adjustColor = true) => {
         let color = tinycolor(theme);
-        if (darkMode) {
+        if (darkMode && adjustColor) {
             color = color.lighten(10);
             //if still not readable, increase again
             if (tinycolor.readability(color, "#282828") < 2.5) {
