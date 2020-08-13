@@ -21,7 +21,7 @@ import net.feedbacky.app.data.user.User;
 import net.feedbacky.app.data.user.dto.FetchUserDto;
 import net.feedbacky.app.service.ServiceUser;
 import net.feedbacky.app.util.PaginableRequest;
-import net.feedbacky.app.util.RequestValidator;
+import net.feedbacky.app.util.request.InternalRequestValidator;
 
 import org.apache.commons.text.StringEscapeUtils;
 import org.modelmapper.Conditions;
@@ -35,7 +35,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -100,7 +99,7 @@ public class CommentServiceImpl implements CommentService {
 
   @Override
   public ResponseEntity<FetchCommentDto> post(PostCommentDto dto) {
-    UserAuthenticationToken auth = RequestValidator.getContextAuthentication();
+    UserAuthenticationToken auth = InternalRequestValidator.getContextAuthentication();
     User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
             .orElseThrow(() -> new InvalidAuthenticationException("User session not found. Try again with new token"));
     Idea idea = ideaRepository.findById(dto.getIdeaId())
@@ -140,7 +139,7 @@ public class CommentServiceImpl implements CommentService {
 
   @Override
   public FetchUserDto postLike(long id) {
-    UserAuthenticationToken auth = RequestValidator.getContextAuthentication();
+    UserAuthenticationToken auth = InternalRequestValidator.getContextAuthentication();
     User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
             .orElseThrow(() -> new InvalidAuthenticationException("User session not found. Try again with new token"));
     Comment comment = commentRepository.findById(id)
@@ -159,7 +158,7 @@ public class CommentServiceImpl implements CommentService {
 
   @Override
   public FetchCommentDto patch(long id, PatchCommentDto dto) {
-    UserAuthenticationToken auth = RequestValidator.getContextAuthentication();
+    UserAuthenticationToken auth = InternalRequestValidator.getContextAuthentication();
     User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
             .orElseThrow(() -> new InvalidAuthenticationException("User session not found. Try again with new token"));
     Idea idea = ideaRepository.findById(id)
@@ -180,7 +179,7 @@ public class CommentServiceImpl implements CommentService {
 
   @Override
   public ResponseEntity delete(long id) {
-    UserAuthenticationToken auth = RequestValidator.getContextAuthentication();
+    UserAuthenticationToken auth = InternalRequestValidator.getContextAuthentication();
     User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
             .orElseThrow(() -> new InvalidAuthenticationException("User session not found. Try again with new token"));
     Comment comment = commentRepository.findById(id)
@@ -196,7 +195,7 @@ public class CommentServiceImpl implements CommentService {
 
   @Override
   public ResponseEntity deleteLike(long id) {
-    UserAuthenticationToken auth = RequestValidator.getContextAuthentication();
+    UserAuthenticationToken auth = InternalRequestValidator.getContextAuthentication();
     User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
             .orElseThrow(() -> new InvalidAuthenticationException("User session not found. Try again with new token"));
     Comment comment = commentRepository.findById(id)

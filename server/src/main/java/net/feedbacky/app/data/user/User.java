@@ -57,6 +57,8 @@ public class User implements Serializable {
   private MailPreferences mailPreferences;
   @CreationTimestamp
   private Date creationDate;
+  private boolean fake = false;
+  private String token = "";
   private boolean serviceStaff = false;
 
   public FetchUserRequest convertToDto() {

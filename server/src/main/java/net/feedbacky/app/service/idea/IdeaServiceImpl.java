@@ -31,7 +31,7 @@ import net.feedbacky.app.service.ServiceUser;
 import net.feedbacky.app.util.Base64Util;
 import net.feedbacky.app.util.CommentBuilder;
 import net.feedbacky.app.util.PaginableRequest;
-import net.feedbacky.app.util.RequestValidator;
+import net.feedbacky.app.util.request.InternalRequestValidator;
 import net.feedbacky.app.util.SortFilterResolver;
 import net.feedbacky.app.util.objectstorage.ObjectStorage;
 
@@ -71,11 +71,13 @@ public class IdeaServiceImpl implements IdeaService {
   private final AttachmentRepository attachmentRepository;
   private final ObjectStorage objectStorage;
   private final SubscriptionExecutor subscriptionExecutor;
+  private final IdeaPostCreator ideaPostCreator;
 
   @Autowired
   //todo too big constructor
   public IdeaServiceImpl(IdeaRepository ideaRepository, BoardRepository boardRepository, UserRepository userRepository, TagRepository tagRepository,
-                         CommentRepository commentRepository, AttachmentRepository attachmentRepository, ObjectStorage objectStorage, SubscriptionExecutor subscriptionExecutor) {
+                         CommentRepository commentRepository, AttachmentRepository attachmentRepository, ObjectStorage objectStorage,
+                         SubscriptionExecutor subscriptionExecutor, IdeaPostCreator ideaPostCreator) {
     this.ideaRepository = ideaRepository;
     this.boardRepository = boardRepository;
     this.userRepository = userRepository;
@@ -84,6 +86,7 @@ public class IdeaServiceImpl implements IdeaService {
     this.attachmentRepository = attachmentRepository;
     this.objectStorage = objectStorage;
     this.subscriptionExecutor = subscriptionExecutor;
+    this.ideaPostCreator = ideaPostCreator;
   }
 
   @Override
@@ -147,51 +150,17 @@ public class IdeaServiceImpl implements IdeaService {
 
   @Override
   public ResponseEntity<FetchIdeaDto> post(PostIdeaDto dto) {
-    UserAuthenticationToken auth = RequestValidator.getContextAuthentication();
+    UserAuthenticationToken auth = InternalRequestValidator.getContextAuthentication();
     User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
             .orElseThrow(() -> new InvalidAuthenticationException("User session not found. Try again with new token"));
     Board board = boardRepository.findByDiscriminator(dto.getDiscriminator())
             .orElseThrow(() -> new ResourceNotFoundException("Board with discriminator " + dto.getDiscriminator() + " not found."));
-    Optional<Idea> optional = ideaRepository.findByTitleAndBoard(dto.getTitle(), board);
-    if(optional.isPresent() && optional.get().getBoard().getId().equals(board.getId())) {
-      throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "Idea with that title in that board already exists.");
-    }
-    ModelMapper mapper = new ModelMapper();
-    Idea idea = mapper.map(dto, Idea.class);
-    idea.setId(null);
-    idea.setBoard(board);
-    idea.setCreator(user);
-    idea.setCreationDate(Calendar.getInstance().getTime());
-    Set<User> set = new HashSet<>();
-    set.add(user);
-    idea.setVoters(set);
-    idea.setStatus(Idea.IdeaStatus.OPENED);
-    idea.setDescription(StringEscapeUtils.escapeHtml4(idea.getDescription()));
-    idea.setSubscribers(set);
-    idea = ideaRepository.save(idea);
-
-    //must save idea first in order to apply and save attachment
-    Set<Attachment> attachments = new HashSet<>();
-    if(dto.getAttachment() != null) {
-      String link = objectStorage.storeImage(Base64Util.extractBase64Data(dto.getAttachment()), ObjectStorage.ImageType.ATTACHMENT);
-      Attachment attachment = new Attachment();
-      attachment.setIdea(idea);
-      attachment.setUrl(link);
-      attachment = attachmentRepository.save(attachment);
-      attachments.add(attachment);
-    }
-    idea.setAttachments(attachments);
-    ideaRepository.save(idea);
-
-    FetchIdeaDto fetchDto = idea.convertToDto(user);
-    WebhookDataBuilder builder = new WebhookDataBuilder().withUser(user).withIdea(idea);
-    idea.getBoard().getWebhookExecutor().executeWebhooks(Webhook.Event.IDEA_CREATE, builder.build());
-    return ResponseEntity.status(HttpStatus.CREATED).body(fetchDto);
+    return ResponseEntity.status(HttpStatus.CREATED).body(ideaPostCreator.post(dto, board, user));
   }
 
   @Override
   public FetchIdeaDto patch(long id, PatchIdeaDto dto) {
-    UserAuthenticationToken auth = RequestValidator.getContextAuthentication();
+    UserAuthenticationToken auth = InternalRequestValidator.getContextAuthentication();
     User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
             .orElseThrow(() -> new InvalidAuthenticationException("User session not found. Try again with new token"));
     Idea idea = ideaRepository.findById(id)
@@ -262,7 +231,7 @@ public class IdeaServiceImpl implements IdeaService {
 
   @Override
   public ResponseEntity delete(long id) {
-    UserAuthenticationToken auth = RequestValidator.getContextAuthentication();
+    UserAuthenticationToken auth = InternalRequestValidator.getContextAuthentication();
     User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
             .orElseThrow(() -> new InvalidAuthenticationException("User session not found. Try again with new token"));
     Idea idea = ideaRepository.findById(id)
@@ -292,7 +261,7 @@ public class IdeaServiceImpl implements IdeaService {
   @Override
   public FetchUserDto postUpvote(long id) {
     //todo X-User-Id vote on behalf
-    UserAuthenticationToken auth = RequestValidator.getContextAuthentication();
+    UserAuthenticationToken auth = InternalRequestValidator.getContextAuthentication();
     User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
             .orElseThrow(() -> new InvalidAuthenticationException("User session not found. Try again with new token"));
     Idea idea = ideaRepository.findById(id)
@@ -310,7 +279,7 @@ public class IdeaServiceImpl implements IdeaService {
 
   @Override
   public ResponseEntity deleteUpvote(long id) {
-    UserAuthenticationToken auth = RequestValidator.getContextAuthentication();
+    UserAuthenticationToken auth = InternalRequestValidator.getContextAuthentication();
     User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
             .orElseThrow(() -> new InvalidAuthenticationException("User session not found. Try again with new token"));
     Idea idea = ideaRepository.findById(id)
@@ -327,7 +296,7 @@ public class IdeaServiceImpl implements IdeaService {
 
   @Override
   public List<FetchTagDto> patchTags(long id, List<PatchTagRequestDto> tags) {
-    UserAuthenticationToken auth = RequestValidator.getContextAuthentication();
+    UserAuthenticationToken auth = InternalRequestValidator.getContextAuthentication();
     User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
             .orElseThrow(() -> new InvalidAuthenticationException("User session not found. Try again with new token"));
     Idea idea = ideaRepository.findById(id)

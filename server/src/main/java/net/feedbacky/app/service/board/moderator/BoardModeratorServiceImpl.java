@@ -16,7 +16,7 @@ import net.feedbacky.app.data.board.invite.Invitation;
 import net.feedbacky.app.data.board.moderator.Moderator;
 import net.feedbacky.app.data.user.User;
 import net.feedbacky.app.service.ServiceUser;
-import net.feedbacky.app.util.RequestValidator;
+import net.feedbacky.app.util.request.InternalRequestValidator;
 import net.feedbacky.app.util.mailservice.MailHandler;
 import net.feedbacky.app.util.mailservice.MailPlaceholderParser;
 import net.feedbacky.app.util.mailservice.MailService;
@@ -57,7 +57,7 @@ public class BoardModeratorServiceImpl implements BoardModeratorService {
 
   @Override
   public List<FetchInviteDto> getAllInvited(String discriminator) {
-    UserAuthenticationToken auth = RequestValidator.getContextAuthentication();
+    UserAuthenticationToken auth = InternalRequestValidator.getContextAuthentication();
     User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
             .orElseThrow(() -> new InvalidAuthenticationException("User session not found. Try again with new token"));
     Board board = boardRepository.findByDiscriminator(discriminator)
@@ -70,7 +70,7 @@ public class BoardModeratorServiceImpl implements BoardModeratorService {
 
   @Override
   public FetchBoardDto postAccept(String code) {
-    UserAuthenticationToken auth = RequestValidator.getContextAuthentication();
+    UserAuthenticationToken auth = InternalRequestValidator.getContextAuthentication();
     User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
             .orElseThrow(() -> new InvalidAuthenticationException("User session not found. Try again with new token"));
     Invitation invitation = invitationRepository.findByCode(code)
@@ -91,7 +91,7 @@ public class BoardModeratorServiceImpl implements BoardModeratorService {
 
   @Override
   public ResponseEntity<FetchInviteDto> post(String discriminator, PostInviteDto dto) {
-    UserAuthenticationToken auth = RequestValidator.getContextAuthentication();
+    UserAuthenticationToken auth = InternalRequestValidator.getContextAuthentication();
     User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
             .orElseThrow(() -> new InvalidAuthenticationException("User session not found. Try again with new token"));
     Board board = boardRepository.findByDiscriminator(discriminator)
@@ -125,7 +125,7 @@ public class BoardModeratorServiceImpl implements BoardModeratorService {
 
   @Override
   public ResponseEntity deleteInvitation(long id) {
-    UserAuthenticationToken auth = RequestValidator.getContextAuthentication();
+    UserAuthenticationToken auth = InternalRequestValidator.getContextAuthentication();
     User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
             .orElseThrow(() -> new InvalidAuthenticationException("User session not found. Try again with new token"));
     Invitation invitation = invitationRepository.findById(id)
@@ -145,7 +145,7 @@ public class BoardModeratorServiceImpl implements BoardModeratorService {
 
   @Override
   public ResponseEntity delete(String discriminator, long id) {
-    UserAuthenticationToken auth = RequestValidator.getContextAuthentication();
+    UserAuthenticationToken auth = InternalRequestValidator.getContextAuthentication();
     User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
             .orElseThrow(() -> new InvalidAuthenticationException("User session not found. Try again with new token"));
     Board board = boardRepository.findByDiscriminator(discriminator)

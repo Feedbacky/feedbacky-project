@@ -15,7 +15,7 @@ import net.feedbacky.app.repository.idea.AttachmentRepository;
 import net.feedbacky.app.repository.idea.IdeaRepository;
 import net.feedbacky.app.service.ServiceUser;
 import net.feedbacky.app.util.Base64Util;
-import net.feedbacky.app.util.RequestValidator;
+import net.feedbacky.app.util.request.InternalRequestValidator;
 import net.feedbacky.app.util.objectstorage.ObjectStorage;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +46,7 @@ public class AttachmentServiceImpl implements AttachmentService {
 
   @Override
   public ResponseEntity<FetchAttachmentDto> postAttachment(long id, PostAttachmentDto dto) {
-    UserAuthenticationToken auth = RequestValidator.getContextAuthentication();
+    UserAuthenticationToken auth = InternalRequestValidator.getContextAuthentication();
     User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
             .orElseThrow(() -> new InvalidAuthenticationException("User session not found. Try again with new token"));
     Idea idea = ideaRepository.findById(id)
@@ -67,7 +67,7 @@ public class AttachmentServiceImpl implements AttachmentService {
   }
   @Override
   public ResponseEntity deleteAttachment(long id) {
-    UserAuthenticationToken auth = RequestValidator.getContextAuthentication();
+    UserAuthenticationToken auth = InternalRequestValidator.getContextAuthentication();
     User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
             .orElseThrow(() -> new InvalidAuthenticationException("User session not found. Try again with new token"));
     Attachment attachment = attachmentRepository.findById(id)

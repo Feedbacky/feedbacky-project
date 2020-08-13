@@ -1,6 +1,7 @@
-package net.feedbacky.app.config;
+package net.feedbacky.app.config.filter;
 
 import io.jsonwebtoken.JwtException;
+import net.feedbacky.app.config.UserAuthenticationToken;
 import net.feedbacky.app.service.FeedbackyUserDetailsService;
 import net.feedbacky.app.service.ServiceUser;
 import net.feedbacky.app.util.JwtTokenUtil;
@@ -25,19 +26,19 @@ import java.io.IOException;
  * Created at 01.10.2019
  */
 @Component
-public class RequestFilter extends OncePerRequestFilter {
+public class InternalRequestFilter extends OncePerRequestFilter {
 
   private final FeedbackyUserDetailsService userDetailsService;
 
   @Autowired
-  public RequestFilter(FeedbackyUserDetailsService userDetailsService) {
+  public InternalRequestFilter(FeedbackyUserDetailsService userDetailsService) {
     this.userDetailsService = userDetailsService;
   }
 
   @Override
   protected boolean shouldNotFilter(HttpServletRequest request) {
     String path = request.getServletPath();
-    return !path.startsWith("/v1/");
+    return !path.startsWith("/v1/") || path.startsWith("/v1/public/");
   }
 
   @Override
@@ -65,9 +66,6 @@ public class RequestFilter extends OncePerRequestFilter {
         userAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(userAuthenticationToken);
       }
-    } else if(tokenHeader.startsWith("Apikey ")) {
-      response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Apikeys not yet supported.");
-      return;
     }
     chain.doFilter(request, response);
   }
