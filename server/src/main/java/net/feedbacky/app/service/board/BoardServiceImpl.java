@@ -30,6 +30,7 @@ import net.feedbacky.app.util.mailservice.MailPlaceholderParser;
 import net.feedbacky.app.util.mailservice.MailService;
 import net.feedbacky.app.util.objectstorage.ObjectStorage;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
@@ -38,6 +39,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
@@ -81,14 +83,19 @@ public class BoardServiceImpl implements BoardService {
     List<Board> boards = pageData.getContent();
     int totalPages = pageData.getTotalElements() == 0 ? 0 : pageData.getTotalPages() - 1;
     return new PaginableRequest<>(new PaginableRequest.PageMetadata(page, totalPages, pageSize),
-            boards.stream().map(Board::convertToDto).collect(Collectors.toList()));
+            boards.stream().map(board -> board.convertToDto().exposeSensitiveData(false)).collect(Collectors.toList()));
   }
 
   @Override
   public FetchBoardDto getOne(String discriminator) {
+    User user = null;
+    if(SecurityContextHolder.getContext().getAuthentication() instanceof UserAuthenticationToken) {
+      UserAuthenticationToken auth = (UserAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+      user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail()).orElse(null);
+    }
     Board board = boardRepository.findByDiscriminator(discriminator)
             .orElseThrow(() -> new ResourceNotFoundException("Board with discriminator " + discriminator + " not found"));
-    return board.convertToDto();
+    return board.convertToDto().exposeSensitiveData(board.getCreator().equals(user));
   }
 
   @Override
@@ -135,7 +142,7 @@ public class BoardServiceImpl implements BoardService {
     user.getPermissions().add(node);
     userRepository.save(user);
     populateBoardWithExamples(board);
-    return ResponseEntity.status(HttpStatus.CREATED).body(board.convertToDto());
+    return ResponseEntity.status(HttpStatus.CREATED).body(board.convertToDto().exposeSensitiveData(true));
   }
 
 
@@ -216,7 +223,7 @@ public class BoardServiceImpl implements BoardService {
     board.setFullDescription(StringEscapeUtils.escapeHtml4(board.getFullDescription()));
 
     boardRepository.save(board);
-    return board.convertToDto();
+    return board.convertToDto().exposeSensitiveData(true);
   }
 
   @Override

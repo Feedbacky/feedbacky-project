@@ -41,6 +41,8 @@ public class FetchBoardDto {
   private String logo;
   private String banner;
 
+  private String apiKey;
+
   private final String ideasUrl = "/v1/boards/:id/ideas";
   private final String tagsUrl = "/v1/boards/:id/tags";
   private final String webhooksUrl = "/v1/boards/:id/webhooks";

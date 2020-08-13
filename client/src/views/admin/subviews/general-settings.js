@@ -13,7 +13,7 @@ import BoardContext from "context/board-context";
 import ClickableTip from "components/util/clickable-tip";
 import TextareaAutosize from "react-autosize-textarea";
 import LoadingSpinner from "components/util/loading-spinner";
-import {FaUpload} from "react-icons/all";
+import {FaEyeSlash, FaUpload} from "react-icons/all";
 import Button from "react-bootstrap/Button";
 import {useHistory} from "react-router-dom";
 
@@ -24,6 +24,7 @@ const GeneralSettings = ({reRouteTo, updateState}) => {
     const context = useContext(AppContext);
     const boardData = useContext(BoardContext).data;
     const swalGenerator = swalReact(Swal);
+    const [apiKeyBlurred, setApiKeyBlurred] = useState(true);
     const [bannerInput, setBannerInput] = useState(null);
     const [logoInput, setLogoInput] = useState(null);
     const renderContent = () => {
@@ -134,6 +135,37 @@ const GeneralSettings = ({reRouteTo, updateState}) => {
             </Row>
         </div>
     };
+    const renderApiKeyContent = () => {
+        if (boardData.apiKey === "") {
+            return <Row noGutters className="m-0 p-0 px-4 my-2">
+                <Col sm={9} xs={12}>
+                    <h4 className="mb-1 text-danger">API Key</h4>
+                    <span className="text-black-50" style={{fontSize: ".9em"}}>
+                        Generate access key to utilise Feedbacky API for anonymous ideas posting.<br/>
+                    </span>
+                </Col>
+                <Col sm={3} xs={6} className="text-sm-right text-left my-auto">
+                    <ActionButton onClick={() => onApiKeyEnable()} variant="success" text="Enable"/>
+                </Col>
+            </Row>
+        } else {
+            return <Row noGutters className="m-0 p-0 px-4 my-2">
+                <Col sm={9} xs={12}>
+                    <h4 className="mb-1 text-danger">API Key</h4>
+                    <span className="text-black-50" style={{fontSize: ".9em"}}>
+                        Generate access key to utilise Feedbacky API for anonymous ideas posting.<br/>
+                        Your API key <span className={!apiKeyBlurred || "blurred"}>{boardData.apiKey}</span>
+                        <FaEyeSlash className="board-role internal ml-1" onClick={() => setApiKeyBlurred(!apiKeyBlurred)}/>.
+                        Remember to keep it safe!<br/>
+                        <strong><span className="text-danger" onClick={() => onApiKeyRegenerate()}>Click here</span> to regenerate API key if it got compromised.</strong>
+                    </span>
+                </Col>
+                <Col sm={3} xs={6} className="text-sm-right text-left my-auto">
+                    <ActionButton onClick={() => onApiKeyDisable()} variant="danger" text="Disable"/>
+                </Col>
+            </Row>
+        }
+    };
     const onBoardDelete = () => {
         swalGenerator.fire({
             title: "Irreversible action!",
@@ -167,6 +199,87 @@ const GeneralSettings = ({reRouteTo, updateState}) => {
                 }
                 history.push("/me");
                 toastSuccess("Board permanently deleted.", toastId);
+            }).catch(err => toastError(err.response.data.errors[0]));
+        });
+    };
+    const onApiKeyEnable = () => {
+        swalGenerator.fire({
+            title: "Are you sure?",
+            html: "Once you activate API key you can disable or regenerate it later. You'll get access to Public Feedbacky API with it.",
+            icon: "question",
+            showCancelButton: true,
+            animation: false,
+            reverseButtons: true,
+            focusCancel: true,
+            cancelButtonColor: "#00c851",
+            confirmButtonColor: "#d33",
+            confirmButtonText: "Enable",
+        }).then(willClose => {
+            if (!willClose.value) {
+                return;
+            }
+            let toastId = toastAwait("Generating API key, hold on...");
+            axios.patch("/boards/" + boardData.discriminator + "/apiKey").then(res => {
+                if (res.status !== 200 && res.status !== 204) {
+                    toastError();
+                    return;
+                }
+                boardData.apiKey = res.data.apiKey;
+                toastSuccess("API key generated and enabled.", toastId);
+            }).catch(err => toastError(err.response.data.errors[0]));
+        });
+    };
+    const onApiKeyDisable = () => {
+        swalGenerator.fire({
+            title: "Are you sure?",
+            html: "You won't be able to use Public Feedbacky API anymore.",
+            icon: "question",
+            showCancelButton: true,
+            animation: false,
+            reverseButtons: true,
+            focusCancel: true,
+            cancelButtonColor: "#00c851",
+            confirmButtonColor: "#d33",
+            confirmButtonText: "Disable",
+        }).then(willClose => {
+            if (!willClose.value) {
+                return;
+            }
+            let toastId = toastAwait("Disabling API key, hold on...");
+            axios.delete("/boards/" + boardData.discriminator + "/apiKey").then(res => {
+                if (res.status !== 200 && res.status !== 204) {
+                    toastError();
+                    return;
+                }
+                boardData.apiKey = "";
+                toastSuccess("API key disabled.", toastId);
+            }).catch(err => toastError(err.response.data.errors[0]));
+        });
+    };
+    const onApiKeyRegenerate = () => {
+        swalGenerator.fire({
+            title: "Are you sure?",
+            html: "API key will be regenerated and you must update it anywhere you use it.",
+            icon: "question",
+            showCancelButton: true,
+            animation: false,
+            reverseButtons: true,
+            focusCancel: true,
+            cancelButtonColor: "#00c851",
+            confirmButtonColor: "#d33",
+            confirmButtonText: "Regenerate",
+        }).then(willClose => {
+            if (!willClose.value) {
+                return;
+            }
+            let toastId = toastAwait("Generating new API key, hold on...");
+            axios.patch("/boards/" + boardData.discriminator + "/apiKey").then(res => {
+                if (res.status !== 200 && res.status !== 204) {
+                    toastError();
+                    return;
+                }
+                boardData.apiKey = res.data.apiKey;
+                toastSuccess("API key regenerated.", toastId);
             }).catch(err => toastError(err.response.data.errors[0]));
         });
     };

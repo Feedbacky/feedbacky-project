@@ -13,6 +13,7 @@ import net.feedbacky.app.data.board.webhook.WebhookExecutor;
 import net.feedbacky.app.data.idea.Idea;
 import net.feedbacky.app.data.tag.Tag;
 import net.feedbacky.app.data.user.User;
+import net.feedbacky.app.data.user.dto.FetchUserDto;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.modelmapper.ModelMapper;
@@ -79,11 +80,28 @@ public class Board implements Serializable {
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "board")
   private Set<SocialLink> socialLinks = new HashSet<>();
 
-  public FetchBoardDto convertToDto() {
+  public FetchBoardRequest convertToDto() {
     FetchBoardDto dto = new ModelMapper().map(this, FetchBoardDto.class);
     dto.setSocialLinks(getSocialLinks().stream().map(SocialLink::convertToDto).collect(Collectors.toList()));
     dto.setModerators(getModerators().stream().map(Moderator::convertToModeratorDto).collect(Collectors.toList()));
-    return dto;
+    return new FetchBoardRequest(dto);
+  }
+
+  public static class FetchBoardRequest {
+
+    private final FetchBoardDto dto;
+
+    public FetchBoardRequest(FetchBoardDto dto) {
+      this.dto = dto;
+    }
+
+    public FetchBoardDto exposeSensitiveData(boolean expose) {
+      if(!expose) {
+        dto.setApiKey(null);
+      }
+      return dto;
+    }
+
   }
 
 }
