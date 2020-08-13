@@ -52,6 +52,9 @@ public class StartupMigrator {
         return;
       }
       String content = new String(Files.readAllBytes(versionFile.toPath()), StandardCharsets.UTF_8);
+      if(content.equals("")) {
+        content = "1";
+      }
       version = Integer.parseInt(content);
     } catch(IOException e) {
       logger.log(Level.WARNING, "Failed to get version file contents! Migrator will not run.");
