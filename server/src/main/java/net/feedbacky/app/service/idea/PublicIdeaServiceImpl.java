@@ -13,6 +13,7 @@ import net.feedbacky.app.util.request.PublicRequestValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -23,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
  * <p>
  * Created at 13.08.2020
  */
+@Service
 public class PublicIdeaServiceImpl implements PublicIdeaService {
 
   private BoardRepository boardRepository;

@@ -122,6 +122,7 @@ const GeneralSettings = ({reRouteTo, updateState}) => {
     };
     const renderDangerContent = () => {
         return <div className="mb-3 view-box-bg px-1 py-3 rounded mt-2 danger-shadow rounded-bottom">
+            {renderApiKeyContent()}
             <Row noGutters className="m-0 p-0 px-4 my-2">
                 <Col sm={9} xs={12}>
                     <h4 className="mb-1 text-danger">Delete Board</h4>
@@ -137,7 +138,7 @@ const GeneralSettings = ({reRouteTo, updateState}) => {
     };
     const renderApiKeyContent = () => {
         if (boardData.apiKey === "") {
-            return <Row noGutters className="m-0 p-0 px-4 my-2">
+            return <Row noGutters className="m-0 p-0 pb-2 px-4 my-2">
                 <Col sm={9} xs={12}>
                     <h4 className="mb-1 text-danger">API Key</h4>
                     <span className="text-black-50" style={{fontSize: ".9em"}}>
@@ -149,15 +150,15 @@ const GeneralSettings = ({reRouteTo, updateState}) => {
                 </Col>
             </Row>
         } else {
-            return <Row noGutters className="m-0 p-0 px-4 my-2">
+            return <Row noGutters className="m-0 p-0 pb-2 px-4 my-2">
                 <Col sm={9} xs={12}>
                     <h4 className="mb-1 text-danger">API Key</h4>
                     <span className="text-black-50" style={{fontSize: ".9em"}}>
                         Generate access key to utilise Feedbacky API for anonymous ideas posting.<br/>
-                        Your API key <span className={!apiKeyBlurred || "blurred"}>{boardData.apiKey}</span>
+                        Your API key <span className={!apiKeyBlurred || "text-blurred"}>{boardData.apiKey}</span>
                         <FaEyeSlash className="board-role internal ml-1" onClick={() => setApiKeyBlurred(!apiKeyBlurred)}/>.
                         Remember to keep it safe!<br/>
-                        <strong><span className="text-danger" onClick={() => onApiKeyRegenerate()}>Click here</span> to regenerate API key if it got compromised.</strong>
+                        <strong><span className="text-danger cursor-click" onClick={() => onApiKeyRegenerate()}>Click here</span> to regenerate API key if it got compromised.</strong>
                     </span>
                 </Col>
                 <Col sm={3} xs={6} className="text-sm-right text-left my-auto">
@@ -224,7 +225,7 @@ const GeneralSettings = ({reRouteTo, updateState}) => {
                     toastError();
                     return;
                 }
-                boardData.apiKey = res.data.apiKey;
+                updateState({...boardData, apiKey: res.data.apiKey});
                 toastSuccess("API key generated and enabled.", toastId);
             }).catch(err => toastError(err.response.data.errors[0]));
         });
@@ -251,7 +252,7 @@ const GeneralSettings = ({reRouteTo, updateState}) => {
                     toastError();
                     return;
                 }
-                boardData.apiKey = "";
+                updateState({...boardData, apiKey: ""});
                 toastSuccess("API key disabled.", toastId);
             }).catch(err => toastError(err.response.data.errors[0]));
         });
@@ -278,7 +279,7 @@ const GeneralSettings = ({reRouteTo, updateState}) => {
                     toastError();
                     return;
                 }
-                boardData.apiKey = res.data.apiKey;
+                updateState({...boardData, apiKey: res.data.apiKey});
                 toastSuccess("API key regenerated.", toastId);
             }).catch(err => toastError(err.response.data.errors[0]));
         });

@@ -165,4 +165,7 @@ $dark-comment-internal: #3299ff;
       background-color: $dark-hover;
     }
   }
+  .text-blurred {
+    text-shadow: 0 0 5px $dark-font-color;
+  }
 }

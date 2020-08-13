@@ -551,4 +551,9 @@ a {
   }
 }
 
+.text-blurred {
+  color: transparent;
+  text-shadow: 0 0 5px $font-color;
+}
+
 @import "assets/scss/dark-mode";

@@ -17,12 +17,14 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
 /**
  * @author Plajer
  * <p>
  * Created at 13.08.2020
  */
+@Service
 public class ApiKeyServiceImpl implements ApiKeyService {
 
   private BoardRepository boardRepository;
@@ -44,7 +46,7 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     if(!hasPermission(board, Moderator.Role.OWNER, user)) {
       throw new InvalidAuthenticationException("No permission to manage api keys for this board.");
     }
-    board.setApiKey(RandomStringUtils.randomAscii(20));
+    board.setApiKey(RandomStringUtils.randomAlphanumeric(20));
     boardRepository.save(board);
     return ResponseEntity.ok(board.convertToDto().exposeSensitiveData(true));
   }
