@@ -42,6 +42,9 @@ public class PublicRequestValidator {
 
   public User getUserByTokenOnly(HttpServletRequest request) {
     String userToken = request.getHeader("X-Feedbacky-User-Token");
+    if(userToken == null || userToken.equals("")) {
+      return null;
+    }
     return userRepository.findByToken(userToken).orElse(null);
   }
 
