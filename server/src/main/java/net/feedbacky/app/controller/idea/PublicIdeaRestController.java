@@ -85,12 +85,12 @@ public class PublicIdeaRestController {
     return publicIdeaService.post(dto);
   }
 
-  @PostMapping("v1/ideas/{id}/voters")
+  @PostMapping("v1/public/ideas/{id}/voters")
   public PublicApiRequest<FetchUserDto> postUpvote(@PathVariable long id) {
     return publicIdeaService.postUpvote(id);
   }
 
-  @DeleteMapping("v1/ideas/{id}/voters")
+  @DeleteMapping("v1/public/ideas/{id}/voters")
   public ResponseEntity<PublicApiRequest<?>> deleteUpvote(@PathVariable long id) {
     return publicIdeaService.deleteUpvote(id);
   }
