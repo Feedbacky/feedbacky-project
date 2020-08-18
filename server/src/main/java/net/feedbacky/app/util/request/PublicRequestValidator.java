@@ -40,6 +40,12 @@ public class PublicRequestValidator {
     }
   }
 
+  public User getUserByTokenOnly(Board board, HttpServletRequest request) {
+    String userToken = request.getHeader("X-Feedbacky-User-Token");
+    validateUserToken(userToken, board);
+    return userRepository.findByToken(userToken).orElse(null);
+  }
+
   public User getUser(Board board, HttpServletRequest request) {
     String userToken = request.getHeader("X-Feedbacky-User-Token");
     String username = request.getHeader("X-Feedbacky-User-Username");

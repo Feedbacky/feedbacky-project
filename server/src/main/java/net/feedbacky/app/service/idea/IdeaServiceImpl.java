@@ -30,7 +30,6 @@ import net.feedbacky.app.service.ServiceUser;
 import net.feedbacky.app.util.CommentBuilder;
 import net.feedbacky.app.util.PaginableRequest;
 import net.feedbacky.app.util.request.InternalRequestValidator;
-import net.feedbacky.app.util.SortFilterResolver;
 import net.feedbacky.app.util.objectstorage.ObjectStorage;
 
 import org.apache.commons.text.StringEscapeUtils;
@@ -47,7 +46,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -67,13 +65,13 @@ public class IdeaServiceImpl implements IdeaService {
   private final AttachmentRepository attachmentRepository;
   private final ObjectStorage objectStorage;
   private final SubscriptionExecutor subscriptionExecutor;
-  private final IdeaPostUtils ideaPostUtils;
+  private final IdeaServiceCommons ideaServiceCommons;
 
   @Autowired
   //todo too big constructor
   public IdeaServiceImpl(IdeaRepository ideaRepository, BoardRepository boardRepository, UserRepository userRepository, TagRepository tagRepository,
                          CommentRepository commentRepository, AttachmentRepository attachmentRepository, ObjectStorage objectStorage,
-                         SubscriptionExecutor subscriptionExecutor, IdeaPostUtils ideaPostUtils) {
+                         SubscriptionExecutor subscriptionExecutor, IdeaServiceCommons ideaServiceCommons) {
     this.ideaRepository = ideaRepository;
     this.boardRepository = boardRepository;
     this.userRepository = userRepository;
@@ -82,7 +80,7 @@ public class IdeaServiceImpl implements IdeaService {
     this.attachmentRepository = attachmentRepository;
     this.objectStorage = objectStorage;
     this.subscriptionExecutor = subscriptionExecutor;
-    this.ideaPostUtils = ideaPostUtils;
+    this.ideaServiceCommons = ideaServiceCommons;
   }
 
   @Override
@@ -94,26 +92,7 @@ public class IdeaServiceImpl implements IdeaService {
     }
     Board board = boardRepository.findByDiscriminator(discriminator)
             .orElseThrow(() -> new ResourceNotFoundException("Board with discriminator " + discriminator + " does not exist."));
-    //not using board.getIdeas() because it would load all, we need paged limited list
-    Page<Idea> pageData;
-    switch(filter) {
-      case OPENED:
-        pageData = ideaRepository.findByBoardAndStatus(board, Idea.IdeaStatus.OPENED, PageRequest.of(page, pageSize, SortFilterResolver.resolveSorting(sort)));
-        break;
-      case CLOSED:
-        pageData = ideaRepository.findByBoardAndStatus(board, Idea.IdeaStatus.CLOSED, PageRequest.of(page, pageSize, SortFilterResolver.resolveSorting(sort)));
-        break;
-      case ALL:
-        pageData = ideaRepository.findByBoard(board, PageRequest.of(page, pageSize, SortFilterResolver.resolveSorting(sort)));
-        break;
-      default:
-        throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "Invalid filter type.");
-    }
-    List<Idea> ideas = pageData.getContent();
-    final User finalUser = user;
-    int totalPages = pageData.getTotalElements() == 0 ? 0 : pageData.getTotalPages() - 1;
-    return new PaginableRequest<>(new PaginableRequest.PageMetadata(page, totalPages, pageSize), ideas.stream()
-            .map(idea -> idea.convertToDto(finalUser)).collect(Collectors.toList()));
+    return ideaServiceCommons.getAllIdeas(board, user, page, pageSize, filter, sort);
   }
 
   @Override
@@ -125,12 +104,7 @@ public class IdeaServiceImpl implements IdeaService {
     }
     Board board = boardRepository.findByDiscriminator(discriminator)
             .orElseThrow(() -> new ResourceNotFoundException("Board with discriminator " + discriminator + " does not exist."));
-    final User finalUser = user;
-    Page<Idea> pageData = ideaRepository.findByBoardAndTitleIgnoreCaseContaining(board, query, PageRequest.of(page, pageSize));
-    List<Idea> ideas = pageData.getContent();
-    int totalPages = pageData.getTotalElements() == 0 ? 0 : pageData.getTotalPages() - 1;
-    return new PaginableRequest<>(new PaginableRequest.PageMetadata(page, totalPages, pageSize), ideas.stream()
-            .map(idea -> idea.convertToDto(finalUser)).collect(Collectors.toList()));
+    return ideaServiceCommons.getAllIdeasContaining(board, user, page, pageSize, query);
   }
 
   @Override
@@ -140,8 +114,7 @@ public class IdeaServiceImpl implements IdeaService {
       UserAuthenticationToken auth = (UserAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
       user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail()).orElse(null);
     }
-    Idea idea = ideaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Idea with id " + id + " not found"));
-    return idea.convertToDto(user);
+    return ideaServiceCommons.getOne(user, id);
   }
 
   @Override
@@ -151,7 +124,7 @@ public class IdeaServiceImpl implements IdeaService {
             .orElseThrow(() -> new InvalidAuthenticationException("User session not found. Try again with new token"));
     Board board = boardRepository.findByDiscriminator(dto.getDiscriminator())
             .orElseThrow(() -> new ResourceNotFoundException("Board with discriminator " + dto.getDiscriminator() + " not found."));
-    return ResponseEntity.status(HttpStatus.CREATED).body(ideaPostUtils.post(dto, board, user));
+    return ResponseEntity.status(HttpStatus.CREATED).body(ideaServiceCommons.post(dto, board, user));
   }
 
   @Override
@@ -255,7 +228,7 @@ public class IdeaServiceImpl implements IdeaService {
     User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
             .orElseThrow(() -> new InvalidAuthenticationException("User session not found. Try again with new token"));
     Idea idea = ideaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Idea with id " + id + " does not exist."));
-    return ideaPostUtils.postUpvote(user, idea);
+    return ideaServiceCommons.postUpvote(user, idea);
   }
 
   @Override
@@ -264,7 +237,7 @@ public class IdeaServiceImpl implements IdeaService {
     User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
             .orElseThrow(() -> new InvalidAuthenticationException("User session not found. Try again with new token"));
     Idea idea = ideaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Idea with id " + id + " does not exist."));
-    return ideaPostUtils.deleteUpvote(user, idea);
+    return ideaServiceCommons.deleteUpvote(user, idea);
   }
 
   @Override
