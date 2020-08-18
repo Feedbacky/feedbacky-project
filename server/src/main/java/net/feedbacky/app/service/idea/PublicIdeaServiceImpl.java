@@ -51,7 +51,7 @@ public class PublicIdeaServiceImpl implements PublicIdeaService {
             .orElseThrow(() -> new ResourceNotFoundException("Board with discriminator " + discriminator + " not found."));
     HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
     publicRequestValidator.validateApiKeyFromRequest(request, board);
-    User user = publicRequestValidator.getUserByTokenOnly(board, request);
+    User user = publicRequestValidator.getUserByTokenOnly(request);
     return new PublicApiRequest<>(user == null ? null : user.getToken(), ideaServiceCommons.getAllIdeas(board, user, page, pageSize, filter, sort));
   }
 
@@ -61,7 +61,7 @@ public class PublicIdeaServiceImpl implements PublicIdeaService {
     Board board = idea.getBoard();
     HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
     publicRequestValidator.validateApiKeyFromRequest(request, board);
-    User user = publicRequestValidator.getUserByTokenOnly(board, request);
+    User user = publicRequestValidator.getUserByTokenOnly(request);
     return new PublicApiRequest<>(user == null ? null : user.getToken(), idea.convertToDto(user));
   }
 
