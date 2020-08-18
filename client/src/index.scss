@@ -554,6 +554,7 @@ a {
 .text-blurred {
   color: transparent;
   text-shadow: 0 0 5px $font-color;
+  user-select: none;
 }
 
 @import "assets/scss/dark-mode";
