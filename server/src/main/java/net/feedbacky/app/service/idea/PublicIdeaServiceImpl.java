@@ -1,12 +1,14 @@
 package net.feedbacky.app.service.idea;
 
 import net.feedbacky.app.data.board.Board;
+import net.feedbacky.app.data.idea.Idea;
 import net.feedbacky.app.data.idea.dto.FetchIdeaDto;
 import net.feedbacky.app.data.idea.dto.PostIdeaDto;
 import net.feedbacky.app.data.user.User;
+import net.feedbacky.app.data.user.dto.FetchUserDto;
 import net.feedbacky.app.exception.types.ResourceNotFoundException;
-import net.feedbacky.app.repository.UserRepository;
 import net.feedbacky.app.repository.board.BoardRepository;
+import net.feedbacky.app.repository.idea.IdeaRepository;
 import net.feedbacky.app.util.PublicApiRequest;
 import net.feedbacky.app.util.request.PublicRequestValidator;
 
@@ -28,12 +30,14 @@ import javax.servlet.http.HttpServletRequest;
 public class PublicIdeaServiceImpl implements PublicIdeaService {
 
   private BoardRepository boardRepository;
-  private IdeaPostCreator ideaPostCreator;
+  private IdeaRepository ideaRepository;
+  private IdeaPostUtils ideaPostCreator;
   private PublicRequestValidator publicRequestValidator;
 
   @Autowired
-  public PublicIdeaServiceImpl(BoardRepository boardRepository, IdeaPostCreator ideaPostCreator, PublicRequestValidator publicRequestValidator) {
+  public PublicIdeaServiceImpl(BoardRepository boardRepository, IdeaRepository ideaRepository, IdeaPostUtils ideaPostCreator, PublicRequestValidator publicRequestValidator) {
     this.boardRepository = boardRepository;
+    this.ideaRepository = ideaRepository;
     this.ideaPostCreator = ideaPostCreator;
     this.publicRequestValidator = publicRequestValidator;
   }
@@ -49,4 +53,23 @@ public class PublicIdeaServiceImpl implements PublicIdeaService {
     return ResponseEntity.status(HttpStatus.CREATED).body(data);
   }
 
+  @Override
+  public PublicApiRequest<FetchUserDto> postUpvote(long id) {
+    Idea idea = ideaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Idea with id " + id + " does not exist."));
+    Board board = idea.getBoard();
+    HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+    publicRequestValidator.validateApiKeyFromRequest(request, board);
+    User user = publicRequestValidator.getUser(board, request);
+    return new PublicApiRequest<>(user.getToken(), ideaPostCreator.postUpvote(user, idea));
+  }
+
+  @Override
+  public ResponseEntity<PublicApiRequest<?>> deleteUpvote(long id) {
+    Idea idea = ideaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Idea with id " + id + " does not exist."));
+    Board board = idea.getBoard();
+    HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+    publicRequestValidator.validateApiKeyFromRequest(request, board);
+    User user = publicRequestValidator.getUser(board, request);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new PublicApiRequest<>(user.getToken(), ideaPostCreator.deleteUpvote(user, idea)));
+  }
 }

@@ -156,7 +156,7 @@ const GeneralSettings = ({reRouteTo, updateState}) => {
                     <span className="text-black-50" style={{fontSize: ".9em"}}>
                         Generate access key to utilise Feedbacky API for anonymous ideas posting.<br/>
                         Your API key <span className={!apiKeyBlurred || "text-blurred"}>{boardData.apiKey}</span>
-                        <FaEyeSlash className="board-role internal ml-1" onClick={() => setApiKeyBlurred(!apiKeyBlurred)}/>.
+                        <FaEyeSlash className="board-role internal cursor-click ml-1" onClick={() => setApiKeyBlurred(!apiKeyBlurred)}/>.
                         Remember to keep it safe!<br/>
                         <strong><span className="text-danger cursor-click" onClick={() => onApiKeyRegenerate()}>Click here</span> to regenerate API key if it got compromised.</strong>
                     </span>

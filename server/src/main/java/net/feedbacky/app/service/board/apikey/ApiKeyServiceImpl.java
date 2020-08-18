@@ -46,7 +46,7 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     if(!hasPermission(board, Moderator.Role.OWNER, user)) {
       throw new InvalidAuthenticationException("No permission to manage api keys for this board.");
     }
-    board.setApiKey(RandomStringUtils.randomAlphanumeric(20));
+    board.setApiKey(RandomStringUtils.randomAlphanumeric(40));
     boardRepository.save(board);
     return ResponseEntity.ok(board.convertToDto().exposeSensitiveData(true));
   }

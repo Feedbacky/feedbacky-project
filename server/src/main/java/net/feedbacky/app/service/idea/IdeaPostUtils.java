@@ -8,9 +8,13 @@ import net.feedbacky.app.data.idea.attachment.Attachment;
 import net.feedbacky.app.data.idea.dto.FetchIdeaDto;
 import net.feedbacky.app.data.idea.dto.PostIdeaDto;
 import net.feedbacky.app.data.user.User;
+import net.feedbacky.app.data.user.dto.FetchUserDto;
 import net.feedbacky.app.exception.FeedbackyRestException;
+import net.feedbacky.app.exception.types.InvalidAuthenticationException;
+import net.feedbacky.app.exception.types.ResourceNotFoundException;
 import net.feedbacky.app.repository.idea.AttachmentRepository;
 import net.feedbacky.app.repository.idea.IdeaRepository;
+import net.feedbacky.app.service.ServiceUser;
 import net.feedbacky.app.util.Base64Util;
 import net.feedbacky.app.util.objectstorage.ObjectStorage;
 
@@ -32,14 +36,14 @@ import java.util.Set;
  * Created at 13.08.2020
  */
 @Component
-public class IdeaPostCreator {
+public class IdeaPostUtils {
 
   private IdeaRepository ideaRepository;
   private ObjectStorage objectStorage;
   private AttachmentRepository attachmentRepository;
 
   @Autowired
-  public IdeaPostCreator(IdeaRepository ideaRepository, ObjectStorage objectStorage, AttachmentRepository attachmentRepository) {
+  public IdeaPostUtils(IdeaRepository ideaRepository, ObjectStorage objectStorage, AttachmentRepository attachmentRepository) {
     this.ideaRepository = ideaRepository;
     this.objectStorage = objectStorage;
     this.attachmentRepository = attachmentRepository;
@@ -81,6 +85,29 @@ public class IdeaPostCreator {
     WebhookDataBuilder builder = new WebhookDataBuilder().withUser(user).withIdea(idea);
     idea.getBoard().getWebhookExecutor().executeWebhooks(Webhook.Event.IDEA_CREATE, builder.build());
     return fetchDto;
+  }
+
+  public FetchUserDto postUpvote(User user, Idea idea) {
+    if(idea.getVoters().contains(user)) {
+      throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "Idea with id " + idea.getId() + " is already upvoted by you.");
+    }
+    Set<User> voters = idea.getVoters();
+    voters.add(user);
+    idea.setVoters(voters);
+    ideaRepository.save(idea);
+    //no need to expose
+    return user.convertToDto().exposeSensitiveData(false);
+  }
+
+  public ResponseEntity deleteUpvote(User user, Idea idea) {
+    if(!idea.getVoters().contains(user)) {
+      throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "Idea with id " + idea.getId() + " is not upvoted by you.");
+    }
+    Set<User> voters = idea.getVoters();
+    voters.remove(user);
+    idea.setVoters(voters);
+    ideaRepository.save(idea);
+    return ResponseEntity.noContent().build();
   }
 
 }

@@ -6,7 +6,6 @@ import net.feedbacky.app.data.board.moderator.Moderator;
 import net.feedbacky.app.data.board.webhook.Webhook;
 import net.feedbacky.app.data.board.webhook.WebhookDataBuilder;
 import net.feedbacky.app.data.idea.Idea;
-import net.feedbacky.app.data.idea.attachment.Attachment;
 import net.feedbacky.app.data.idea.comment.Comment;
 import net.feedbacky.app.data.idea.dto.FetchIdeaDto;
 import net.feedbacky.app.data.idea.dto.PatchIdeaDto;
@@ -28,7 +27,6 @@ import net.feedbacky.app.repository.idea.AttachmentRepository;
 import net.feedbacky.app.repository.idea.CommentRepository;
 import net.feedbacky.app.repository.idea.IdeaRepository;
 import net.feedbacky.app.service.ServiceUser;
-import net.feedbacky.app.util.Base64Util;
 import net.feedbacky.app.util.CommentBuilder;
 import net.feedbacky.app.util.PaginableRequest;
 import net.feedbacky.app.util.request.InternalRequestValidator;
@@ -48,9 +46,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -71,13 +67,13 @@ public class IdeaServiceImpl implements IdeaService {
   private final AttachmentRepository attachmentRepository;
   private final ObjectStorage objectStorage;
   private final SubscriptionExecutor subscriptionExecutor;
-  private final IdeaPostCreator ideaPostCreator;
+  private final IdeaPostUtils ideaPostUtils;
 
   @Autowired
   //todo too big constructor
   public IdeaServiceImpl(IdeaRepository ideaRepository, BoardRepository boardRepository, UserRepository userRepository, TagRepository tagRepository,
                          CommentRepository commentRepository, AttachmentRepository attachmentRepository, ObjectStorage objectStorage,
-                         SubscriptionExecutor subscriptionExecutor, IdeaPostCreator ideaPostCreator) {
+                         SubscriptionExecutor subscriptionExecutor, IdeaPostUtils ideaPostUtils) {
     this.ideaRepository = ideaRepository;
     this.boardRepository = boardRepository;
     this.userRepository = userRepository;
@@ -86,7 +82,7 @@ public class IdeaServiceImpl implements IdeaService {
     this.attachmentRepository = attachmentRepository;
     this.objectStorage = objectStorage;
     this.subscriptionExecutor = subscriptionExecutor;
-    this.ideaPostCreator = ideaPostCreator;
+    this.ideaPostUtils = ideaPostUtils;
   }
 
   @Override
@@ -155,7 +151,7 @@ public class IdeaServiceImpl implements IdeaService {
             .orElseThrow(() -> new InvalidAuthenticationException("User session not found. Try again with new token"));
     Board board = boardRepository.findByDiscriminator(dto.getDiscriminator())
             .orElseThrow(() -> new ResourceNotFoundException("Board with discriminator " + dto.getDiscriminator() + " not found."));
-    return ResponseEntity.status(HttpStatus.CREATED).body(ideaPostCreator.post(dto, board, user));
+    return ResponseEntity.status(HttpStatus.CREATED).body(ideaPostUtils.post(dto, board, user));
   }
 
   @Override
@@ -248,11 +244,6 @@ public class IdeaServiceImpl implements IdeaService {
 
   @Override
   public List<FetchUserDto> getAllVoters(long id) {
-    User user = null;
-    if(SecurityContextHolder.getContext().getAuthentication() instanceof UserAuthenticationToken) {
-      UserAuthenticationToken auth = (UserAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-      user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail()).orElse(null);
-    }
     Idea idea = ideaRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Idea with id " + id + " does not exist."));
     return idea.getVoters().stream().map(usr -> usr.convertToDto().exposeSensitiveData(false)).collect(Collectors.toList());
@@ -260,21 +251,11 @@ public class IdeaServiceImpl implements IdeaService {
 
   @Override
   public FetchUserDto postUpvote(long id) {
-    //todo X-User-Id vote on behalf
     UserAuthenticationToken auth = InternalRequestValidator.getContextAuthentication();
     User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
             .orElseThrow(() -> new InvalidAuthenticationException("User session not found. Try again with new token"));
-    Idea idea = ideaRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Idea with id " + id + " does not exist."));
-    if(idea.getVoters().contains(user)) {
-      throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "Idea with id " + id + " is already upvoted by you.");
-    }
-    Set<User> voters = idea.getVoters();
-    voters.add(user);
-    idea.setVoters(voters);
-    ideaRepository.save(idea);
-    //no need to expose
-    return user.convertToDto().exposeSensitiveData(false);
+    Idea idea = ideaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Idea with id " + id + " does not exist."));
+    return ideaPostUtils.postUpvote(user, idea);
   }
 
   @Override
@@ -282,16 +263,8 @@ public class IdeaServiceImpl implements IdeaService {
     UserAuthenticationToken auth = InternalRequestValidator.getContextAuthentication();
     User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
             .orElseThrow(() -> new InvalidAuthenticationException("User session not found. Try again with new token"));
-    Idea idea = ideaRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Idea with id " + id + " does not exist."));
-    if(!idea.getVoters().contains(user)) {
-      throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "Idea with id " + id + " is not upvoted by you.");
-    }
-    Set<User> voters = idea.getVoters();
-    voters.remove(user);
-    idea.setVoters(voters);
-    ideaRepository.save(idea);
-    return ResponseEntity.noContent().build();
+    Idea idea = ideaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Idea with id " + id + " does not exist."));
+    return ideaPostUtils.deleteUpvote(user, idea);
   }
 
   @Override
