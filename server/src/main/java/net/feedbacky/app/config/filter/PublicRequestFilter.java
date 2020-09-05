@@ -1,5 +1,8 @@
 package net.feedbacky.app.config.filter;
 
+import net.feedbacky.app.exception.FeedbackyRestException;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -30,12 +33,10 @@ public class PublicRequestFilter extends OncePerRequestFilter {
 
     response.setContentType("application/json");
     if(tokenHeader == null) {
-      response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authorization header required to use Public API.");
-      return;
+      throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "Authorization header required to use Public API.");
     }
     if(!tokenHeader.startsWith("Apikey ")) {
-      response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Only Apikeys supported in Public API.");
-      return;
+      throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "Only Apikeys supported in Public API.");
     }
     chain.doFilter(request, response);
   }
