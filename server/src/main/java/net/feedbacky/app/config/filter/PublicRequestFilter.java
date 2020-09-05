@@ -45,7 +45,6 @@ public class PublicRequestFilter extends OncePerRequestFilter {
       response.setContentType(MediaType.APPLICATION_JSON_VALUE);
       ObjectMapper mapper = new ObjectMapper();
       mapper.writeValue(response.getWriter(), error);
-      chain.doFilter(request, response);
       return;
     }
     if(!tokenHeader.startsWith("Apikey ")) {
@@ -57,6 +56,7 @@ public class PublicRequestFilter extends OncePerRequestFilter {
       response.setContentType(MediaType.APPLICATION_JSON_VALUE);
       ObjectMapper mapper = new ObjectMapper();
       mapper.writeValue(response.getWriter(), error);
+      return;
     }
     chain.doFilter(request, response);
   }
