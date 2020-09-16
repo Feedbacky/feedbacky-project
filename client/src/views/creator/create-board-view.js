@@ -11,6 +11,8 @@ import StepThird from "views/creator/steps/step-third";
 import axios from "axios";
 import {NextStepButton, PreviousStepButton} from "components/steps/steps-buttons";
 import "views/Steps.css";
+import ErrorView from "views/errors/error-view";
+import {FaSignInAlt} from "react-icons/all";
 
 const CreateBoardView = () => {
     const context = useContext(AppContext);
@@ -20,8 +22,7 @@ const CreateBoardView = () => {
         //eslint-disable-next-line
         []);
     if (!context.user.loggedIn) {
-         history.push("/me");
-        return <React.Fragment/>
+        return <ErrorView icon={<FaSignInAlt className="error-icon"/>} message="You Must Be Logged To Do That"/>
     }
     const updateSettings = (data) => {
         setSettings(data);
