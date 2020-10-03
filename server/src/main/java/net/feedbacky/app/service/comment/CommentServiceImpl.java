@@ -22,6 +22,7 @@ import net.feedbacky.app.data.user.dto.FetchUserDto;
 import net.feedbacky.app.service.ServiceUser;
 import net.feedbacky.app.util.PaginableRequest;
 import net.feedbacky.app.util.request.InternalRequestValidator;
+import net.feedbacky.app.util.SortFilterResolver;
 
 import org.apache.commons.text.StringEscapeUtils;
 import org.modelmapper.Conditions;
@@ -61,7 +62,7 @@ public class CommentServiceImpl implements CommentService {
   }
 
   @Override
-  public PaginableRequest<List<FetchCommentDto>> getAllForIdea(long ideaId, int page, int pageSize) {
+  public PaginableRequest<List<FetchCommentDto>> getAllForIdea(long ideaId, int page, int pageSize, SortType sortType) {
     User user = null;
     if(SecurityContextHolder.getContext().getAuthentication() instanceof UserAuthenticationToken) {
       UserAuthenticationToken auth = (UserAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
@@ -69,7 +70,7 @@ public class CommentServiceImpl implements CommentService {
     }
     Idea idea = ideaRepository.findById(ideaId)
             .orElseThrow(() -> new ResourceNotFoundException("Idea with id " + ideaId + " does not exist."));
-    Page<Comment> pageData = commentRepository.findByIdea(idea, PageRequest.of(page, pageSize, Sort.by("id").ascending()));
+    Page<Comment> pageData = commentRepository.findByIdea(idea, PageRequest.of(page, pageSize, SortFilterResolver.resolveCommentsSorting(sortType)));
     List<Comment> comments = pageData.getContent();
     int totalPages = pageData.getTotalElements() == 0 ? 0 : pageData.getTotalPages() - 1;
     final User finalUser = user;
@@ -129,7 +130,8 @@ public class CommentServiceImpl implements CommentService {
       WebhookDataBuilder webhookBuilder = new WebhookDataBuilder().withUser(user).withIdea(idea).withComment(comment);
       idea.getBoard().getWebhookExecutor().executeWebhooks(Webhook.Event.IDEA_COMMENT, webhookBuilder.build());
 
-      if(isModerator) {
+      //notify only if moderator and not author of the idea
+      if(isModerator && !idea.getCreator().equals(user)) {
         SubscriptionDataBuilder subscribeBuilder = new SubscriptionDataBuilder().withUser(user).withComment(comment).withIdea(idea);
         subscriptionExecutor.notifySubscribers(idea, SubscriptionExecutor.Event.IDEA_BY_MODERATOR_COMMENT, subscribeBuilder.build());
       }

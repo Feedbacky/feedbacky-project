@@ -52,10 +52,7 @@ public class StartupMigrator {
         return;
       }
       String content = new String(Files.readAllBytes(versionFile.toPath()), StandardCharsets.UTF_8);
-      if(content.equals("")) {
-        content = "1";
-      }
-      version = Integer.parseInt(content);
+      version = parseIntOrDefault(content, FILE_VERSION);
     } catch(IOException e) {
       logger.log(Level.WARNING, "Failed to get version file contents! Migrator will not run.");
       e.printStackTrace();
@@ -98,6 +95,17 @@ public class StartupMigrator {
       out.print(FILE_VERSION + "");
     } catch(FileNotFoundException e) {
       e.printStackTrace();
+    }
+  }
+
+  private int parseIntOrDefault(String string, int defaultValue) {
+    if(string.equals("")) {
+      return defaultValue;
+    }
+    try {
+      return Integer.parseInt(string);
+    } catch(Exception ex) {
+      return defaultValue;
     }
   }
 
