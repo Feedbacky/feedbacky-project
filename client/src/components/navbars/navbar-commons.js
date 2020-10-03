@@ -1,4 +1,4 @@
-import {Dropdown, DropdownItem, NavItem} from "react-bootstrap";
+import {Dropdown, NavItem} from "react-bootstrap";
 import React from "react";
 import {Link} from "react-router-dom";
 import {FaCogs, FaSignInAlt, FaUserAlt} from "react-icons/fa";
@@ -34,10 +34,10 @@ export const renderLogIn = (onNotLoggedClick, context) => {
                 </Dropdown.Item>
                 {renderModeratedBoards(context)}
                 <div className="my-1"/>
-                <DropdownItem as={Link} to="/create">
+                <Dropdown.Item as={Link} to="/create">
                     <strong>Create Own Board</strong>
-                </DropdownItem>
-            </DropdownMenu>
+                </Dropdown.Item>
+            </Dropdown.Menu>
         </Dropdown>
     </NavItem>
 };
