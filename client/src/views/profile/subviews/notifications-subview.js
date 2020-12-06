@@ -5,7 +5,6 @@ import axios from "axios";
 import ProfileSidebar from "components/sidebar/profile-sidebar";
 import {Col, Row} from "react-bootstrap";
 import ViewBox from "components/viewbox/view-box";
-import Button from "react-bootstrap/Button";
 import ActionButton from "components/app/action-button";
 import ExecutableButton from "components/app/executable-button";
 

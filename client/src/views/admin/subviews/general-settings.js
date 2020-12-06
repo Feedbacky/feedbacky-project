@@ -172,7 +172,7 @@ const GeneralSettings = ({reRouteTo, updateState}) => {
                     </span>
                 </Col>
                 <Col sm={3} xs={6} className="text-sm-right text-left my-auto">
-                    <ActionButton onClick={() => onApiKeyEnable()} variant="success" text="Enable"/>
+                    <ExecutableButton onClick={() => onApiKeyEnable()} variant="success">Enable</ExecutableButton>
                 </Col>
             </Row>
         } else {
@@ -188,7 +188,7 @@ const GeneralSettings = ({reRouteTo, updateState}) => {
                     </span>
                 </Col>
                 <Col sm={3} xs={6} className="text-sm-right text-left my-auto">
-                    <ActionButton onClick={() => onApiKeyDisable()} variant="danger" text="Disable"/>
+                    <ExecutableButton onClick={() => onApiKeyDisable()} variant="danger">Disable</ExecutableButton>
                 </Col>
             </Row>
         }
