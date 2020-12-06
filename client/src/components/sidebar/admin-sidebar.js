@@ -1,7 +1,7 @@
 import React, {useContext} from 'react';
 import {Col} from "react-bootstrap";
 import AppContext from "context/app-context";
-import {FaAt, FaColumns, FaSlidersH, FaTags, FaUserLock, FaUsersCog} from "react-icons/all";
+import {FaAt, FaColumns, FaDiscord, FaQuestionCircle, FaRegCommentDots, FaSlidersH, FaTags, FaUserLock, FaUsersCog} from "react-icons/all";
 import {renderSidebarRoutes} from "components/sidebar/sidebar-commons";
 import Attribution from "components/util/attribution";
 
