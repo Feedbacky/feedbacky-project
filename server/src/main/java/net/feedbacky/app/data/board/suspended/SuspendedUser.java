@@ -1,18 +1,18 @@
-package net.feedbacky.app.data.tag;
+package net.feedbacky.app.data.board.suspended;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import net.feedbacky.app.data.board.Board;
-import net.feedbacky.app.data.tag.dto.FetchTagDto;
+import net.feedbacky.app.data.board.dto.social.FetchSocialLinkDto;
+import net.feedbacky.app.data.board.dto.suspended.FetchSuspendedUserDto;
+import net.feedbacky.app.data.user.User;
 
 import org.modelmapper.ModelMapper;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -21,39 +21,36 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author Plajer
  * <p>
- * Created at 13.10.2019
+ * Created at 17.11.2020
  */
 @Entity
-@Table(name = "boards_tags")
+@Table(name = "boards_suspended_users")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Tag implements Serializable {
+public class SuspendedUser implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @EqualsAndHashCode.Include private Long id;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne
   @JoinColumn(name = "board_id")
   private Board board;
-  private String name;
-  private String color;
-  private boolean roadmapIgnored = false;
+  @ManyToOne
+  @JoinColumn(name = "user_id")
+  private User user;
+  private Date suspensionEndDate;
 
-  public FetchTagDto convertToDto() {
-    return new ModelMapper().map(this, FetchTagDto.class);
-  }
-
-  public String convertToSpecialCommentMention() {
-    return "{data_tag;" + id + ";" + name + ";" + color + "}";
+  public FetchSuspendedUserDto convertToDto() {
+    return new ModelMapper().map(this, FetchSuspendedUserDto.class);
   }
 
 }

@@ -17,6 +17,7 @@ import MailSubscriptionComponent from "components/idea/details/mail-subscription
 import VoteButton from "components/app/vote-button";
 import {useHistory} from "react-router-dom";
 import {PageAvatar} from "components/app/page-avatar";
+import ExecutableButton from "components/app/executable-button";
 
 const IdeaDetailsBox = ({ideaData, updateState, moderators, onNotLoggedClick}) => {
     const context = useContext(AppContext);
@@ -41,9 +42,9 @@ const IdeaDetailsBox = ({ideaData, updateState, moderators, onNotLoggedClick}) =
         if (ideaData.description === description) {
             setEditor({enabled: false, value: htmlDecode(description)});
             toastWarning("Content not changed.");
-            return;
+            return Promise.resolve();
         }
-        axios.patch("/ideas/" + ideaData.id, {
+        return axios.patch("/ideas/" + ideaData.id, {
             description
         }).then(res => {
             if (res.status !== 200) {
@@ -122,8 +123,8 @@ const IdeaDetailsBox = ({ideaData, updateState, moderators, onNotLoggedClick}) =
             <TextareaAutosize className="form-control bg-lighter" id="editorBox" rows={1} maxRows={12}
                               placeholder="Write a description..." required as="textarea"
                               style={{resize: "none", overflow: "hidden"}} defaultValue={htmlDecode(editor.value)}/>
-            <Button className="m-0 mt-2" variant="" style={{backgroundColor: context.getTheme()}} onClick={onEditApply}>Save</Button>
-            <Button className="m-0 mt-2 text-black-50" variant="link" onClick={() => setEditor({...editor, enabled: false})}>Cancel</Button>
+            <ExecutableButton className="m-0 mt-2" variant="" style={{backgroundColor: context.getTheme()}} onClick={onEditApply}>Save</ExecutableButton>
+            <Button className="m-0 mt-2 text-black-50 btn-cancel" variant="link" onClick={() => setEditor({...editor, enabled: false})}>Cancel</Button>
         </React.Fragment>
     };
     const renderDeletionButton = () => {
@@ -142,7 +143,7 @@ const IdeaDetailsBox = ({ideaData, updateState, moderators, onNotLoggedClick}) =
             {renderDeletionButton()}
             {ideaData.user.id !== context.user.data.id || <FaPen className="ml-2 fa-xs cursor-click move-top-2px text-black-60" onClick={() => setEditor({...editor, enabled: true})}/>}
             <br/>
-            <PageAvatar circle className="mr-1" url={ideaData.user.avatar} size={18} style={{maxWidth: "none"}}/>
+            <PageAvatar roundedCircle className="mr-1" url={ideaData.user.avatar} size={18} style={{maxWidth: "none"}}/>
             <small>{formatUsername(ideaData.user.id, ideaData.user.username, moderators)} ·{" "}</small>
             <small className="text-black-60"><TimeAgo datetime={ideaData.creationDate}/></small>
             {!ideaData.edited || <small className="text-black-60"> · edited</small>}

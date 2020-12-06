@@ -2,14 +2,15 @@ import React, {useContext} from "react";
 import {OverlayTrigger, Tooltip} from "react-bootstrap";
 import {formatUsername, parseMarkdown} from "components/util/utils";
 import TimeAgo from "timeago-react";
-import {FaEdit, FaHeart, FaLockOpen, FaLowVision, FaRegHeart, FaTags, FaTimesCircle, FaTrashAlt} from "react-icons/all";
+import {FaEdit, FaHeart, FaLockOpen, FaLowVision, FaRegHeart, FaTags, FaTimesCircle, FaTrashAlt, FaUserLock} from "react-icons/all";
 import AppContext from "context/app-context";
 import BoardContext from "context/board-context";
 import {PageAvatar} from "components/app/page-avatar";
+import parseComment from "components/idea/discussion/comment-parser";
 
-const CommentComponent = ({data, onCommentDelete, onCommentUnlike, onCommentLike}) => {
+const CommentComponent = ({data, onCommentDelete, onCommentUnlike, onCommentLike, onSuspend}) => {
     const context = useContext(AppContext);
-    const {moderators} = useContext(BoardContext).data;
+    const boardContext = useContext(BoardContext).data;
     const retrieveSpecialCommentTypeIcon = (type) => {
         switch (type) {
             case "IDEA_CLOSED":
@@ -33,14 +34,21 @@ const CommentComponent = ({data, onCommentDelete, onCommentUnlike, onCommentLike
                 </OverlayTrigger>
             </React.Fragment>
         }
-        return <small style={{fontWeight: "bold"}}>{formatUsername(data.user.id, data.user.username, moderators)}</small>
+        return <small style={{fontWeight: "bold"}}>{formatUsername(data.user.id, data.user.username, boardContext.moderators)}</small>
     };
     const renderDeletionButton = () => {
-        const moderator = moderators.find(mod => mod.userId === context.user.data.id);
+        const moderator = boardContext.moderators.find(mod => mod.userId === context.user.data.id);
         if (data.user.id !== context.user.data.id && !moderator) {
             return;
         }
         return <FaTrashAlt className="ml-1 fa-xs cursor-click" onClick={() => onCommentDelete(data.id)}/>
+    };
+    const renderSuspensionButton = () => {
+        const moderator = boardContext.moderators.find(mod => mod.userId === context.user.data.id);
+        if (!moderator) {
+            return;
+        }
+        return <FaUserLock className="ml-1 fa-xs cursor-click" onClick={() => onSuspend(data)}/>
     };
     const renderLikes = () => {
         const likes = data.likesAmount;
@@ -52,10 +60,11 @@ const CommentComponent = ({data, onCommentDelete, onCommentUnlike, onCommentLike
     if (!data.special) {
         return <React.Fragment key={data.id}>
             <div className="d-inline-flex mb-2" style={{wordBreak: "break-word"}}>
-                <PageAvatar circle className="mr-3 mt-2" size={30} url={data.user.avatar} style={{minWidth: "30px"}}/>
+                <PageAvatar roundedCircle className="mr-3 mt-2" size={30} url={data.user.avatar} style={{minWidth: "30px"}}/>
                 <div>
                     {renderCommentUsername(data)}
                     {renderDeletionButton(data)}
+                    {renderSuspensionButton(data)}
                     <br/>
                     <span className="snarkdown-box" dangerouslySetInnerHTML={{__html: parseMarkdown(data.description)}}/>
                     <small className="text-black-60"> {renderLikes(data)} · <TimeAgo datetime={data.creationDate}/></small>
@@ -70,7 +79,7 @@ const CommentComponent = ({data, onCommentDelete, onCommentUnlike, onCommentLike
         <div className="d-inline-flex my-1">
             <div className="comment-icon mr-3" style={{backgroundColor: color, color, minWidth: 30}}>{retrieveSpecialCommentTypeIcon(data.specialType)}</div>
             <div>
-                <span style={{color}} dangerouslySetInnerHTML={{__html: data.description}}/>
+                <span style={{color}}>{parseComment(data.description, boardContext.moderators, boardContext.tags)}</span>
                 <small className="ml-1 text-black-60"><TimeAgo datetime={data.creationDate}/></small>
             </div>
         </div>

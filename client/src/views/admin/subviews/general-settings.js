@@ -8,7 +8,6 @@ import Swal from "sweetalert2";
 import AdminSidebar from "components/sidebar/admin-sidebar";
 import {retry} from "components/util/lazy-init";
 import ViewBox from "components/viewbox/view-box";
-import ActionButton from "components/app/action-button";
 import BoardContext from "context/board-context";
 import ClickableTip from "components/util/clickable-tip";
 import TextareaAutosize from "react-autosize-textarea";
@@ -17,6 +16,7 @@ import {FaEyeSlash, FaEllipsisH, FaUpload} from "react-icons/all";
 import Button from "react-bootstrap/Button";
 import {useHistory} from "react-router-dom";
 import ColorSelectionModal from "components/modal/color-selection-modal";
+import ExecutableButton from "components/app/executable-button";
 
 const CirclePicker = lazy(() => retry(() => import ("react-color").then(module => ({default: module.CirclePicker}))));
 
@@ -31,7 +31,7 @@ const GeneralSettings = ({reRouteTo, updateState}) => {
     const [modalOpen, setModalOpen] = useState(false);
     const renderContent = () => {
         return <React.Fragment>
-            <ColorSelectionModal open={modalOpen} onClose={() => setModalOpen(false)} onUpdate={(color) => context.onThemeChange(color.hex)}/>
+            <ColorSelectionModal open={modalOpen} onClose={() => setModalOpen(false)} onUpdate={(color) => context.onThemeChange(color)}/>
             <Col xs={12} lg={6}>
                 <Form.Label className="mr-1 text-black-60">Board Name</Form.Label>
                 <ClickableTip id="boardName" title="Set Board Name" description="Name of your board should be at least 4 and maximum 25 characters long."/>
@@ -138,9 +138,9 @@ const GeneralSettings = ({reRouteTo, updateState}) => {
                 <input hidden accept="image/jpeg, image/png" id="logoInput" type="file" name="logo" onChange={onLogoChange}/>
             </Col>
             <Col xs={12}>
-                <Button className="m-0 mt-3 float-right" variant="" style={{backgroundColor: context.getTheme()}} onClick={onChangesSave}>
+                <ExecutableButton className="m-0 mt-3 float-right" variant="" style={{backgroundColor: context.getTheme()}} onClick={onChangesSave}>
                     Save Settings
-                </Button>
+                </ExecutableButton>
             </Col>
         </React.Fragment>
     };
@@ -155,7 +155,9 @@ const GeneralSettings = ({reRouteTo, updateState}) => {
                     </span>
                 </Col>
                 <Col sm={3} xs={6} className="text-sm-right text-left my-auto">
-                    <ActionButton onClick={() => onBoardDelete()} variant="danger" text="Delete"/>
+                    <ExecutableButton onClick={onBoardDelete} variant="danger">
+                        Delete
+                    </ExecutableButton>
                 </Col>
             </Row>
         </div>
@@ -192,7 +194,7 @@ const GeneralSettings = ({reRouteTo, updateState}) => {
         }
     };
     const onBoardDelete = () => {
-        swalGenerator.fire({
+        return swalGenerator.fire({
             title: "Irreversible action!",
             html: "Hold on, <strong>this is one way road</strong>.<br/>Your board with all ideas will be <strong>permanently lost.</strong>" +
                 "<br/><br/>Type board name (" + boardData.name + ") to confirm deletion and continue.",
@@ -222,6 +224,8 @@ const GeneralSettings = ({reRouteTo, updateState}) => {
                     toastError();
                     return;
                 }
+                //user no longer owns this board, remove from local context
+                context.user.data.permissions = context.user.data.permissions.filter(board => board.boardDiscriminator !== boardData.discriminator);
                 history.push("/me");
                 toastSuccess("Board permanently deleted.", toastId);
             }).catch(err => toastError(err.response.data.errors[0]));
@@ -316,7 +320,7 @@ const GeneralSettings = ({reRouteTo, updateState}) => {
         const shortDescription = document.getElementById("shortDescrTextarea").value;
         const fullDescription = document.getElementById("fullDescrTextarea").value;
         const themeColor = context.theme;
-        axios.patch("/boards/" + boardData.discriminator, {
+        return axios.patch("/boards/" + boardData.discriminator, {
             name, shortDescription, fullDescription, themeColor, banner, logo,
         }).then(res => {
             if (res.status !== 200 && res.status !== 204) {
@@ -334,7 +338,7 @@ const GeneralSettings = ({reRouteTo, updateState}) => {
                 return;
             }
             err.response.data.errors.forEach(data => toastWarning(data));
-        })
+        });
     };
     const onLogoChange = (e) => {
         if (!validateImageWithWarning(e, "logoInput", 250)) {

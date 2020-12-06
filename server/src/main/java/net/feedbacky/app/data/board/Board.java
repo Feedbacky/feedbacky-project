@@ -8,6 +8,7 @@ import net.feedbacky.app.data.board.dto.FetchBoardDto;
 import net.feedbacky.app.data.board.invite.Invitation;
 import net.feedbacky.app.data.board.moderator.Moderator;
 import net.feedbacky.app.data.board.social.SocialLink;
+import net.feedbacky.app.data.board.suspended.SuspendedUser;
 import net.feedbacky.app.data.board.webhook.Webhook;
 import net.feedbacky.app.data.board.webhook.WebhookExecutor;
 import net.feedbacky.app.data.idea.Idea;
@@ -25,6 +26,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -79,10 +81,13 @@ public class Board implements Serializable {
   private Set<Webhook> webhooks = new HashSet<>();
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "board")
   private Set<SocialLink> socialLinks = new HashSet<>();
+  @ManyToMany(fetch = FetchType.LAZY)
+  private Set<SuspendedUser> suspensedList = new HashSet<>();
 
   public FetchBoardRequest convertToDto() {
     FetchBoardDto dto = new ModelMapper().map(this, FetchBoardDto.class);
     dto.setSocialLinks(getSocialLinks().stream().map(SocialLink::convertToDto).collect(Collectors.toList()));
+    dto.setTags(getTags().stream().map(Tag::convertToDto).collect(Collectors.toList()));
     dto.setModerators(getModerators().stream().map(Moderator::convertToModeratorDto).collect(Collectors.toList()));
     return new FetchBoardRequest(dto);
   }
