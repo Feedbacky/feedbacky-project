@@ -97,6 +97,9 @@ public class IdeaServiceCommons {
     if(optional.isPresent() && optional.get().getBoard().getId().equals(board.getId())) {
       throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "Idea with that title in that board already exists.");
     }
+    if(board.getSuspensedList().stream().anyMatch(suspended -> suspended.getUser().equals(user))) {
+      throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "You've been suspended, please contact board owner for more information.");
+    }
     ModelMapper mapper = new ModelMapper();
     Idea idea = mapper.map(dto, Idea.class);
     idea.setId(null);
@@ -134,6 +137,9 @@ public class IdeaServiceCommons {
     if(idea.getVoters().contains(user)) {
       throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "Idea with id " + idea.getId() + " is already upvoted by you.");
     }
+    if(idea.getBoard().getSuspensedList().stream().anyMatch(suspended -> suspended.getUser().equals(user))) {
+      throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "You've been suspended, please contact board owner for more information.");
+    }
     Set<User> voters = idea.getVoters();
     voters.add(user);
     idea.setVoters(voters);
@@ -145,6 +151,9 @@ public class IdeaServiceCommons {
   public ResponseEntity deleteUpvote(User user, Idea idea) {
     if(!idea.getVoters().contains(user)) {
       throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "Idea with id " + idea.getId() + " is not upvoted by you.");
+    }
+    if(idea.getBoard().getSuspensedList().stream().anyMatch(suspended -> suspended.getUser().equals(user))) {
+      throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "You've been suspended, please contact board owner for more information.");
     }
     Set<User> voters = idea.getVoters();
     voters.remove(user);
