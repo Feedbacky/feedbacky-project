@@ -172,7 +172,7 @@ const GeneralSettings = ({reRouteTo, updateState}) => {
                     </span>
                 </Col>
                 <Col sm={3} xs={6} className="text-sm-right text-left my-auto">
-                    <ExecutableButton onClick={() => onApiKeyEnable()} variant="success">Enable</ExecutableButton>
+                    <ExecutableButton onClick={onApiKeyEnable} variant="success">Enable</ExecutableButton>
                 </Col>
             </Row>
         } else {
@@ -188,7 +188,7 @@ const GeneralSettings = ({reRouteTo, updateState}) => {
                     </span>
                 </Col>
                 <Col sm={3} xs={6} className="text-sm-right text-left my-auto">
-                    <ExecutableButton onClick={() => onApiKeyDisable()} variant="danger">Disable</ExecutableButton>
+                    <ExecutableButton onClick={onApiKeyDisable} variant="danger">Disable</ExecutableButton>
                 </Col>
             </Row>
         }
@@ -232,7 +232,7 @@ const GeneralSettings = ({reRouteTo, updateState}) => {
         });
     };
     const onApiKeyEnable = () => {
-        swalGenerator.fire({
+        return swalGenerator.fire({
             title: "Are you sure?",
             html: "Once you activate API key you can disable or regenerate it later. You'll get access to Public Feedbacky API with it.",
             icon: "question",
@@ -259,7 +259,7 @@ const GeneralSettings = ({reRouteTo, updateState}) => {
         });
     };
     const onApiKeyDisable = () => {
-        swalGenerator.fire({
+        return swalGenerator.fire({
             title: "Are you sure?",
             html: "You won't be able to use Public Feedbacky API anymore.",
             icon: "question",
