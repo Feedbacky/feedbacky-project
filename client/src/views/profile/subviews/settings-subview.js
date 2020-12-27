@@ -19,7 +19,7 @@ const SettingsSubview = ({reRouteTo}) => {
     const swalGenerator = swalReact(Swal);
     const [username, setUsername] = useState(context.user.data.username);
     const [avatar, setAvatar] = useState(context.user.data.avatar);
-    const [connectedAccounts, setConnectedAccounts] = useState({data: [], loaded: false, error: false});
+    const [connectedAccounts, setConnectedAccounts] = useState({data: {}, loaded: false, error: false});
     const [modalOpened, setModalOpened] = useState(false);
     const onChangesSave = () => {
         let toastId = toastAwait("Saving changes...");
@@ -94,7 +94,7 @@ const SettingsSubview = ({reRouteTo}) => {
             <ProfileSidebar currentNode="settings" reRouteTo={reRouteTo}/>
             <Col xs={12} md={9}>
                 <ViewBox theme={context.getTheme(false)} title="User Settings" description="Edit your account here.">
-                    <Col className="text-center">Please log in to see contents of this page.</Col>
+                    <Col className="text-center py-4">Please log in to see contents of this page.</Col>
                 </ViewBox>
             </Col>
         </React.Fragment>
