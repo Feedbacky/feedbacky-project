@@ -7,11 +7,13 @@ import net.feedbacky.app.data.idea.Idea;
 import net.feedbacky.app.data.idea.attachment.Attachment;
 import net.feedbacky.app.data.idea.dto.FetchIdeaDto;
 import net.feedbacky.app.data.idea.dto.PostIdeaDto;
+import net.feedbacky.app.data.tag.Tag;
 import net.feedbacky.app.data.user.User;
 import net.feedbacky.app.data.user.dto.FetchUserDto;
 import net.feedbacky.app.exception.FeedbackyRestException;
 import net.feedbacky.app.exception.types.InvalidAuthenticationException;
 import net.feedbacky.app.exception.types.ResourceNotFoundException;
+import net.feedbacky.app.repository.board.TagRepository;
 import net.feedbacky.app.repository.idea.AttachmentRepository;
 import net.feedbacky.app.repository.idea.IdeaRepository;
 import net.feedbacky.app.service.ServiceUser;
@@ -47,12 +49,14 @@ public class IdeaServiceCommons {
   private IdeaRepository ideaRepository;
   private ObjectStorage objectStorage;
   private AttachmentRepository attachmentRepository;
+  private TagRepository tagRepository;
 
   @Autowired
-  public IdeaServiceCommons(IdeaRepository ideaRepository, ObjectStorage objectStorage, AttachmentRepository attachmentRepository) {
+  public IdeaServiceCommons(IdeaRepository ideaRepository, ObjectStorage objectStorage, AttachmentRepository attachmentRepository, TagRepository tagRepository) {
     this.ideaRepository = ideaRepository;
     this.objectStorage = objectStorage;
     this.attachmentRepository = attachmentRepository;
+    this.tagRepository = tagRepository;
   }
 
   public PaginableRequest<List<FetchIdeaDto>> getAllIdeas(Board board, User user, int page, int pageSize, IdeaService.FilterType filter, IdeaService.SortType sort) {
@@ -100,6 +104,17 @@ public class IdeaServiceCommons {
     if(board.getSuspensedList().stream().anyMatch(suspended -> suspended.getUser().equals(user))) {
       throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "You've been suspended, please contact board owner for more information.");
     }
+    Set<Tag> tags = new HashSet<>();
+    for(long tagId : dto.getTags()) {
+      Tag tag = tagRepository.getOne(tagId);
+      if(!tag.getBoard().equals(board)) {
+        throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "This tag does not belong to this board.");
+      }
+      if(!tag.isPublicUse()) {
+        throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "This tag cannot be used by you.");
+      }
+      tags.add(tag);
+    }
     ModelMapper mapper = new ModelMapper();
     Idea idea = mapper.map(dto, Idea.class);
     idea.setId(null);
@@ -109,6 +124,7 @@ public class IdeaServiceCommons {
     Set<User> set = new HashSet<>();
     set.add(user);
     idea.setVoters(set);
+    idea.setTags(tags);
     idea.setStatus(Idea.IdeaStatus.OPENED);
     idea.setDescription(StringEscapeUtils.escapeHtml4(idea.getDescription()));
     idea.setSubscribers(set);
