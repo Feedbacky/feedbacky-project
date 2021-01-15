@@ -13,6 +13,7 @@ import net.feedbacky.app.data.user.dto.FetchConnectedAccount;
 import net.feedbacky.app.data.user.dto.FetchUserDto;
 import net.feedbacky.app.data.user.dto.PatchUserDto;
 import net.feedbacky.app.service.ServiceUser;
+import net.feedbacky.app.util.mailservice.MailBuilder;
 import net.feedbacky.app.util.request.InternalRequestValidator;
 import net.feedbacky.app.util.mailservice.MailHandler;
 import net.feedbacky.app.util.mailservice.MailService;

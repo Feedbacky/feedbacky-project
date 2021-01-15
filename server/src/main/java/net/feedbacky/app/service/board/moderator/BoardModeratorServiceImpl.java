@@ -16,6 +16,7 @@ import net.feedbacky.app.repository.board.BoardRepository;
 import net.feedbacky.app.repository.board.InvitationRepository;
 import net.feedbacky.app.repository.board.ModeratorRepository;
 import net.feedbacky.app.service.ServiceUser;
+import net.feedbacky.app.util.mailservice.MailBuilder;
 import net.feedbacky.app.util.request.InternalRequestValidator;
 import net.feedbacky.app.util.mailservice.MailHandler;
 import net.feedbacky.app.util.mailservice.MailService;

@@ -17,7 +17,7 @@ const BoardContainer = ({id, searchQuery, onNotLoggedClick}) => {
     const [scrollTo, setScrollTo] = useState(null);
     const isInitialMount = useRef(true);
     useEffect(() => {
-        if(isInitialMount.current) {
+        if (isInitialMount.current) {
             isInitialMount.current = false;
         } else {
             setIdeas({...ideas, loaded: false});
@@ -30,7 +30,7 @@ const BoardContainer = ({id, searchQuery, onNotLoggedClick}) => {
             return <SvgNotice Component={UndrawNoIdeas} title={<React.Fragment><FaRegFrown className="mr-1"/> Failed to load ideas</React.Fragment>}/>
         }
         if (ideas.loaded && ideas.data.length === 0 && !ideas.moreToLoad) {
-            if(searchQuery !== "") {
+            if (searchQuery !== "") {
                 return <SvgNotice Component={UndrawNoIdeas} title={"No ideas for query '" + searchQuery + "'."}/>
             }
             return <SvgNotice Component={UndrawNoIdeas} title="No ideas yet." description="How about creating one?"/>
@@ -57,7 +57,7 @@ const BoardContainer = ({id, searchQuery, onNotLoggedClick}) => {
         return axios.get("/boards/" + id + "/ideas?page=" + (page - 1) + prepareFilterAndSortRequests(context.user.localPreferences.ideas) + withQuery).then(res => {
             const data = res.data.data;
             data.forEach(element => element.tags.sort((a, b) => a.name.localeCompare(b.name)));
-            if(override) {
+            if (override) {
                 setIdeas({...ideas, data, loaded: true, moreToLoad: res.data.pageMetadata.currentPage < res.data.pageMetadata.pages});
             } else {
                 setIdeas({...ideas, data: ideas.data.concat(data), loaded: true, moreToLoad: res.data.pageMetadata.currentPage < res.data.pageMetadata.pages});
