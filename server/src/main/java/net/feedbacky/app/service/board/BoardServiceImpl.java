@@ -26,7 +26,6 @@ import net.feedbacky.app.util.Constants;
 import net.feedbacky.app.util.PaginableRequest;
 import net.feedbacky.app.util.request.InternalRequestValidator;
 import net.feedbacky.app.util.mailservice.MailHandler;
-import net.feedbacky.app.util.mailservice.MailPlaceholderParser;
 import net.feedbacky.app.util.mailservice.MailService;
 import net.feedbacky.app.util.objectstorage.ObjectStorage;
 
@@ -236,12 +235,11 @@ public class BoardServiceImpl implements BoardService {
     if(!hasPermission(board, Moderator.Role.OWNER, user)) {
       throw new InvalidAuthenticationException("No permission to delete board with discriminator " + discriminator + ".");
     }
-
-    MailService.EmailTemplate template = MailService.EmailTemplate.BOARD_DELETED;
-    String subject = MailPlaceholderParser.parseAllAvailablePlaceholders(template.getSubject(), template, board, user, null);
-    String text = MailPlaceholderParser.parseAllAvailablePlaceholders(template.getLegacyText(), template, board, user, null);
-    String html = MailPlaceholderParser.parseAllAvailablePlaceholders(template.getHtml(), template, board, user, null);
-    mailHandler.getMailService().send(board.getCreator().getEmail(), subject, text, html);
+    new MailBuilder()
+            .withRecipient(board.getCreator())
+            .withEventBoard(board)
+            .withTemplate(MailService.EmailTemplate.BOARD_DELETED)
+            .sendMail(mailHandler.getMailService()).sync();
 
     board.getModerators().forEach(moderator -> {
       User modUser = moderator.getUser();

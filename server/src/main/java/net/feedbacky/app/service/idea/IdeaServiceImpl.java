@@ -10,7 +10,7 @@ import net.feedbacky.app.data.idea.comment.Comment;
 import net.feedbacky.app.data.idea.dto.FetchIdeaDto;
 import net.feedbacky.app.data.idea.dto.PatchIdeaDto;
 import net.feedbacky.app.data.idea.dto.PostIdeaDto;
-import net.feedbacky.app.data.idea.subscribe.SubscriptionDataBuilder;
+import net.feedbacky.app.data.idea.subscribe.NotificationEvent;
 import net.feedbacky.app.data.idea.subscribe.SubscriptionExecutor;
 import net.feedbacky.app.data.tag.Tag;
 import net.feedbacky.app.data.tag.dto.FetchTagDto;
@@ -32,6 +32,7 @@ import net.feedbacky.app.util.PaginableRequest;
 import net.feedbacky.app.util.request.InternalRequestValidator;
 import net.feedbacky.app.util.objectstorage.ObjectStorage;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.text.StringEscapeUtils;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
@@ -180,8 +181,8 @@ public class IdeaServiceImpl implements IdeaService {
         WebhookDataBuilder builder = new WebhookDataBuilder().withUser(user).withIdea(idea).withComment(comment);
         idea.getBoard().getWebhookExecutor().executeWebhooks(Webhook.Event.IDEA_OPEN, builder.build());
       }
-      SubscriptionDataBuilder builder = new SubscriptionDataBuilder().withUser(user).withIdea(idea).withComment(comment);
-      subscriptionExecutor.notifySubscribers(idea, SubscriptionExecutor.Event.IDEA_STATUS_CHANGE, builder.build());
+      subscriptionExecutor.notifySubscribers(idea, new NotificationEvent(SubscriptionExecutor.Event.IDEA_STATUS_CHANGE,
+              idea.getId(), idea.getStatus().name()));
     }
     ModelMapper mapper = new ModelMapper();
     mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
@@ -280,9 +281,8 @@ public class IdeaServiceImpl implements IdeaService {
             .withTagsChangedData(prepareTagChangeMessage(user, idea, addedTags, removedTags, false));
     idea.getBoard().getWebhookExecutor().executeWebhooks(Webhook.Event.IDEA_TAG_CHANGE, webhookBuilder.build());
 
-    SubscriptionDataBuilder subscriptionBuilder = new SubscriptionDataBuilder().withUser(user).withIdea(idea).withComment(comment)
-            .withTagsChangedData(prepareTagChangeMessage(user, idea, addedTags, removedTags, false));
-    subscriptionExecutor.notifySubscribers(idea, SubscriptionExecutor.Event.IDEA_TAGS_CHANGE, subscriptionBuilder.build());
+    subscriptionExecutor.notifySubscribers(idea, new NotificationEvent(SubscriptionExecutor.Event.IDEA_TAGS_CHANGE,
+            idea.getId(), prepareTagChangeMessage(user, idea, addedTags, removedTags, false)));
     return idea.getTags().stream().map(Tag::convertToDto).collect(Collectors.toList());
   }
 

@@ -1,7 +1,8 @@
-package net.feedbacky.app.util.notification;
+package net.feedbacky.app.util.mailservice.notification;
 
 import net.feedbacky.app.data.idea.Idea;
 import net.feedbacky.app.data.idea.comment.Comment;
+import net.feedbacky.app.data.idea.subscribe.NotificationEvent;
 import net.feedbacky.app.data.idea.subscribe.SubscriptionExecutor;
 import net.feedbacky.app.data.user.User;
 import net.feedbacky.app.repository.idea.CommentRepository;
@@ -17,6 +18,8 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Plajer
@@ -26,6 +29,7 @@ import java.util.concurrent.CompletableFuture;
 @Component
 public class MailNotifierTask {
 
+  private final Logger logger = Logger.getLogger("MailService");
   private MailHandler mailHandler;
   private SubscriptionExecutor subscriptionExecutor;
   private IdeaRepository ideaRepository;
@@ -41,43 +45,47 @@ public class MailNotifierTask {
 
   @Scheduled(fixedRate = 1000 * 60 * 5 /* 5 minutes */)
   private void sendNotificationMailsTask() {
-    for(Map.Entry<User, List<Pair<SubscriptionExecutor.Event, Map<String, String>>>> entry : subscriptionExecutor.getNotificationBuffer().entrySet()) {
+    if(subscriptionExecutor.getNotificationBuffer().isEmpty()) {
+      return;
+    }
+    int entries = subscriptionExecutor.getNotificationBuffer().size();
+    int condensedNotifications = 0;
+    for(Map.Entry<User, List<NotificationEvent>> entry : subscriptionExecutor.getNotificationBuffer().entrySet()) {
       User user = entry.getKey();
       MailNotificationBuilder builder = new MailNotificationBuilder();
-      builder = builder.withMailRecipient(user);
-      for(Pair<SubscriptionExecutor.Event, Map<String, String>> event : entry.getValue()) {
-        Map<String, String> data = event.getRight();
+      for(NotificationEvent event : entry.getValue()) {
         String status;
         Idea idea;
-        switch(event.getLeft()) {
+        switch(event.getEventType()) {
           case IDEA_BY_MODERATOR_COMMENT:
             //todo null checks
-            Comment comment = commentRepository.findById(Long.parseLong(data.get(SubscriptionExecutor.SubscriptionMapData.COMMENT_ID.getName()))).get();
+            Comment comment = commentRepository.findById(event.getObjectId()).get();
             builder = builder.withIdeaCommentedByModerator(comment);
             break;
           case IDEA_STATUS_CHANGE:
             //todo null checks
-            idea = ideaRepository.findById(Long.parseLong(data.get(SubscriptionExecutor.SubscriptionMapData.IDEA_ID.getName()))).get();
-            status = "Idea status changed to " + data.get(SubscriptionExecutor.SubscriptionMapData.NEW_STATUS.getName());
+            idea = ideaRepository.findById(event.getObjectId()).get();
+            status = "Idea status changed to " + event.getContent();
             builder = builder.withIdeaStatusChange(idea, status);
             break;
           case IDEA_TAGS_CHANGE:
             //todo null checks
-            idea = ideaRepository.findById(Long.parseLong(data.get(SubscriptionExecutor.SubscriptionMapData.IDEA_ID.getName()))).get();
-            status = data.get(SubscriptionExecutor.SubscriptionMapData.TAGS_CHANGED.getName());
+            idea = ideaRepository.findById(event.getObjectId()).get();
+            status = event.getContent();
             builder = builder.withIdeaTagsChange(idea, status);
             break;
           default:
             break;
         }
+        condensedNotifications++;
       }
-      final String html = builder.buildHtml();
-      final int amount = builder.getNotificationsAmount();
-      MailService.EmailTemplate template = MailNotificationBuilder.MAIL_TEMPLATE;
-      CompletableFuture.runAsync(() -> mailHandler.getMailService().send(user.getEmail(),
-              template.getSubject().replace("${notifications.amount}", String.valueOf(amount)), template.getLegacyText(), html));
+      builder.build()
+              .withRecipient(user)
+              .sendMail(mailHandler.getMailService())
+              .async();
     }
     subscriptionExecutor.emptyNotificationBuffer();
+    logger.log(Level.INFO, "Cleaned notifications buffer, sent " + entries + " mails condensed from " + condensedNotifications + " entries.");
   }
 
 }
