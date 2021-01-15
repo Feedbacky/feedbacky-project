@@ -93,9 +93,7 @@ public class PublicRequestValidator {
     user.setPermissions(new HashSet<>());
     user.setConnectedAccounts(new HashSet<>());
     MailPreferences preferences = new MailPreferences();
-    preferences.setNotifyFromTagsChange(false);
-    preferences.setNotifyFromStatusChange(false);
-    preferences.setNotifyFromModeratorsComments(false);
+    preferences.setNotificationsEnabled(false);
     preferences.setUser(user);
     preferences.setUnsubscribeToken("none");
     user.setMailPreferences(preferences);
