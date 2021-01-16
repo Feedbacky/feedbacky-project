@@ -15,6 +15,7 @@ import LoadingSpinner from "components/util/loading-spinner";
 import {FaEyeSlash, FaEllipsisH, FaUpload} from "react-icons/all";
 import Button from "react-bootstrap/Button";
 import {useHistory} from "react-router-dom";
+import tinycolor from "tinycolor2";
 import ColorSelectionModal from "components/modal/color-selection-modal";
 import ExecutableButton from "components/app/executable-button";
 
@@ -39,7 +40,10 @@ const GeneralSettings = ({reRouteTo, updateState}) => {
                               required type="text"
                               placeholder="Short name of board." defaultValue={boardData.name}
                               id="boardTextarea" className="bg-light"
-                              onKeyUp={() => formatRemainingCharacters("remainingBoardName", "boardTextarea", 25)}/>
+                              onChange={e => {
+                                  e.target.value = e.target.value.substring(0, 25);
+                                  formatRemainingCharacters("remainingBoardName", "boardTextarea", 25);
+                              }}/>
                 <Form.Text className="text-right text-black-60" id="remainingBoardName">
                     {25 - boardData.name.length} Remaining
                 </Form.Text>
@@ -51,7 +55,10 @@ const GeneralSettings = ({reRouteTo, updateState}) => {
                               required type="text" className="bg-light"
                               placeholder="Short description of board."
                               defaultValue={boardData.shortDescription} id="shortDescrTextarea"
-                              onKeyUp={() => formatRemainingCharacters("remainingShortDescr", "shortDescrTextarea", 50)}/>
+                              onChange={e => {
+                                  e.target.value = e.target.value.substring(0, 50);
+                                  formatRemainingCharacters("remainingShortDescr", "shortDescrTextarea", 50);
+                              }}/>
                 <Form.Text className="text-right text-black-60" id="remainingShortDescr">
                     {50 - boardData.shortDescription.length} Remaining
                 </Form.Text>
@@ -70,7 +77,10 @@ const GeneralSettings = ({reRouteTo, updateState}) => {
                                   placeholder="Full and descriptive description of board (supports emojis and markdown)."
                                   defaultValue={htmlDecode(boardData.fullDescription)}
                                   id="fullDescrTextarea"
-                                  onKeyUp={() => formatRemainingCharacters("remainingFullDescr", "fullDescrTextarea", 2500)}/>
+                                  onChange={e => {
+                                      e.target.value = e.target.value.substring(0, 2500);
+                                      formatRemainingCharacters("remainingFullDescr", "fullDescrTextarea", 2500);
+                                  }}/>
                 <Form.Text className="d-inline float-left text-black-60 d-inline">
                     Markdown Supported
                 </Form.Text>
@@ -111,7 +121,7 @@ const GeneralSettings = ({reRouteTo, updateState}) => {
                         <h3 style={{color: "transparent"}}>{boardData.name}</h3>
                         <h5 style={{color: "transparent"}}>{boardData.shortDescription}</h5>
                         <div className="p-3 rounded-circle hoverable-option" style={{
-                            backgroundColor: context.getTheme().setAlpha(.8), cursor: "pointer",
+                            backgroundColor: tinycolor(context.getTheme().hex).setAlpha(.8), cursor: "pointer",
                             width: "90px", height: "90px", position: "absolute", inset: 0, margin: "auto"
                         }}>
                             <FaUpload className="mb-1" style={{width: "1.8em", height: "1.8em"}}/>
@@ -128,7 +138,7 @@ const GeneralSettings = ({reRouteTo, updateState}) => {
                 <div style={{position: "relative", maxWidth: 200}} onClick={() => document.getElementById("logoInput").click()}>
                     <img alt="logo" src={boardData.logo} id="boardLogo" className="img-fluid mb-2" style={{height: 200}}/>
                     <div className="p-3 rounded-circle hoverable-option text-center text-white" style={{
-                        backgroundColor: context.getTheme().setAlpha(.8), cursor: "pointer",
+                        backgroundColor: tinycolor(context.getTheme().hex).setAlpha(.8), cursor: "pointer",
                         width: "90px", height: "90px", position: "absolute", inset: 0, margin: "auto"
                     }}>
                         <FaUpload className="mb-1" style={{width: "1.8em", height: "1.8em"}}/>

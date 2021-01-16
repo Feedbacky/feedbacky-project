@@ -22,6 +22,10 @@ const SettingsSubview = ({reRouteTo}) => {
     const [connectedAccounts, setConnectedAccounts] = useState({data: [], loaded: false, error: false});
     const [modalOpened, setModalOpened] = useState(false);
     const onChangesSave = () => {
+        if(username.length < 3) {
+            toastWarning("Username length should be longer than 3 characters.");
+            return Promise.resolve();
+        }
         let toastId = toastAwait("Saving changes...");
         return axios.patch("/users/@me", {
             username, avatar
@@ -113,8 +117,8 @@ const SettingsSubview = ({reRouteTo}) => {
                 <Form.Control style={{minHeight: 38, resize: "none"}} minLength="4" maxLength="20" rows="1" required
                               type="text" className="bg-light"
                               placeholder="Name of your account." defaultValue={username} id="usernameTextarea"
-                              onKeyUp={e => {
-                                  setUsername(e.target.value);
+                              onChange={e => {
+                                  setUsername(e.target.value.substring(0, 20));
                                   formatRemainingCharacters("remainingUsername", "usernameTextarea", 20);
                               }}/>
                 <Form.Text className="text-right text-black-60" id="remainingUsername">
