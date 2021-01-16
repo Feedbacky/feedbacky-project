@@ -317,6 +317,7 @@ const GeneralSettings = ({reRouteTo, updateState}) => {
                     toastError();
                     return;
                 }
+                setApiKeyBlurred(true);
                 updateState({...boardData, apiKey: res.data.apiKey});
                 toastSuccess("API key regenerated.", toastId);
             }).catch(err => toastError(err.response.data.errors[0]));
