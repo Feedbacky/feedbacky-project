@@ -96,11 +96,6 @@ const CreateBoardView = () => {
                 }
             }).catch(() => setSettings({...settings, step: settings.step + 1}));
             return;
-        } else if (settings.step === 2) {
-            if (settings.banner === null || settings.logo === null) {
-                toastWarning("Banner and logo must be set.");
-                return;
-            }
         }
         setSettings({...settings, step: settings.step + 1});
     };
