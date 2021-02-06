@@ -1,3 +1,10 @@
+### Official Fork
+This is official fork of https://app.feedbacky.net service which shouldn't be used, please use main fork [here](https://github.com/Plajer/feedbacky-project)
+for self-hosted app.
+
+This fork contains some changes in code that shouldn't be available in self-hosted version.
+**All changes between this fork and self-hosted version are located in [FORK_DIFFERENCES.md](https://github.com/Feedbacky/feedbacky-project/blob/master/FORK_DIFFERENCES.md)**
+
 <p align="center">
     <a href="https://feedbacky.net">
         <img src="https://static.plajer.xyz/feedbacky/img/new-banner-beta.png">
