@@ -69,9 +69,9 @@ public class Board implements Serializable {
   private String logo;
   private String banner;
   private String apiKey = "";
-  @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "board")
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "board")
   private Set<Idea> ideas = new LinkedHashSet<>();
-  @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "board", orphanRemoval = true)
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "board", orphanRemoval = true)
   private Set<Moderator> moderators = new HashSet<>();
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "board")
   private Set<Invitation> invitedModerators = new HashSet<>();
