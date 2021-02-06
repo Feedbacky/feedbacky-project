@@ -1,8 +1,7 @@
-import tinycolor from "tinycolor2";
-import PageBadge from "components/app/page-badge";
 import React from "react";
-import {formatUsername} from "components/util/utils";
 import replace from "react-string-replace";
+import tinycolor from "tinycolor2";
+import {UiBadge, UiPrettyUsername} from "ui";
 
 const parseComment = (message, moderatorsData, tagsData) => {
     const regex = /[^{}]+(?=})/g;
@@ -18,7 +17,7 @@ const parseComment = (message, moderatorsData, tagsData) => {
         const text = span.exec(el)[1];
         const colorRegex = /<span[^)>]*style='background-color: ([^)>]*)'[^)>]*>/g;
         const color = tinycolor(colorRegex.exec(el)[1]);
-        finalMessage = replace(finalMessage, el, (match, i) => <PageBadge key={match + i} color={tinycolor(color)} text={text}/>)
+        finalMessage = replace(finalMessage, el, (match, i) => <UiBadge key={match + i} color={tinycolor(color)}>{text}</UiBadge>)
     });
     //todo backward compatibility for old <span></span> badge tags
     return finalMessage;
@@ -29,20 +28,23 @@ const parseTag = (result, moderatorsData, tagsData) => {
     if (data[0] === "data_tag") {
         return parseBoardTagData(data, tagsData);
     } else if (data[0] === "data_user") {
-        return parseModeratorData(data, moderatorsData);
+        return parseModeratorData(data);
     }
 };
 
 const parseBoardTagData = (data, tagsData) => {
     const foundTag = tagsData.find(el => el.name === data[2]);
     if (foundTag === undefined) {
-        return <PageBadge key={data[2]} text={data[2]} color={tinycolor(data[3])}/>
+        return <UiBadge key={data[2]} color={tinycolor(data[3])}>{data[2]}</UiBadge>
     }
-    return <PageBadge key={data[2]} text={foundTag.name} color={tinycolor(foundTag.color)}/>
+    return <UiBadge key={data[2]} color={tinycolor(foundTag.color)}>{foundTag.name}</UiBadge>
 };
 
-const parseModeratorData = (data, moderatorsData) => {
-    return <span key={data[1]}>{formatUsername(parseInt(data[1]), data[2], moderatorsData)}</span>;
+const parseModeratorData = (data) => {
+    //simulate user from user context, WARNING, might be unsafe in the future!
+    return <span key={data[1]}>
+        <UiPrettyUsername user={{id: parseInt(data[1]), username: data[2]}}/>
+    </span>
 };
 
 export default parseComment;

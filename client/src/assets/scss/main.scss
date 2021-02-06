@@ -1,0 +1,65 @@
+$pure-dark-half: hsla(0, 0%, 0%, .5);
+
+@import "utilities/root";
+@import "utilities/toasts";
+@import "utilities/colors";
+
+@import "~react-toastify/dist/ReactToastify.css";
+@import "commons/override-variables";
+@import "commons/align-utils";
+@import "commons/font-face";
+@import "commons/bootstrap-imports";
+
+@font-face {
+  font-family: 'Roboto', sans-serif;
+  font-display: swap;
+}
+
+/* fixes scrollbar repositioning page */
+html {
+  overflow-x: hidden;
+  margin-right: calc(-1 * (100vw - 100%));
+}
+
+/* fixes mobile minimum width */
+body, .modal {
+  min-width: 310px;
+}
+
+body {
+  min-height: 100vh;
+  position: relative;
+  margin: 0;
+}
+
+@keyframes pulse {
+  from, to {
+    transform: scale3d(1, 1, 1);
+  }
+
+  50% {
+    transform: scale3d(1.05, 1.05, 1.05);
+  }
+}
+
+.upvote-animation {
+  animation-duration: 1s;
+  animation-fill-mode: both;
+  animation-name: pulse;
+  z-index: 1;
+}
+
+.justify-content-center {
+  justify-content: center !important;
+}
+
+.Toastify__toast {
+  box-shadow: var(--box-shadow) !important;
+}
+
+.danger-shadow {
+  box-shadow: 0 3px 5px 0 hsla(15, 100%, 40%, .5) !important;
+}
+
+
+@import "main-dark";

@@ -69,7 +69,7 @@ public class Board implements Serializable {
   private String logo;
   private String banner;
   private String apiKey = "";
-  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "board")
+  @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "board")
   private Set<Idea> ideas = new LinkedHashSet<>();
   @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "board", orphanRemoval = true)
   private Set<Moderator> moderators = new HashSet<>();
@@ -90,6 +90,9 @@ public class Board implements Serializable {
     dto.setTags(getTags().stream().map(Tag::convertToDto).collect(Collectors.toList()));
     dto.setModerators(getModerators().stream().map(Moderator::convertToModeratorDto).collect(Collectors.toList()));
     dto.setSuspendedUsers(getSuspensedList().stream().map(SuspendedUser::convertToDto).collect(Collectors.toList()));
+    dto.setAllIdeas(getIdeas().size());
+    dto.setOpenedIdeas(getIdeas().stream().map(idea -> idea.getStatus() == Idea.IdeaStatus.OPENED).count());
+    dto.setOpenedIdeas(getIdeas().stream().map(idea -> idea.getStatus() == Idea.IdeaStatus.CLOSED).count());
     return new FetchBoardRequest(dto);
   }
 
