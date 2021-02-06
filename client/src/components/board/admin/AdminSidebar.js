@@ -1,8 +1,8 @@
+import Attribution from "components/commons/Attribution";
 import {renderSidebarRoutes, Sidebar, SidebarIcon} from "components/commons/sidebar-commons";
 import AppContext from "context/AppContext";
 import React, {useContext} from 'react';
-import {SafeAnchor} from "react-bootstrap";
-import {FaAt, FaColumns, FaSlidersH, FaTags, FaUserLock, FaUsersCog} from "react-icons/all";
+import {FaAt, FaColumns, FaDiscord, FaQuestionCircle, FaRegCommentDots, FaSlidersH, FaTags, FaUserLock, FaUsersCog} from "react-icons/all";
 import {UiCol} from "ui/grid";
 
 const AdminSidebar = ({currentNode, reRouteTo}) => {
@@ -18,14 +18,26 @@ const AdminSidebar = ({currentNode, reRouteTo}) => {
     const themeColor = context.getTheme();
 
     return <UiCol xs={12} md={3} as={Sidebar}>
-        <ul>{renderSidebarRoutes(routes, themeColor, currentNode, reRouteTo)}</ul>
-        <small className={"text-black-60"}>
-            <div>
-                Running <img alt={"Logo"} src={"https://cdn.feedbacky.net/static/img/logo.png"} width={16} height={16}/> <SafeAnchor href={"https://feedbacky.net"} className={"text-black-60"}>Feedbacky</SafeAnchor>
-                <span className={"text-black-75"}>{" "}v{context.clientVersion}</span>
-            </div>
-            <div>Server Version <span className={"text-black-75"}>v{context.serviceData.serverVersion}</span></div>
-        </small>
+        <ul>
+            {renderSidebarRoutes(routes, themeColor, currentNode, reRouteTo)}
+            <li className="my-4"/>
+            <li>
+                <a href="https://app.feedbacky.net/b/feedbacky-official" className="text-black-75">
+                    <FaRegCommentDots className="mr-1 text-black-75 move-top-1px"/> Feedback
+                </a>
+            </li>
+            <li>
+                <a href="https://docs.feedbacky.net" className="text-black-75">
+                    <FaQuestionCircle className="mr-1 text-black-75 move-top-1px"/> FAQ
+                </a>
+            </li>
+            <li>
+                <a href="https://discordapp.com/invite/6qCnKh5" className="text-black-75">
+                    <FaDiscord className="mr-1 text-black-75 move-top-1px"/> Discord Support
+                </a>
+            </li>
+        </ul>
+        <Attribution/>
     </UiCol>
 };
 

@@ -1,8 +1,9 @@
-import React, {useEffect, useState} from 'react';
-import {CardDeck, Container, Row} from "react-bootstrap";
 import axios from "axios";
-import ExploreBox from "components/profile/explore-box";
-import LoadingSpinner from "components/util/loading-spinner";
+import ExploreBox from "components/profile/ExploreBox";
+import React, {useEffect, useState} from 'react';
+import {CardDeck} from "react-bootstrap";
+import {UiLoadingSpinner} from "ui";
+import {UiContainer, UiRow} from "ui/grid";
 
 const ExploreElement = () => {
     const [featuredBoards, setFeaturedBoards] = useState([]);
@@ -27,7 +28,7 @@ const ExploreElement = () => {
 
     const renderFeaturedBoards = () => {
         if (!loaded) {
-            return <div className="mt-5"><LoadingSpinner/></div>
+            return <div className="my-5"><UiLoadingSpinner/></div>
         }
         return featuredBoards.map(boardData => {
             return <ExploreBox key={boardData.id} name={boardData.name} description={boardData.shortDescription}
@@ -36,13 +37,13 @@ const ExploreElement = () => {
         });
     };
 
-    return <Container>
-        <Row className="justify-content-center text-center">
+    return <UiContainer>
+        <UiRow centered className="text-center">
             <CardDeck id="profile-featured" className="col-12 row justify-content-center">
                 {renderFeaturedBoards()}
             </CardDeck>
-        </Row>
-    </Container>
+        </UiRow>
+    </UiContainer>
 };
 
 export default ExploreElement;

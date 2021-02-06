@@ -26,3 +26,11 @@
   color: hsl(210, 100%, 60%);
 }
 
+.text-blurred {
+  color: transparent;
+  text-shadow: 0 0 5px var(--font-color);
+  user-select: none;
+}
+.dark .text-blurred {
+  text-shadow: 0 0 5px var(--dark-font-color) !important;
+}

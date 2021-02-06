@@ -1,4 +1,5 @@
 import IdeaCreateModal from "components/board/IdeaCreateModal";
+import Attribution from "components/commons/Attribution";
 import MarkdownContainer from "components/commons/MarkdownContainer";
 import AppContext from "context/AppContext";
 import BoardContext from "context/BoardContext";
@@ -45,6 +46,7 @@ const BoardInfoCard = ({onIdeaCreation}) => {
             </UiLoadableButton>
             {renderEditButton()}
         </UiCard>
+        <Attribution/>
     </UiCol>
 };
 

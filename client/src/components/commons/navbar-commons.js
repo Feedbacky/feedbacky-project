@@ -6,7 +6,6 @@ import {Link} from "react-router-dom";
 import {UiClassicButton} from "ui/button";
 import {UiDropdown, UiDropdownElement} from "ui/dropdown";
 import {UiAvatar} from "ui/image";
-import {isServiceAdmin} from "utils/basic-utils";
 
 const LoginButton = styled(UiClassicButton)`
   padding: 0 .75rem;
@@ -61,7 +60,10 @@ export const renderLogIn = (onNotLoggedClick, context) => {
         </UiDropdownElement>
         {renderModeratedBoards(context)}
         <div className={"my-1"}/>
-        {renderCreateBoardSection(context)}
+        <UiDropdownElement as={Link} to={"/create"}>
+            <FaUserCog className={"mr-2 move-top-1px"}/>
+            <strong>Create Own Board</strong>
+        </UiDropdownElement>
     </UiDropdown>
 };
 
@@ -80,14 +82,4 @@ const renderModeratedBoards = (context) => {
             return <UiDropdownElement key={data.boardDiscriminator} as={Link} to={"/b/" + data.boardDiscriminator}>{data.boardName}</UiDropdownElement>
         })}
     </React.Fragment>
-};
-
-const renderCreateBoardSection = (context) => {
-    if (!isServiceAdmin(context)) {
-        return <React.Fragment/>
-    }
-    return <UiDropdownElement as={Link} to={"/admin/create"}>
-        <FaUserCog className={"mr-2 move-top-1px"}/>
-        <strong>Create New Board</strong>
-    </UiDropdownElement>
 };

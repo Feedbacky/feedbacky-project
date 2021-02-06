@@ -3,15 +3,17 @@ import ProfileNavbar from "components/profile/ProfileNavbar";
 import AppContext from "context/AppContext";
 import {Step} from "rc-steps";
 import React, {useContext, useEffect, useState} from 'react';
+import {FaSignInAlt} from "react-icons/all";
 import {Link, useHistory} from "react-router-dom";
 import StepFirstSubroute from "routes/board/creator/StepFirstSubroute";
 import StepSecondSubroute from "routes/board/creator/StepSecondSubroute";
 import StepThirdSubroute from "routes/board/creator/StepThirdSubroute";
+import ErrorRoute from "routes/ErrorRoute";
 import tinycolor from "tinycolor2";
 import {UiProgressBar} from "ui";
 import {UiButton, UiCancelButton, UiNextStepButton, UiPreviousStepButton} from "ui/button";
 import {UiCol, UiContainer, UiRow} from "ui/grid";
-import {isServiceAdmin, toastAwait, toastError, toastSuccess, toastWarning} from "utils/basic-utils";
+import {toastAwait, toastError, toastSuccess, toastWarning} from "utils/basic-utils";
 
 const CreatorBoardRoute = () => {
     const context = useContext(AppContext);
@@ -19,9 +21,8 @@ const CreatorBoardRoute = () => {
     const history = useHistory();
     const [settings, setSettings] = useState({step: 1, name: "", discriminator: "", banner: null, logo: null, themeColor: "#2d3436"});
     useEffect(() => onThemeChange(), [onThemeChange]);
-    if (!user.loggedIn || !isServiceAdmin(context)) {
-        history.push("/me");
-        return <React.Fragment/>
+    if (!user.loggedIn) {
+        return <ErrorRoute Icon={FaSignInAlt} message="You Must Be Logged To Do That"/>
     }
     const updateSettings = (data) => {
         setSettings(data);
@@ -95,14 +96,32 @@ const CreatorBoardRoute = () => {
                 }
             }).catch(() => setSettings({...settings, step: settings.step + 1}));
             return;
-        } else if (settings.step === 2) {
-            if (settings.banner === null || settings.logo === null) {
-                toastWarning("Banner and logo must be set.");
-                return;
-            }
         }
         setSettings({...settings, step: settings.step + 1});
     };
+    const calculateOwnedBoards = () => {
+        let owned = 0;
+        user.data.permissions.forEach(board => {
+            if (board.role.toLowerCase() === "owner") {
+                owned++;
+            }
+        });
+        return owned;
+    };
+    if (calculateOwnedBoards() >= 5) {
+        return <React.Fragment>
+            <ProfileNavbar/>
+            <UiContainer>
+                <UiCol xs={12} className="mt-5 pt-5 text-center">
+                    <img alt="" src="https://cdn.feedbacky.net/static/svg/undraw_project_limit.svg" className="my-2" width={150} height={150}/>
+                    <h2 className="text-red">Boards Limit Reached</h2>
+                    <span className="text-black-60">
+                        Cannot create any more boards.
+                    </span>
+                </UiCol>
+            </UiContainer>
+        </React.Fragment>
+    }
     return <React.Fragment>
         <ProfileNavbar/>
         <UiContainer>
