@@ -48,7 +48,7 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     }
     board.setApiKey(RandomStringUtils.randomAlphanumeric(40));
     boardRepository.save(board);
-    return ResponseEntity.ok(board.convertToDto().exposeSensitiveData(true));
+    return ResponseEntity.ok(new FetchBoardDto().from(board).withConfidentialData(board, true));
   }
 
   @Override
@@ -66,6 +66,6 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     }
     board.setApiKey("");
     boardRepository.save(board);
-    return ResponseEntity.ok(board.convertToDto().exposeSensitiveData(true));
+    return ResponseEntity.ok(new FetchBoardDto().from(board).withConfidentialData(board, true));
   }
 }

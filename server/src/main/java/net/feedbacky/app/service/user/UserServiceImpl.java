@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
   @Override
   public FetchUserDto getSelf() {
     UserAuthenticationToken auth = InternalRequestValidator.getContextAuthentication();
-    User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
+    User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail(), EntityGraphs.named("User.fetch"))
             .orElseThrow(() -> new InvalidAuthenticationException("User session not found. Try again with new token"));
     return new FetchUserDto().from(user).withConfidentialData(user);
   }
@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
   @Override
   public List<FetchConnectedAccount> getSelfConnectedAccounts() {
     UserAuthenticationToken auth = InternalRequestValidator.getContextAuthentication();
-    User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
+    User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail(), EntityGraphs.named("User.fetchConnections"))
             .orElseThrow(() -> new InvalidAuthenticationException("User session not found. Try again with new token"));
     return user.getConnectedAccounts().stream().map(acc -> new FetchConnectedAccount().from(acc)).collect(Collectors.toList());
   }

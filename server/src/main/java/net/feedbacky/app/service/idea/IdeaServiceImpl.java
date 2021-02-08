@@ -23,23 +23,18 @@ import net.feedbacky.app.exception.types.ResourceNotFoundException;
 import net.feedbacky.app.repository.UserRepository;
 import net.feedbacky.app.repository.board.BoardRepository;
 import net.feedbacky.app.repository.board.TagRepository;
-import net.feedbacky.app.repository.idea.AttachmentRepository;
 import net.feedbacky.app.repository.idea.CommentRepository;
 import net.feedbacky.app.repository.idea.IdeaRepository;
 import net.feedbacky.app.service.ServiceUser;
 import net.feedbacky.app.util.CommentBuilder;
 import net.feedbacky.app.util.PaginableRequest;
-import net.feedbacky.app.util.request.InternalRequestValidator;
 import net.feedbacky.app.util.objectstorage.ObjectStorage;
-
-import com.cosium.spring.data.jpa.entity.graph.domain.EntityGraphs;
+import net.feedbacky.app.util.request.InternalRequestValidator;
 
 import org.apache.commons.text.StringEscapeUtils;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -64,7 +59,6 @@ public class IdeaServiceImpl implements IdeaService {
   private final UserRepository userRepository;
   private final TagRepository tagRepository;
   private final CommentRepository commentRepository;
-  private final AttachmentRepository attachmentRepository;
   private final ObjectStorage objectStorage;
   private final SubscriptionExecutor subscriptionExecutor;
   private final IdeaServiceCommons ideaServiceCommons;
@@ -72,14 +66,13 @@ public class IdeaServiceImpl implements IdeaService {
   @Autowired
   //todo too big constructor
   public IdeaServiceImpl(IdeaRepository ideaRepository, BoardRepository boardRepository, UserRepository userRepository, TagRepository tagRepository,
-                         CommentRepository commentRepository, AttachmentRepository attachmentRepository, ObjectStorage objectStorage,
+                         CommentRepository commentRepository, ObjectStorage objectStorage,
                          SubscriptionExecutor subscriptionExecutor, IdeaServiceCommons ideaServiceCommons) {
     this.ideaRepository = ideaRepository;
     this.boardRepository = boardRepository;
     this.userRepository = userRepository;
     this.tagRepository = tagRepository;
     this.commentRepository = commentRepository;
-    this.attachmentRepository = attachmentRepository;
     this.objectStorage = objectStorage;
     this.subscriptionExecutor = subscriptionExecutor;
     this.ideaServiceCommons = ideaServiceCommons;

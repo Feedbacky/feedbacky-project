@@ -62,7 +62,7 @@ public class PublicIdeaServiceImpl implements PublicIdeaService {
     HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
     publicRequestValidator.validateApiKeyFromRequest(request, board);
     User user = publicRequestValidator.getUserByTokenOnly(request);
-    return new PublicApiRequest<>(user == null ? null : user.getToken(), idea.convertToDto(user));
+    return new PublicApiRequest<>(user == null ? null : user.getToken(), new FetchIdeaDto().from(idea).withUser(idea, user));
   }
 
   @Override

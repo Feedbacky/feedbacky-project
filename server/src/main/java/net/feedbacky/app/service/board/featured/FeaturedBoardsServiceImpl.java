@@ -54,7 +54,7 @@ public class FeaturedBoardsServiceImpl implements FeaturedBoardsService {
         scheduleFeaturedBoardsSelectionTask();
         return getAll();
       }
-      boards.add(board.get().convertToDto().exposeSensitiveData(false));
+      boards.add(new FetchBoardDto().from(board.get()));
     }
     return boards;
   }

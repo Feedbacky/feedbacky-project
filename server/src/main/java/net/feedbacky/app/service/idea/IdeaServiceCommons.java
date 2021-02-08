@@ -11,16 +11,16 @@ import net.feedbacky.app.data.tag.Tag;
 import net.feedbacky.app.data.user.User;
 import net.feedbacky.app.data.user.dto.FetchUserDto;
 import net.feedbacky.app.exception.FeedbackyRestException;
-import net.feedbacky.app.exception.types.InvalidAuthenticationException;
 import net.feedbacky.app.exception.types.ResourceNotFoundException;
 import net.feedbacky.app.repository.board.TagRepository;
 import net.feedbacky.app.repository.idea.AttachmentRepository;
 import net.feedbacky.app.repository.idea.IdeaRepository;
-import net.feedbacky.app.service.ServiceUser;
 import net.feedbacky.app.util.Base64Util;
 import net.feedbacky.app.util.PaginableRequest;
 import net.feedbacky.app.util.SortFilterResolver;
 import net.feedbacky.app.util.objectstorage.ObjectStorage;
+
+import com.cosium.spring.data.jpa.entity.graph.domain.EntityGraphs;
 
 import org.apache.commons.text.StringEscapeUtils;
 import org.modelmapper.ModelMapper;
@@ -76,24 +76,23 @@ public class IdeaServiceCommons {
         throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "Invalid filter type.");
     }
     List<Idea> ideas = pageData.getContent();
-    final User finalUser = user;
     int totalPages = pageData.getTotalElements() == 0 ? 0 : pageData.getTotalPages() - 1;
     return new PaginableRequest<>(new PaginableRequest.PageMetadata(page, totalPages, pageSize), ideas.stream()
-            .map(idea -> idea.convertToDto(finalUser)).collect(Collectors.toList()));
+            .map(idea -> new FetchIdeaDto().from(idea).withUser(idea, user)).collect(Collectors.toList()));
   }
 
   public PaginableRequest<List<FetchIdeaDto>> getAllIdeasContaining(Board board, User user, int page, int pageSize, String query) {
-    final User finalUser = user;
     Page<Idea> pageData = ideaRepository.findByBoardAndTitleIgnoreCaseContaining(board, query, PageRequest.of(page, pageSize));
     List<Idea> ideas = pageData.getContent();
     int totalPages = pageData.getTotalElements() == 0 ? 0 : pageData.getTotalPages() - 1;
     return new PaginableRequest<>(new PaginableRequest.PageMetadata(page, totalPages, pageSize), ideas.stream()
-            .map(idea -> idea.convertToDto(finalUser)).collect(Collectors.toList()));
+            .map(idea -> new FetchIdeaDto().from(idea).withUser(idea, user)).collect(Collectors.toList()));
   }
 
   public FetchIdeaDto getOne(User user, long id) {
-    return ideaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Idea with id " + id + " not found"))
-            .convertToDto(user);
+    Idea idea = ideaRepository.findById(id, EntityGraphs.named("Idea.fetch"))
+            .orElseThrow(() -> new ResourceNotFoundException("Idea with id " + id + " not found"));
+    return new FetchIdeaDto().from(idea).withUser(idea, user);
   }
 
   public FetchIdeaDto post(PostIdeaDto dto, Board board, User user) {
@@ -143,7 +142,7 @@ public class IdeaServiceCommons {
     idea.setAttachments(attachments);
     ideaRepository.save(idea);
 
-    FetchIdeaDto fetchDto = idea.convertToDto(user);
+    FetchIdeaDto fetchDto = new FetchIdeaDto().from(idea).withUser(idea, user);
     WebhookDataBuilder builder = new WebhookDataBuilder().withUser(user).withIdea(idea);
     idea.getBoard().getWebhookExecutor().executeWebhooks(Webhook.Event.IDEA_CREATE, builder.build());
     return fetchDto;
@@ -160,8 +159,7 @@ public class IdeaServiceCommons {
     voters.add(user);
     idea.setVoters(voters);
     ideaRepository.save(idea);
-    //no need to expose
-    return user.convertToDto().exposeSensitiveData(false);
+    return new FetchUserDto().from(user);
   }
 
   public ResponseEntity deleteUpvote(User user, Idea idea) {
