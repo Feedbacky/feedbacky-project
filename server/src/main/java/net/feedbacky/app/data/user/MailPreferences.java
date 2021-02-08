@@ -5,9 +5,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.feedbacky.app.data.user.dto.FetchMailPreferences;
-
-import org.modelmapper.ModelMapper;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -41,10 +38,6 @@ public class MailPreferences implements Serializable {
   private User user;
   private boolean notificationsEnabled;
   private String unsubscribeToken;
-
-  public FetchMailPreferences convertToDto() {
-    return new ModelMapper().map(this, FetchMailPreferences.class);
-  }
 
 
 }

@@ -24,7 +24,8 @@ import net.feedbacky.app.util.PaginableRequest;
 import net.feedbacky.app.util.request.InternalRequestValidator;
 import net.feedbacky.app.util.SortFilterResolver;
 
-import org.apache.commons.lang3.tuple.Pair;
+import com.cosium.spring.data.jpa.entity.graph.domain.EntityGraphs;
+
 import org.apache.commons.text.StringEscapeUtils;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
@@ -80,7 +81,7 @@ public class CommentServiceImpl implements CommentService {
       comments = comments.stream().filter(comment -> comment.getViewType() != Comment.ViewType.INTERNAL).collect(Collectors.toList());
     }
     return new PaginableRequest<>(new PaginableRequest.PageMetadata(page, totalPages, pageSize),
-            comments.stream().map(comment -> comment.convertToDto(finalUser)).collect(Collectors.toList()));
+            comments.stream().map(comment -> new FetchCommentDto().from(comment).withUser(comment, finalUser)).collect(Collectors.toList()));
   }
 
   @Override
@@ -90,13 +91,14 @@ public class CommentServiceImpl implements CommentService {
       UserAuthenticationToken auth = (UserAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
       user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail()).orElse(null);
     }
-    Comment comment = commentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Comment with id " + id + " does not exist."));
+    Comment comment = commentRepository.findById(id, EntityGraphs.named("Comments.fetch"))
+            .orElseThrow(() -> new ResourceNotFoundException("Comment with id " + id + " does not exist."));
     final User finalUser = user;
     boolean isModerator = comment.getIdea().getBoard().getModerators().stream().anyMatch(mod -> mod.getUser().equals(finalUser));
     if(comment.getViewType() == Comment.ViewType.INTERNAL && !isModerator) {
       throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "No permission to view this comment.");
     }
-    return comment.convertToDto(user);
+    return new FetchCommentDto().from(comment).withUser(comment, finalUser);
   }
 
   @Override
@@ -140,7 +142,7 @@ public class CommentServiceImpl implements CommentService {
                 comment, StringEscapeUtils.unescapeHtml4(comment.getDescription())));
       }
     }
-    return ResponseEntity.status(HttpStatus.CREATED).body(comment.convertToDto(user));
+    return ResponseEntity.status(HttpStatus.CREATED).body(new FetchCommentDto().from(comment).withUser(comment, user));
   }
 
   @Override
@@ -158,8 +160,7 @@ public class CommentServiceImpl implements CommentService {
     }
     comment.getLikers().add(user);
     commentRepository.save(comment);
-    //no need to expose
-    return user.convertToDto().exposeSensitiveData(false);
+    return  new FetchUserDto().from(user);
   }
 
   @Override
@@ -180,7 +181,7 @@ public class CommentServiceImpl implements CommentService {
 
     comment.setDescription(StringEscapeUtils.escapeHtml4(comment.getDescription()));
     commentRepository.save(comment);
-    return comment.convertToDto(user);
+    return new FetchCommentDto().from(comment).withUser(comment, user);
   }
 
   @Override

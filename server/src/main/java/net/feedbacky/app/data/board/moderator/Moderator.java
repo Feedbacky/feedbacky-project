@@ -6,11 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.feedbacky.app.data.board.Board;
-import net.feedbacky.app.data.board.dto.moderator.FetchModeratorDto;
-import net.feedbacky.app.data.board.dto.moderator.FetchUserPermissionDto;
 import net.feedbacky.app.data.user.User;
-
-import org.modelmapper.ModelMapper;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -48,19 +44,6 @@ public class Moderator implements Serializable {
   private User user;
   private Role role;
 
-  public FetchModeratorDto convertToModeratorDto() {
-    FetchModeratorDto dto = new ModelMapper().map(this, FetchModeratorDto.class);
-    dto.setUser(user.convertToDto().exposeSensitiveData(false).convertToSimpleDto());
-    dto.setUserId(user.getId());
-    return dto;
-  }
-
-  public FetchUserPermissionDto convertToUserPermissionDto() {
-    FetchUserPermissionDto dto = new ModelMapper().map(this, FetchUserPermissionDto.class);
-    dto.setBoardDiscriminator(board.getDiscriminator());
-    dto.setBoardName(board.getName());
-    return dto;
-  }
 
   public enum Role {
     USER(3), MODERATOR(2),

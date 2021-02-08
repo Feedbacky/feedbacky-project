@@ -21,6 +21,8 @@ import net.feedbacky.app.util.request.InternalRequestValidator;
 import net.feedbacky.app.util.mailservice.MailHandler;
 import net.feedbacky.app.util.mailservice.MailService;
 
+import com.cosium.spring.data.jpa.entity.graph.domain.EntityGraphUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -57,14 +59,14 @@ public class BoardModeratorServiceImpl implements BoardModeratorService {
   @Override
   public List<FetchInviteDto> getAllInvited(String discriminator) {
     UserAuthenticationToken auth = InternalRequestValidator.getContextAuthentication();
-    User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
+    User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail(), EntityGraphUtils.fromAttributePaths("permissions"))
             .orElseThrow(() -> new InvalidAuthenticationException("User session not found. Try again with new token"));
-    Board board = boardRepository.findByDiscriminator(discriminator)
+    Board board = boardRepository.findByDiscriminator(discriminator, EntityGraphUtils.fromAttributePaths("invitedModerators"))
             .orElseThrow(() -> new ResourceNotFoundException("Board with discriminator " + discriminator + " does not exist."));
     if(!hasPermission(board, Moderator.Role.OWNER, user)) {
       throw new InvalidAuthenticationException("No permission to view invited moderators of this board.");
     }
-    return board.getInvitedModerators().stream().map(Invitation::convertToDto).collect(Collectors.toList());
+    return board.getInvitedModerators().stream().map(invite -> new FetchInviteDto().from(invite)).collect(Collectors.toList());
   }
 
   @Override
@@ -85,7 +87,7 @@ public class BoardModeratorServiceImpl implements BoardModeratorService {
     board.getModerators().add(moderator);
     boardRepository.save(board);
     invitationRepository.delete(invitation);
-    return board.convertToDto().exposeSensitiveData(false);
+    return new FetchBoardDto().from(board);
   }
 
   @Override
@@ -118,7 +120,7 @@ public class BoardModeratorServiceImpl implements BoardModeratorService {
             .withInvitation(invitation)
             .withTemplate(MailService.EmailTemplate.MODERATOR_INVITATION)
             .sendMail(mailHandler.getMailService()).async();
-    return ResponseEntity.status(HttpStatus.CREATED).body(invitation.convertToDto());
+    return ResponseEntity.status(HttpStatus.CREATED).body(new FetchInviteDto().from(invitation));
   }
 
   @Override

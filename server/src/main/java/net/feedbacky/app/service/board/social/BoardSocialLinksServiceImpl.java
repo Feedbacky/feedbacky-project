@@ -1,23 +1,25 @@
 package net.feedbacky.app.service.board.social;
 
 import net.feedbacky.app.config.UserAuthenticationToken;
-import net.feedbacky.app.exception.FeedbackyRestException;
-import net.feedbacky.app.exception.types.InvalidAuthenticationException;
-import net.feedbacky.app.exception.types.ResourceNotFoundException;
-import net.feedbacky.app.repository.UserRepository;
-import net.feedbacky.app.repository.board.BoardRepository;
-import net.feedbacky.app.repository.board.SocialLinksRepository;
 import net.feedbacky.app.data.board.Board;
 import net.feedbacky.app.data.board.dto.social.FetchSocialLinkDto;
 import net.feedbacky.app.data.board.dto.social.PostSocialLinkDto;
 import net.feedbacky.app.data.board.moderator.Moderator;
 import net.feedbacky.app.data.board.social.SocialLink;
 import net.feedbacky.app.data.user.User;
+import net.feedbacky.app.exception.FeedbackyRestException;
+import net.feedbacky.app.exception.types.InvalidAuthenticationException;
+import net.feedbacky.app.exception.types.ResourceNotFoundException;
+import net.feedbacky.app.repository.UserRepository;
+import net.feedbacky.app.repository.board.BoardRepository;
+import net.feedbacky.app.repository.board.SocialLinksRepository;
 import net.feedbacky.app.service.ServiceUser;
 import net.feedbacky.app.util.Base64Util;
 import net.feedbacky.app.util.Constants;
 import net.feedbacky.app.util.request.InternalRequestValidator;
 import net.feedbacky.app.util.objectstorage.ObjectStorage;
+
+import com.cosium.spring.data.jpa.entity.graph.domain.EntityGraphUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -50,9 +52,9 @@ public class BoardSocialLinksServiceImpl implements BoardSocialLinksService {
 
   @Override
   public List<FetchSocialLinkDto> getAll(String discriminator) {
-    Board board = boardRepository.findByDiscriminator(discriminator)
+    Board board = boardRepository.findByDiscriminator(discriminator, EntityGraphUtils.fromAttributePaths("socialLinks"))
             .orElseThrow(() -> new ResourceNotFoundException("Board with discriminator " + discriminator + " not found"));
-    return board.getSocialLinks().stream().map(SocialLink::convertToDto).collect(Collectors.toList());
+    return board.getSocialLinks().stream().map(link -> new FetchSocialLinkDto().from(link)).collect(Collectors.toList());
   }
 
   @Override
@@ -81,7 +83,7 @@ public class BoardSocialLinksServiceImpl implements BoardSocialLinksService {
     socialLink = socialLinksRepository.save(socialLink);
     board.getSocialLinks().add(socialLink);
     boardRepository.save(board);
-    return ResponseEntity.status(HttpStatus.CREATED).body(socialLink.convertToDto());
+    return ResponseEntity.status(HttpStatus.CREATED).body(new FetchSocialLinkDto().from(socialLink));
   }
 
   @Override

@@ -5,11 +5,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.feedbacky.app.data.idea.Idea;
-import net.feedbacky.app.data.idea.dto.comment.FetchCommentDto;
 import net.feedbacky.app.data.user.User;
 
 import org.hibernate.annotations.CreationTimestamp;
-import org.modelmapper.ModelMapper;
+import org.hibernate.annotations.LazyToOne;
+import org.hibernate.annotations.LazyToOneOption;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,6 +19,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
 import javax.persistence.Table;
 
 import java.io.Serializable;
@@ -37,6 +39,7 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@NamedEntityGraph(name = "Comment.fetch", attributeNodes = {@NamedAttributeNode("creator"), @NamedAttributeNode("likers")})
 public class Comment implements Serializable {
 
   @Id
@@ -44,8 +47,10 @@ public class Comment implements Serializable {
   private Long id;
 
   @ManyToOne(fetch = FetchType.LAZY)
+  @LazyToOne(LazyToOneOption.NO_PROXY)
   private Idea idea;
   @ManyToOne(fetch = FetchType.LAZY)
+  @LazyToOne(LazyToOneOption.NO_PROXY)
   private User creator;
   @Column(name = "description", columnDefinition = "text", length = 65_535)
   private String description;
@@ -56,14 +61,6 @@ public class Comment implements Serializable {
   private Set<User> likers = new HashSet<>();
   @CreationTimestamp
   private Date creationDate;
-
-  public FetchCommentDto convertToDto(User user) {
-    FetchCommentDto dto = new ModelMapper().map(this, FetchCommentDto.class);
-    dto.setLiked(likers.contains(user));
-    dto.setLikesAmount(likers.size());
-    dto.setUser(creator.convertToDto().exposeSensitiveData(false).convertToSimpleDto());
-    return dto;
-  }
 
   //byte type to force database to use smaller data type
   public enum SpecialType {

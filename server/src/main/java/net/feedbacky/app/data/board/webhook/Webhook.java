@@ -5,9 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.feedbacky.app.data.board.Board;
-import net.feedbacky.app.data.board.dto.webhook.FetchWebhookDto;
-
-import org.modelmapper.ModelMapper;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -47,10 +44,6 @@ public class Webhook implements Serializable {
   private Type type;
   @ElementCollection(targetClass = Event.class)
   private List<Event> events = new ArrayList<>();
-
-  public FetchWebhookDto convertToDto() {
-    return new ModelMapper().map(this, FetchWebhookDto.class);
-  }
 
   public enum Type {
     CUSTOM_ENDPOINT(0), DISCORD(1);

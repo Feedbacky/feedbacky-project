@@ -7,9 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import net.feedbacky.app.data.board.Board;
-import net.feedbacky.app.data.tag.dto.FetchTagDto;
-
-import org.modelmapper.ModelMapper;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -48,10 +45,6 @@ public class Tag implements Serializable {
   private String color;
   private boolean roadmapIgnored = false;
   private boolean publicUse = false;
-
-  public FetchTagDto convertToDto() {
-    return new ModelMapper().map(this, FetchTagDto.class);
-  }
 
   public String convertToSpecialCommentMention() {
     return "{data_tag;" + id + ";" + name + ";" + color + "}";

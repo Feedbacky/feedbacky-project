@@ -32,7 +32,8 @@ import net.feedbacky.app.util.PaginableRequest;
 import net.feedbacky.app.util.request.InternalRequestValidator;
 import net.feedbacky.app.util.objectstorage.ObjectStorage;
 
-import org.apache.commons.lang3.tuple.Pair;
+import com.cosium.spring.data.jpa.entity.graph.domain.EntityGraphs;
+
 import org.apache.commons.text.StringEscapeUtils;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
@@ -196,7 +197,7 @@ public class IdeaServiceImpl implements IdeaService {
       commentRepository.save(comment);
     }
     ideaRepository.save(idea);
-    return idea.convertToDto(user);
+    return new FetchIdeaDto().from(idea).withUser(idea, user);
   }
 
   @Override
@@ -220,7 +221,7 @@ public class IdeaServiceImpl implements IdeaService {
   public List<FetchUserDto> getAllVoters(long id) {
     Idea idea = ideaRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Idea with id " + id + " does not exist."));
-    return idea.getVoters().stream().map(usr -> usr.convertToDto().exposeSensitiveData(false)).collect(Collectors.toList());
+    return idea.getVoters().stream().map(usr -> new FetchUserDto().from(usr)).collect(Collectors.toList());
   }
 
   @Override
@@ -283,7 +284,7 @@ public class IdeaServiceImpl implements IdeaService {
 
     subscriptionExecutor.notifySubscribers(idea, new NotificationEvent(SubscriptionExecutor.Event.IDEA_TAGS_CHANGE,
             idea, prepareTagChangeMessage(user, idea, addedTags, removedTags, false)));
-    return idea.getTags().stream().map(Tag::convertToDto).collect(Collectors.toList());
+    return idea.getTags().stream().map(tag -> new FetchTagDto().from(tag)).collect(Collectors.toList());
   }
 
   private Comment prepareTagsPatchComment(User user, Idea idea, List<Tag> addedTags, List<Tag> removedTags) {

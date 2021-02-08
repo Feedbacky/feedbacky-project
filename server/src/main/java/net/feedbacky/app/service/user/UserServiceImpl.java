@@ -18,8 +18,7 @@ import net.feedbacky.app.util.request.InternalRequestValidator;
 import net.feedbacky.app.util.mailservice.MailHandler;
 import net.feedbacky.app.util.mailservice.MailService;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.cosium.spring.data.jpa.entity.graph.domain.EntityGraphs;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.Conditions;
@@ -29,10 +28,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -57,7 +54,7 @@ public class UserServiceImpl implements UserService {
     UserAuthenticationToken auth = InternalRequestValidator.getContextAuthentication();
     User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
             .orElseThrow(() -> new InvalidAuthenticationException("User session not found. Try again with new token"));
-    return user.convertToDto().exposeSensitiveData(true);
+    return new FetchUserDto().from(user).withConfidentialData(user);
   }
 
   @Override
@@ -65,15 +62,14 @@ public class UserServiceImpl implements UserService {
     UserAuthenticationToken auth = InternalRequestValidator.getContextAuthentication();
     User user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
             .orElseThrow(() -> new InvalidAuthenticationException("User session not found. Try again with new token"));
-    return user.getConnectedAccounts().stream().map(ConnectedAccount::convertToDto).collect(Collectors.toList());
+    return user.getConnectedAccounts().stream().map(acc -> new FetchConnectedAccount().from(acc)).collect(Collectors.toList());
   }
 
   @Override
   public FetchUserDto get(long id) {
-    User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User does not exist of id " + id));
-    TypeReference<HashMap<String, Object>> ref = new TypeReference<HashMap<String, Object>>() {};
-    Map<String, Object> data = new ObjectMapper().convertValue(user.convertToDto().exposeSensitiveData(false), ref);
-    return new ObjectMapper().convertValue(data, FetchUserDto.class);
+    User user = userRepository.findById(id, EntityGraphs.named("User.fetch"))
+            .orElseThrow(() -> new ResourceNotFoundException("User does not exist of id " + id));
+    return new FetchUserDto().from(user);
   }
 
   @Override
@@ -86,7 +82,7 @@ public class UserServiceImpl implements UserService {
     mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
     mapper.map(dto, user);
     userRepository.save(user);
-    return user.convertToDto().exposeSensitiveData(true);
+    return new FetchUserDto().from(user).withConfidentialData(user);
   }
 
   @Override
@@ -101,7 +97,7 @@ public class UserServiceImpl implements UserService {
     mapper.map(dto, preferences);
     user.setMailPreferences(preferences);
     userRepository.save(user);
-    return user.convertToDto().exposeSensitiveData(true);
+    return new FetchUserDto().from(user).withConfidentialData(user);
   }
 
   @Override

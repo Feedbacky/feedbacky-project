@@ -30,6 +30,9 @@ import net.feedbacky.app.util.mailservice.MailHandler;
 import net.feedbacky.app.util.mailservice.MailService;
 import net.feedbacky.app.util.objectstorage.ObjectStorage;
 
+import com.cosium.spring.data.jpa.entity.graph.domain.EntityGraphUtils;
+import com.cosium.spring.data.jpa.entity.graph.domain.EntityGraphs;
+
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.modelmapper.Conditions;
@@ -39,6 +42,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -79,11 +83,11 @@ public class BoardServiceImpl implements BoardService {
 
   @Override
   public PaginableRequest<List<FetchBoardDto>> getAll(int page, int pageSize) {
-    Page<Board> pageData = boardRepository.findAll(PageRequest.of(page, pageSize));
+    Page<Board> pageData = boardRepository.findAll(PageRequest.of(page, pageSize), EntityGraphs.named("Board.fetch"));
     List<Board> boards = pageData.getContent();
     int totalPages = pageData.getTotalElements() == 0 ? 0 : pageData.getTotalPages() - 1;
     return new PaginableRequest<>(new PaginableRequest.PageMetadata(page, totalPages, pageSize),
-            boards.stream().map(board -> board.convertToDto().exposeSensitiveData(false)).collect(Collectors.toList()));
+            boards.stream().map(board -> new FetchBoardDto().from(board)).collect(Collectors.toList()));
   }
 
   @Override
@@ -93,9 +97,9 @@ public class BoardServiceImpl implements BoardService {
       UserAuthenticationToken auth = (UserAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
       user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail()).orElse(null);
     }
-    Board board = boardRepository.findByDiscriminator(discriminator)
+    Board board = boardRepository.findByDiscriminator(discriminator, EntityGraphs.named("Board.fetch"))
             .orElseThrow(() -> new ResourceNotFoundException("Board with discriminator " + discriminator + " not found"));
-    return board.convertToDto().exposeSensitiveData(board.getCreator().equals(user));
+    return new FetchBoardDto().from(board).withConfidentialData(board, board.getCreator().equals(user));
   }
 
   @Override
@@ -142,7 +146,7 @@ public class BoardServiceImpl implements BoardService {
     user.getPermissions().add(node);
     userRepository.save(user);
     populateBoardWithExamples(board);
-    return ResponseEntity.status(HttpStatus.CREATED).body(board.convertToDto().exposeSensitiveData(true));
+    return ResponseEntity.status(HttpStatus.CREATED).body(new FetchBoardDto().from(board).withConfidentialData(board, true));
   }
 
 
@@ -223,7 +227,7 @@ public class BoardServiceImpl implements BoardService {
     board.setFullDescription(StringEscapeUtils.escapeHtml4(board.getFullDescription()));
 
     boardRepository.save(board);
-    return board.convertToDto().exposeSensitiveData(true);
+    return new FetchBoardDto().from(board).withConfidentialData(board, true);
   }
 
   @Override
@@ -259,9 +263,9 @@ public class BoardServiceImpl implements BoardService {
 
   @Override
   public List<FetchTagDto> getAllTags(String discriminator) {
-    Board board = boardRepository.findByDiscriminator(discriminator)
+    Board board = boardRepository.findByDiscriminator(discriminator, EntityGraphUtils.fromAttributePaths("tags"))
             .orElseThrow(() -> new ResourceNotFoundException("Board with discriminator " + discriminator + " does not exist."));
-    return board.getTags().stream().map(Tag::convertToDto).collect(Collectors.toList());
+    return board.getTags().stream().map(tag -> new FetchTagDto().from(tag)).collect(Collectors.toList());
   }
 
   @Override
@@ -270,7 +274,7 @@ public class BoardServiceImpl implements BoardService {
             .orElseThrow(() -> new ResourceNotFoundException("Board with discriminator " + discriminator + " does not exist."));
     Tag tag = tagRepository.findByBoardAndName(board, name)
             .orElseThrow(() -> new ResourceNotFoundException("Tag with name " + name + " does not exist."));
-    return tag.convertToDto();
+    return new FetchTagDto().from(tag);
   }
 
   @Override
@@ -291,7 +295,7 @@ public class BoardServiceImpl implements BoardService {
     }
     Tag tag = dto.convertToEntity(board);
     tagRepository.save(tag);
-    return ResponseEntity.status(HttpStatus.CREATED).body(tag.convertToDto());
+    return ResponseEntity.status(HttpStatus.CREATED).body(new FetchTagDto().from(tag));
   }
 
   @Override
@@ -312,7 +316,7 @@ public class BoardServiceImpl implements BoardService {
     mapper.map(dto, tag);
 
     tagRepository.save(tag);
-    return tag.convertToDto();
+    return new FetchTagDto().from(tag);
   }
 
   @Override
