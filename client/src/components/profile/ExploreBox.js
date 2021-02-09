@@ -26,7 +26,7 @@ const ExploreBox = (props) => {
             <img alt='Board' src={logo} width='60px' height='60px' className="mb-1"/>
             <br/>
             <span className='h4-responsive text-truncate' style={{fontWeight: 500}}>{name}</span>
-            <p className='px-2 mb-0 small text-truncate' style={{letterSpacing: "-.35pt", maxWidth: 180}} dangerouslySetInnerHTML={{__html: description}}/>
+            <p className='px-2 mb-0 small text-truncate' style={{letterSpacing: "-.35pt"}} dangerouslySetInnerHTML={{__html: description}}/>
         </ExploreCard>
     </Link>
 };
