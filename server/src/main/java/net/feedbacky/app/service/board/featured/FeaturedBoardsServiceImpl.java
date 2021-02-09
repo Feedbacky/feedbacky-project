@@ -4,6 +4,8 @@ import net.feedbacky.app.repository.board.BoardRepository;
 import net.feedbacky.app.data.board.Board;
 import net.feedbacky.app.data.board.dto.FetchBoardDto;
 
+import com.cosium.spring.data.jpa.entity.graph.domain.EntityGraphs;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -32,7 +34,9 @@ public class FeaturedBoardsServiceImpl implements FeaturedBoardsService {
   @Scheduled(fixedDelay = 86_400_000)
   public void scheduleFeaturedBoardsSelectionTask() {
     featuredBoards.clear();
-    List<Board> boards = boardRepository.findAll();
+    Iterable<Board> iterable = boardRepository.findAll(EntityGraphs.empty());
+    List<Board> boards = new ArrayList<>();
+    iterable.forEach(boards::add);
     Collections.shuffle(boards);
     int i = 6;
     for(Board board : boards) {
