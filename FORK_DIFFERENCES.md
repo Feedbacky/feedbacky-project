@@ -13,11 +13,15 @@ This file is dedicated to show changes between self-hosted version and this fork
     * Include .text-blurred css
 * [client/src/components/board/BoardInfoCard.js](https://github.com/Feedbacky/feedbacky-project/blob/master/client/src/components/board/BoardInfoCard.js)
     * Include Attribution.js
+* [client/src/components/board/IdeaCreateModal.js](https://github.com/Feedbacky/feedbacky-project/blob/master/client/src/components/board/IdeaCreateModal.js)
+    * Include Ackee events analytics
 * [client/src/components/board/admin/AdminSidebar.js](https://github.com/Feedbacky/feedbacky-project/blob/master/client/src/components/board/admin/AdminSidebar.js)
     * Remove Feedbacky server/client version information
     * Include Attribution.js
 * [client/src/components/commons/navbar-commons.js](https://github.com/Feedbacky/feedbacky-project/blob/master/client/src/components/commons/navbar-commons.js)
     * Remove isServiceAdmin check for board creation - allow everyone to create boards
+* [client/src/components/commons/VoteButton.js](https://github.com/Feedbacky/feedbacky-project/blob/master/client/src/components/commons/VoteButton.js)
+    * Include Ackee events analytics
 * [client/src/components/profile/ProfileSidebar.js](https://github.com/Feedbacky/feedbacky-project/blob/master/client/src/components/profile/ProfileSidebar.js)
     * Include `/me/explore` page route
     * Include Attribution.js
@@ -33,6 +37,8 @@ This file is dedicated to show changes between self-hosted version and this fork
     * Implement default banner and logo values
 * [client/src/routes/profile/ProfileRoute.js](https://github.com/Feedbacky/feedbacky-project/blob/master/client/src/routes/profile/ProfileRoute.js)
     * Include `/me/explore` page route
+* [client/src/routes/LoginRoute.js](https://github.com/Feedbacky/feedbacky-project/blob/master/client/src/routes/LoginRoute.js)
+    * Include Ackee events analytics
 
 ## List of server-side changes
 **TODO**

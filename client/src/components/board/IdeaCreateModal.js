@@ -25,7 +25,7 @@ const AttachmentButton = styled(UiClassicButton)`
 `;
 
 const IdeaCreateModal = ({isOpen, onHide, onIdeaCreation}) => {
-    const {getTheme} = useContext(AppContext);
+    const {getTheme, ackeeInstance} = useContext(AppContext);
     const {discriminator, tags} = useContext(BoardContext).data;
     const [title, setTitle] = useState("");
     const [attachment, setAttachment] = useState(null);
@@ -61,6 +61,10 @@ const IdeaCreateModal = ({isOpen, onHide, onIdeaCreation}) => {
             popupNotification("Idea posted", getTheme().toHexString());
             setTitle("");
             onHide();
+            ackeeInstance.action("6b74faeb-5871-453d-a04b-5d2ad9bc57a0", {
+                key: "Idea post",
+                value: 1
+            });
             onIdeaCreation(res.data);
         });
     };

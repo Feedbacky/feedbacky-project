@@ -1,7 +1,8 @@
 import axios from "axios";
+import AppContext from "context/AppContext";
 import Cookies from "js-cookie";
 import qs from "querystringify";
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {FaTimes} from "react-icons/fa";
 import {Redirect, useLocation, useParams} from "react-router-dom";
 import ErrorRoute from "routes/ErrorRoute";
@@ -10,6 +11,7 @@ import LoadingRouteUtil from "routes/utils/LoadingRouteUtil";
 const LoginRoute = ({onLogin}) => {
     const {provider} = useParams();
     const location = useLocation();
+    const {ackeeInstance} = useContext(AppContext);
     const [data, setData] = useState({loaded: false, error: false, status: 0});
     const logIn = () => {
         if (data.loaded) {
@@ -25,6 +27,10 @@ const LoginRoute = ({onLogin}) => {
                 setData({...data, loaded: true, error: true, status: res.status});
                 return;
             }
+            ackeeInstance.action("31f1c904-3c62-47fc-915c-9d3de4ae8715", {
+                key: "Log-in",
+                value: 1
+            });
             const response = res.data;
             Cookies.set("FSID", response.token, {expires: 14});
             setData({...data, loaded: true});

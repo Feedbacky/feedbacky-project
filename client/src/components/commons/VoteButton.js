@@ -90,17 +90,24 @@ const ToUpvoteIcon = styled(FiChevronUp)`
 `;
 
 const VoteButton = ({onVote}) => {
-    const {getTheme} = useContext(AppContext);
+    const {getTheme, ackeeInstance} = useContext(AppContext);
     const {ideaData} = useContext(IdeaContext);
+    const onPreVote = () => {
+        ackeeInstance.action("0c59b302-cc99-4426-8757-2c12a0f47db2", {
+            key: "Vote click",
+            value: 1
+        });
+        onVote();
+    };
     let color = getTheme();
 
     if (!ideaData.upvoted) {
-        return <ToUpvoteBtn label={"Downvote"} onClick={onVote} variant={""}>
+        return <ToUpvoteBtn label={"Downvote"} onClick={onPreVote} variant={""}>
             <ToUpvoteIcon className={"to-upvote"}/>
             <strong className={"d-block"}>{ideaData.votersAmount}</strong>
         </ToUpvoteBtn>
     } else {
-        return <VoteBtn label={"Upvote"} onClick={onVote} variant={""}>
+        return <VoteBtn label={"Upvote"} onClick={onPreVote} variant={""}>
             <FiChevronsUp className={"upvoted"} style={{color}}/>
             <strong className={"d-block"} style={{color: color}}>{ideaData.votersAmount}</strong>
         </VoteBtn>

@@ -6,12 +6,11 @@ import Cookies from "js-cookie";
 import React, {lazy, Suspense, useEffect, useState} from 'react';
 import {FaDizzy, FaExclamationCircle} from "react-icons/fa";
 import {BrowserRouter, Route, Switch, useLocation} from "react-router-dom";
-
 import ErrorRoute from "routes/ErrorRoute";
 import LoadingRouteUtil from "routes/utils/LoadingRouteUtil";
-import {useAckee} from "use-ackee";
 import {getCookieOrDefault, popupError, popupWarning} from "utils/basic-utils";
 import {retry} from "utils/lazy-init";
+import useAckee from "utils/useAckee";
 
 const ProfileRoute = lazy(() => retry(() => import("routes/profile/ProfileRoute")));
 const CreateBoardRoute = lazy(() => retry(() => import("routes/board/creator/CreatorBoardRoute")));
@@ -52,7 +51,7 @@ const App = ({appearanceSettings}) => {
     const [userData, setUserData] = useState({loaded: false, data: [], error: false});
     const location = useLocation();
 
-    useAckee(location.pathname, {
+    const ackeeInstance  = useAckee(location.pathname, {
         server: 'https://analytics.feedbacky.net',
         domainId: '0a89558f-f907-4506-a0f5-d6365d6f7a36'
     }, {
@@ -147,6 +146,7 @@ const App = ({appearanceSettings}) => {
             defaultTheme: DEFAULT_THEME,
             onThemeChange: (newTheme = DEFAULT_THEME) => setTheme(newTheme),
             hardResetData: hardResetData,
+            ackeeInstance: ackeeInstance,
             clientVersion: CLIENT_VERSION
         }}>
             <Suspense fallback={<LoadingRouteUtil/>}>
