@@ -4,7 +4,7 @@ This file is dedicated to show changes between self-hosted version and this fork
 * [client/public/index.html](https://github.com/Feedbacky/feedbacky-project/blob/master/client/public/index.html)
     * Includes og and twitter meta tags
     * Keywords, description and title changed for service purposes
-    * Includes Google Analytics
+    * Includes [Ackee analytics](https://github.com/electerious/Ackee)
 * [client/public/manifest.json](https://github.com/Feedbacky/feedbacky-project/blob/master/client/public/manifest.json)
     * Update short_name, name and keywords
 * [client/src/App.js](https://github.com/Feedbacky/feedbacky-project/blob/master/client/src/App.js)
