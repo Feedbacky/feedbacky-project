@@ -96,17 +96,17 @@ public class MailBuilder {
 
     private String parsePlaceholders(String text) {
       String newText = text;
-      newText = StringUtils.replace(newText, "${host.address}", MailService.HOST_ADDRESS);
+      newText = StringUtils.replace(newText, "${host.address}", MailService.HOST_ADDRESS + "?source=Personal_Mail");
       newText = StringUtils.replace(newText, "${username}", recipient.getUsername());
       newText = StringUtils.replace(newText, "${avatar}", recipient.getAvatar());
       newText = StringUtils.replace(newText, "${unsubscribe_link}", MailService.HOST_ADDRESS + "/unsubscribe/"
-              + recipient.getId() + "/" + recipient.getMailPreferences().getUnsubscribeToken());
+              + recipient.getId() + "/" + recipient.getMailPreferences().getUnsubscribeToken() + "?source=Personal_Mail");
       if(board != null) {
         newText = StringUtils.replace(newText, "${board.name}", board.getName());
         newText = StringUtils.replace(newText, "${board.owner.name}", board.getCreator().getUsername());
       }
       if(invitation != null) {
-        newText = StringUtils.replace(newText, "${invitation.link}", template.getInviteLink() + invitation.getCode());
+        newText = StringUtils.replace(newText, "${invitation.link}", template.getInviteLink() + invitation.getCode() + "?source=Personal_Mail");
         newText = StringUtils.replace(newText, "${invitation.username}", invitation.getUser().getUsername());
       }
       return newText;
