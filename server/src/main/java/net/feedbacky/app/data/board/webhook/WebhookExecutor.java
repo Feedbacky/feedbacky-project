@@ -55,9 +55,9 @@ public class WebhookExecutor {
     embedObject.setTitle(event.getFormattedMessage(data.getOrDefault(WebhookMapData.IDEA_NAME.getName(), "")));
     embedObject.setTimestamp(new Timestamp(Calendar.getInstance().getTime().getTime()));
     if(event == Webhook.Event.IDEA_DELETE) {
-      embedObject.setUrl(MailService.HOST_ADDRESS + "/b/" + board.getDiscriminator());
+      embedObject.setUrl(MailService.HOST_ADDRESS + "/b/" + board.getDiscriminator() + "?source=Discord_Webhook");
     } else {
-      embedObject.setUrl(data.get(WebhookMapData.IDEA_LINK.getName()));
+      embedObject.setUrl(data.get(WebhookMapData.IDEA_LINK.getName()) + "?source=Discord_Webhook");
     }
     switch(event) {
       case IDEA_CREATE:
