@@ -56,7 +56,8 @@ const App = ({appearanceSettings}) => {
         server: 'https://analytics.feedbacky.net',
         domainId: '0a89558f-f907-4506-a0f5-d6365d6f7a36'
     }, {
-        ignoreOwnVisits: false
+        detailed: true,
+        ignoreOwnVisits: true
     });
     useEffect(() => {
         axios.defaults.baseURL = API_ROUTE;
