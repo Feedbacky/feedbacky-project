@@ -11,12 +11,13 @@ import StepThirdSubroute from "routes/board/creator/StepThirdSubroute";
 import ErrorRoute from "routes/ErrorRoute";
 import tinycolor from "tinycolor2";
 import {UiProgressBar} from "ui";
-import {UiButton, UiCancelButton, UiNextStepButton, UiPreviousStepButton} from "ui/button";
+import {UiCancelButton, UiLoadableButton, UiNextStepButton, UiPreviousStepButton} from "ui/button";
 import {UiCol, UiContainer, UiRow} from "ui/grid";
-import {toastAwait, toastError, toastSuccess, toastWarning} from "utils/basic-utils";
+import {popupNotification, popupWarning} from "utils/basic-utils";
 
 const CreatorBoardRoute = () => {
     const context = useContext(AppContext);
+    const {getTheme} = context;
     const {onThemeChange, user} = context;
     const history = useHistory();
     const [settings, setSettings] = useState({step: 1, name: "", discriminator: "", banner: null, logo: null, themeColor: "#2d3436"});
@@ -35,29 +36,8 @@ const CreatorBoardRoute = () => {
                 return <StepSecondSubroute updateSettings={updateSettings} settings={settings}/>;
             case 3:
                 return <StepThirdSubroute updateSettings={updateSettings} settings={settings}/>;
-            case 4:
-                let toastId = toastAwait("Creating new board...");
-                axios.post("/boards/", {
-                    discriminator: settings.discriminator,
-                    name: settings.name,
-                    shortDescription: settings.name + " feedback",
-                    fullDescription: "Feedback for **" + settings.name + "** project." +
-                        " " +
-                        "Edit this description in admin panel.",
-                    themeColor: settings.themeColor,
-                    banner: settings.banner,
-                    logo: settings.logo,
-                }).then(res => {
-                    if (res.status !== 201) {
-                        toastWarning("Couldn't create new board due to unknown error!", toastId);
-                        return;
-                    }
-                    toastSuccess("Created new board! Hooray!", toastId);
-                    history.push("/b/" + settings.discriminator);
-                }).catch(err => toastError(err.response.data.errors[0]));
-                return <StepThirdSubroute updateSettings={updateSettings} settings={settings}/>;
             default:
-                toastWarning("Setup encountered unexpected issue.");
+                popupWarning("Encountered unexpected issue");
                 return <StepFirstSubroute updateSettings={updateSettings} settings={settings}/>;
         }
     };
@@ -69,7 +49,25 @@ const CreatorBoardRoute = () => {
     };
     const renderNextButton = () => {
         if (settings.step >= 3) {
-            return <UiButton label={"Create Board"} color={tinycolor("#00c851")} className={"ml-2"} onClick={nextStep}>Create Board</UiButton>
+            const onFinish = () => axios.post("/boards/", {
+                discriminator: settings.discriminator,
+                name: settings.name,
+                shortDescription: settings.name + " feedback",
+                fullDescription: "Feedback for **" + settings.name + "** project." +
+                    " " +
+                    "Edit this description in admin panel.",
+                themeColor: settings.themeColor,
+                banner: settings.banner,
+                logo: settings.logo,
+            }).then(res => {
+                if (res.status !== 201) {
+                    popupWarning("Couldn't create new board due to unknown error!");
+                    return;
+                }
+                popupNotification("Board created", getTheme().toHexString());
+                history.push("/b/" + settings.discriminator);
+            });
+            return <UiLoadableButton label={"Create Board"} color={tinycolor("#00c851")} className={"ml-2"} onClick={onFinish}>Create Board</UiLoadableButton>
         }
         return <UiNextStepButton nextStep={nextStep}/>
     };
@@ -79,20 +77,20 @@ const CreatorBoardRoute = () => {
     const nextStep = () => {
         if (settings.step === 1) {
             if (settings.name === "" || settings.discriminator === "") {
-                toastWarning("Values must not be empty.");
+                popupWarning("Values must not be empty");
                 return;
             }
             if (settings.name.length < 4) {
-                toastWarning("Board name must be longer.");
+                popupWarning("Board name must be longer");
                 return;
             }
             if (settings.discriminator.length < 3) {
-                toastWarning("Discriminator must be longer.");
+                popupWarning("Discriminator must be longer");
                 return;
             }
             axios.get("/boards/" + settings.discriminator).then(res => {
                 if (res.status === 200) {
-                    toastWarning("Board with that discriminator already exists.");
+                    popupWarning("This discriminator is taken");
                 }
             }).catch(() => setSettings({...settings, step: settings.step + 1}));
             return;
@@ -125,7 +123,7 @@ const CreatorBoardRoute = () => {
     return <React.Fragment>
         <ProfileNavbar/>
         <UiContainer>
-            <UiRow className={"mt-5"}>
+            <UiRow className={"mt-4 mt-sm-5"}>
                 <UiProgressBar currentStep={settings.step} steps={4}>
                     <Step title={"Choose Name"}/>
                     <Step title={"Brand Board"}/>

@@ -168,24 +168,24 @@ public class ServiceLoginController {
       if(userRepository.count() == 0) {
         user.setServiceStaff(true);
       }
-      userRepository.save(user);
+      return userRepository.save(user);
     } else {
       User user = optional.get();
       if(user.getConnectedAccounts().stream().noneMatch(acc -> acc.getProvider().equals(id))) {
         Set<ConnectedAccount> accounts = new HashSet<>(user.getConnectedAccounts());
         accounts.add(generateConnectedAccount(id, data, fields, user));
         user.setConnectedAccounts(accounts);
-        userRepository.save(user);
+        return userRepository.save(user);
       }
+      return user;
     }
-    return optional.get();
   }
 
   private ConnectedAccount generateConnectedAccount(String id, Map<String, Object> data, LoginProvider.OauthDetails.DataFields fields, User user) {
     ConnectedAccount account = new ConnectedAccount();
     account.setUser(user);
     account.setProvider(id);
-    account.setAccountId(new BigInteger(String.valueOf(data.get(fields.getId()))));
+    account.setAccountId(String.valueOf(data.get(fields.getId())));
     return account;
   }
 

@@ -1,4 +1,5 @@
 import axios from "axios";
+import AppContext from "context/AppContext";
 import BoardContext from "context/BoardContext";
 import PageNodesContext from "context/PageNodesContext";
 import {Step} from "rc-steps";
@@ -9,12 +10,13 @@ import StepSecondSubroute from "routes/board/admin/subroutes/webhooks/creator/St
 import StepThirdSubroute from "routes/board/admin/subroutes/webhooks/creator/StepThirdSubroute";
 import tinycolor from "tinycolor2";
 import {UiProgressBar} from "ui";
-import {UiButton, UiCancelButton, UiNextStepButton, UiPreviousStepButton} from "ui/button";
+import {UiCancelButton, UiLoadableButton, UiNextStepButton, UiPreviousStepButton} from "ui/button";
 import {UiCol, UiContainer, UiRow} from "ui/grid";
-import {toastAwait, toastError, toastSuccess, toastWarning} from "utils/basic-utils";
+import {popupNotification, popupWarning} from "utils/basic-utils";
 
 const CreateWebhookSubroute = () => {
     const history = useHistory();
+    const {getTheme} = useContext(AppContext);
     const {data: boardData} = useContext(BoardContext);
     const [settings, setSettings] = useState({step: 1, type: "", listenedEvents: [], url: ""});
     const {setCurrentNode} = useContext(PageNodesContext);
@@ -29,24 +31,8 @@ const CreateWebhookSubroute = () => {
                 return <StepSecondSubroute updateSettings={updateSettings} settings={settings}/>;
             case 3:
                 return <StepThirdSubroute updateSettings={updateSettings} settings={settings}/>;
-            case 4:
-                let toastId = toastAwait("Adding new webhook...");
-                axios.post("/boards/" + boardData.discriminator + "/webhooks", {
-                    url: settings.url, type: settings.type, events: settings.listenedEvents,
-                }).then(res => {
-                    if (res.status !== 201) {
-                        toastWarning("Couldn't add webhook due to unknown error!", toastId);
-                        return;
-                    }
-                    toastSuccess("Added new webhook, sending sample response.", toastId);
-                    history.push("/ba/" + boardData.discriminator + "/webhooks");
-                }).catch(err => {
-                    toastError(err.response.data.errors[0], toastId);
-                    setSettings({...settings, step: 3});
-                });
-                return <StepThirdSubroute updateSettings={updateSettings} settings={settings}/>;
             default:
-                toastWarning("Setup encountered unexpected issue.");
+                popupWarning("Encountered unexpected issue");
                 setSettings({...settings, step: 1});
                 return <StepFirstSubroute updateSettings={updateSettings} settings={settings}/>;
         }
@@ -59,7 +45,23 @@ const CreateWebhookSubroute = () => {
     };
     const renderNextButton = () => {
         if (settings.step >= 3) {
-            return <UiButton label={"Finish"} color={tinycolor("#00c851")} className={"ml-2"} onClick={nextStep}>Finish</UiButton>
+            const onFinish = () => {
+                if (settings.url === "") {
+                    popupWarning("URL must be typed");
+                    return Promise.resolve();
+                }
+                return axios.post("/boards/" + boardData.discriminator + "/webhooks", {
+                    url: settings.url, type: settings.type, events: settings.listenedEvents,
+                }).then(res => {
+                    if (res.status !== 201) {
+                        popupWarning("Couldn't add webhook due to unknown error");
+                        return;
+                    }
+                    popupNotification("Webhook added and sent sample response", getTheme().toHexString());
+                    history.push("/ba/" + boardData.discriminator + "/webhooks");
+                }).catch(() => setSettings({...settings, step: 3}));
+            };
+            return <UiLoadableButton label={"Finish"} color={tinycolor("#00c851")} className={"ml-2"} onClick={onFinish}>Finish</UiLoadableButton>
         }
         return <UiNextStepButton nextStep={nextStep}/>
     };
@@ -68,13 +70,10 @@ const CreateWebhookSubroute = () => {
     };
     const nextStep = () => {
         if (settings.step === 1 && settings.type === "") {
-            toastWarning("Type must be chosen.");
+            popupWarning("Type must be chosen");
             return;
         } else if (settings.step === 2 && settings.listenedEvents.length === 0) {
-            toastWarning("Events must be chosen.");
-            return;
-        } else if (settings.step === 3 && settings.url === "") {
-            toastWarning("URL must be typed.");
+            popupWarning("Events must be chosen");
             return;
         }
         setSettings({...settings, step: settings.step + 1});
