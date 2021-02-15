@@ -22,6 +22,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 
+import java.text.MessageFormat;
 import java.util.List;
 
 /**
@@ -48,7 +49,7 @@ public class PublicIdeaServiceImpl implements PublicIdeaService {
   @Override
   public PublicApiRequest<PaginableRequest<List<FetchIdeaDto>>> getAllIdeas(String discriminator, int page, int pageSize, IdeaService.FilterType filter, IdeaService.SortType sort) {
     Board board = boardRepository.findByDiscriminator(discriminator)
-            .orElseThrow(() -> new ResourceNotFoundException("Board with discriminator " + discriminator + " not found."));
+            .orElseThrow(() -> new ResourceNotFoundException(MessageFormat.format("Board {0} not found.", discriminator)));
     HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
     publicRequestValidator.validateApiKeyFromRequest(request, board);
     User user = publicRequestValidator.getUserByTokenOnly(request);
@@ -57,7 +58,7 @@ public class PublicIdeaServiceImpl implements PublicIdeaService {
 
   @Override
   public PublicApiRequest<FetchIdeaDto> getOne(long id) {
-    Idea idea = ideaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Idea with id " + id + " does not exist."));
+    Idea idea = ideaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(MessageFormat.format("Idea with id {0} not found.", id)));
     Board board = idea.getBoard();
     HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
     publicRequestValidator.validateApiKeyFromRequest(request, board);
@@ -68,7 +69,7 @@ public class PublicIdeaServiceImpl implements PublicIdeaService {
   @Override
   public ResponseEntity<PublicApiRequest<FetchIdeaDto>> post(PostIdeaDto dto) {
     Board board = boardRepository.findByDiscriminator(dto.getDiscriminator())
-            .orElseThrow(() -> new ResourceNotFoundException("Board with discriminator " + dto.getDiscriminator() + " not found."));
+            .orElseThrow(() -> new ResourceNotFoundException(MessageFormat.format("Board {0} not found.", dto.getDiscriminator())));
     HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
     publicRequestValidator.validateApiKeyFromRequest(request, board);
     User user = publicRequestValidator.getUser(board, request);
@@ -78,7 +79,7 @@ public class PublicIdeaServiceImpl implements PublicIdeaService {
 
   @Override
   public PublicApiRequest<FetchUserDto> postUpvote(long id) {
-    Idea idea = ideaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Idea with id " + id + " does not exist."));
+    Idea idea = ideaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(MessageFormat.format("Idea with id {0} not found.", id)));
     Board board = idea.getBoard();
     HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
     publicRequestValidator.validateApiKeyFromRequest(request, board);
@@ -88,7 +89,7 @@ public class PublicIdeaServiceImpl implements PublicIdeaService {
 
   @Override
   public ResponseEntity<PublicApiRequest<?>> deleteUpvote(long id) {
-    Idea idea = ideaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Idea with id " + id + " does not exist."));
+    Idea idea = ideaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(MessageFormat.format("Idea with id {0} not found.", id)));
     Board board = idea.getBoard();
     HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
     publicRequestValidator.validateApiKeyFromRequest(request, board);

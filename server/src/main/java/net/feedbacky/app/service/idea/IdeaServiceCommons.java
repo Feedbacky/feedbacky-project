@@ -31,6 +31,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
@@ -91,14 +92,14 @@ public class IdeaServiceCommons {
 
   public FetchIdeaDto getOne(User user, long id) {
     Idea idea = ideaRepository.findById(id, EntityGraphs.named("Idea.fetch"))
-            .orElseThrow(() -> new ResourceNotFoundException("Idea with id " + id + " not found"));
+            .orElseThrow(() -> new ResourceNotFoundException(MessageFormat.format("Idea with id {0} not found.", id)));
     return new FetchIdeaDto().from(idea).withUser(idea, user);
   }
 
   public FetchIdeaDto post(PostIdeaDto dto, Board board, User user) {
     Optional<Idea> optional = ideaRepository.findByTitleAndBoard(dto.getTitle(), board);
     if(optional.isPresent() && optional.get().getBoard().getId().equals(board.getId())) {
-      throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "Idea with that title in that board already exists.");
+      throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "Idea with that title already exists.");
     }
     if(board.getSuspensedList().stream().anyMatch(suspended -> suspended.getUser().equals(user))) {
       throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "You've been suspended, please contact board owner for more information.");
@@ -107,10 +108,10 @@ public class IdeaServiceCommons {
     for(long tagId : dto.getTags()) {
       Tag tag = tagRepository.getOne(tagId);
       if(!tag.getBoard().equals(board)) {
-        throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "This tag does not belong to this board.");
+        throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, MessageFormat.format("Tag {0} not found.", tag.getName()));
       }
       if(!tag.isPublicUse()) {
-        throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "This tag cannot be used by you.");
+        throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, MessageFormat.format("Tag {0} is private.", tag.getName()));
       }
       tags.add(tag);
     }
@@ -150,7 +151,7 @@ public class IdeaServiceCommons {
 
   public FetchUserDto postUpvote(User user, Idea idea) {
     if(idea.getVoters().contains(user)) {
-      throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "Idea with id " + idea.getId() + " is already upvoted by you.");
+      throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "Already upvoted.");
     }
     if(idea.getBoard().getSuspensedList().stream().anyMatch(suspended -> suspended.getUser().equals(user))) {
       throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "You've been suspended, please contact board owner for more information.");
@@ -164,7 +165,7 @@ public class IdeaServiceCommons {
 
   public ResponseEntity deleteUpvote(User user, Idea idea) {
     if(!idea.getVoters().contains(user)) {
-      throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "Idea with id " + idea.getId() + " is not upvoted by you.");
+      throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "Not yet upvoted.");
     }
     if(idea.getBoard().getSuspensedList().stream().anyMatch(suspended -> suspended.getUser().equals(user))) {
       throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "You've been suspended, please contact board owner for more information.");
