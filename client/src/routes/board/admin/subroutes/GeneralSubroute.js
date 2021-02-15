@@ -193,38 +193,35 @@ const GeneralSubroute = ({updateState}) => {
         });
     };
     const onApiKeyEnable = () => {
-        let toastId = toastAwait("Generating API key, hold on...");
         axios.patch("/boards/" + boardData.discriminator + "/apiKey").then(res => {
             if (res.status !== 200 && res.status !== 204) {
-                toastError();
+                popupError();
                 return;
             }
             updateState({...boardData, apiKey: res.data.apiKey});
-            toastSuccess("API key generated and enabled.", toastId);
-        }).catch(err => toastError(err.response.data.errors[0]));
+            popupNotification("API key generated and enabled.");
+        });
     };
     const onApiKeyDisable = () => {
-        let toastId = toastAwait("Disabling API key, hold on...");
         axios.delete("/boards/" + boardData.discriminator + "/apiKey").then(res => {
             if (res.status !== 200 && res.status !== 204) {
-                toastError();
+                popupError();
                 return;
             }
             updateState({...boardData, apiKey: ""});
-            toastSuccess("API key disabled.", toastId);
-        }).catch(err => toastError(err.response.data.errors[0]));
+            popupNotification("API key disabled.");
+        });
     };
     const onApiKeyRegenerate = () => {
-        let toastId = toastAwait("Generating new API key, hold on...");
         axios.patch("/boards/" + boardData.discriminator + "/apiKey").then(res => {
             if (res.status !== 200 && res.status !== 204) {
-                toastError();
+                popupError();
                 return;
             }
             setApiKeyBlurred(true);
             updateState({...boardData, apiKey: res.data.apiKey});
-            toastSuccess("API key regenerated.", toastId);
-        }).catch(err => toastError(err.response.data.errors[0]));
+            popupNotification("API key regenerated.");
+        });
     };
     const onChangesSave = () => {
         const banner = bannerInput;

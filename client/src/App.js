@@ -5,10 +5,11 @@ import AppContext from "context/AppContext";
 import Cookies from "js-cookie";
 import React, {lazy, Suspense, useEffect, useState} from 'react';
 import {FaDizzy, FaExclamationCircle} from "react-icons/fa";
-import {BrowserRouter, Route, Switch} from "react-router-dom";
+import {BrowserRouter, Route, Switch, useLocation} from "react-router-dom";
 
 import ErrorRoute from "routes/ErrorRoute";
 import LoadingRouteUtil from "routes/utils/LoadingRouteUtil";
+import {useAckee} from "use-ackee";
 import {getCookieOrDefault, popupError, popupWarning} from "utils/basic-utils";
 import {retry} from "utils/lazy-init";
 
@@ -49,6 +50,14 @@ const App = ({appearanceSettings}) => {
     });
     const [serviceData, setServiceData] = useState({loaded: false, data: [], error: false});
     const [userData, setUserData] = useState({loaded: false, data: [], error: false});
+    const location = useLocation();
+
+    useAckee(location.pathname, {
+        server: 'https://analytics.feedbacky.net',
+        domainId: '0a89558f-f907-4506-a0f5-d6365d6f7a36'
+    }, {
+        ignoreOwnVisits: false
+    });
     useEffect(() => {
         axios.defaults.baseURL = API_ROUTE;
         axios.defaults.headers.common["Authorization"] = "Bearer " + session;

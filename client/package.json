@@ -27,7 +27,8 @@
     "react-scripts": "^3.4.1",
     "react-string-replace": "^0.4.4",
     "timeago-react": "^3.0.0",
-    "tinycolor2": "^1.4.1"
+    "tinycolor2": "^1.4.1",
+    "use-ackee": "^2.0.0"
   },
   "scripts": {
     "analyze": "source-map-explorer 'build/static/js/*.js'",

@@ -4,11 +4,11 @@ This file is dedicated to show changes between self-hosted version and this fork
 * [client/public/index.html](https://github.com/Feedbacky/feedbacky-project/blob/master/client/public/index.html)
     * Includes og and twitter meta tags
     * Keywords, description and title changed for service purposes
-    * Includes [Ackee analytics](https://github.com/electerious/Ackee)
 * [client/public/manifest.json](https://github.com/Feedbacky/feedbacky-project/blob/master/client/public/manifest.json)
     * Update short_name, name and keywords
 * [client/src/App.js](https://github.com/Feedbacky/feedbacky-project/blob/master/client/src/App.js)
     * Replace `/admin/create` board create route with `/create`
+    * Includes [Ackee analytics](https://github.com/electerious/Ackee) and useAckee hook
 * [client/src/assets/scss/utilities/colors.scss](https://github.com/Feedbacky/feedbacky-project/blob/master/client/src/assets/scss/utilities/colors.scss)
     * Include .text-blurred css
 * [client/src/components/board/BoardInfoCard.js](https://github.com/Feedbacky/feedbacky-project/blob/master/client/src/components/board/BoardInfoCard.js)
