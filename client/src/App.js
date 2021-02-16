@@ -5,7 +5,7 @@ import AppContext from "context/AppContext";
 import Cookies from "js-cookie";
 import React, {lazy, Suspense, useEffect, useState} from 'react';
 import {FaDizzy, FaExclamationCircle} from "react-icons/fa";
-import {BrowserRouter, Route, Switch, useLocation} from "react-router-dom";
+import {BrowserRouter, Route, Switch, useHistory, useLocation} from "react-router-dom";
 import ErrorRoute from "routes/ErrorRoute";
 import LoadingRouteUtil from "routes/utils/LoadingRouteUtil";
 import {getCookieOrDefault, popupError, popupWarning} from "utils/basic-utils";
@@ -50,13 +50,14 @@ const App = ({appearanceSettings}) => {
     });
     const [serviceData, setServiceData] = useState({loaded: false, data: [], error: false});
     const [userData, setUserData] = useState({loaded: false, data: [], error: false});
+    const history = useHistory();
+    const location = useLocation();
     const startAnonymousSession = () => {
         new FingerprintJS.load().then(fp => fp.get().then(res => {
             console.info("Anonymous session started. User identificator: " + res.visitorId);
             axios.defaults.headers.common["X-Feedbacky-Anonymous-Id"] = res.visitorId;
         }));
     };
-    const location = useLocation();
 
     const ackeeInstance  = useAckee(location.pathname, {
         server: 'https://analytics.feedbacky.net',
@@ -120,6 +121,7 @@ const App = ({appearanceSettings}) => {
         delete axios.defaults.headers.common["Authorization"];
         Cookies.remove("FSID");
         setSession(null);
+        history.push({pathname: location.pathname, state: null});
         setUserData({...userData, data: [], loaded: true, loggedIn: false});
     };
     const onLocalPreferencesUpdate = (data) => {
