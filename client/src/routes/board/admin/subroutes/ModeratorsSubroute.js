@@ -156,6 +156,7 @@ const ModeratorsSubroute = () => {
                 popupError();
                 return;
             }
+            setInvited({...invited, data: invited.data.filter(item => item.id !== modal.data)});
             popupNotification("Invitation removed", getTheme().toHexString());
         });
     };
