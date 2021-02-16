@@ -39,6 +39,7 @@ const GeneralSubroute = ({updateState}) => {
     const history = useHistory();
     const {onThemeChange, getTheme, user} = useContext(AppContext);
     const {data: boardData} = useContext(BoardContext);
+    const [anonymousVoting, setAnonymousVoting] = useState(boardData.anonymousAllowed);
     const {setCurrentNode} = useContext(PageNodesContext);
     const [apiKeyBlurred, setApiKeyBlurred] = useState(true);
     const [modal, setModal] = useState({open: false, type: ""});
@@ -129,9 +130,32 @@ const GeneralSubroute = ({updateState}) => {
             </UiCol>
         </React.Fragment>
     };
+    const conditionalButton = (conditionEnabled, funcEnable, funcDisable) => {
+        if (conditionEnabled) {
+            return <UiLoadableButton label={"Disable"} color={tinycolor("#ff3547")} onClick={funcDisable}>Disable</UiLoadableButton>
+        }
+        return <UiLoadableButton label={"Enable"} color={tinycolor("#00c851")} onClick={funcEnable}>Enable</UiLoadableButton>
+    };
     const renderDangerContent = () => {
         return <UiViewBoxBackground className={"mb-3 px-1 py-3 rounded mt-2 danger-shadow rounded-bottom"}>
             {renderApiKeyContent()}
+            <UiRow noGutters className={"m-0 p-0 px-4 my-2 mb-4"}>
+                <UiCol sm={9} xs={12}>
+                    <h4 className={"mb-1"}>Anonymous Voting</h4>
+                    <span className={"text-black-60"} style={{fontSize: ".9em"}}>
+                        Allow users to vote anonymously without the need to log-in.
+                    </span>
+                </UiCol>
+                <UiCol sm={3} xs={6} className={"text-sm-right text-left my-auto"}>
+                    {conditionalButton(anonymousVoting, () => {
+                        setAnonymousVoting(true);
+                        return onChangesSave();
+                    }, () => {
+                        setAnonymousVoting(false);
+                        return onChangesSave();
+                    })}
+                </UiCol>
+            </UiRow>
             <UiRow noGutters className={"m-0 p-0 px-4 my-2"}>
                 <UiCol sm={9} xs={12}>
                     <h4 className={"mb-1 text-red"}>Delete Board</h4>
@@ -230,8 +254,9 @@ const GeneralSubroute = ({updateState}) => {
         const shortDescription = document.getElementById("shortDescrTextarea").value;
         const fullDescription = document.getElementById("fullDescrTextarea").value;
         const themeColor = getTheme(false).toHexString();
+        const anonymousAllowed = anonymousVoting;
         return axios.patch("/boards/" + boardData.discriminator, {
-            name, shortDescription, fullDescription, themeColor, banner, logo,
+            name, shortDescription, fullDescription, themeColor, banner, logo, anonymousAllowed
         }).then(res => {
             if (res.status !== 200 && res.status !== 204) {
                 popupError();

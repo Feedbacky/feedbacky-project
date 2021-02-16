@@ -93,5 +93,6 @@ public class Board implements Serializable {
   private Set<SocialLink> socialLinks = new HashSet<>();
   @ManyToMany(fetch = FetchType.LAZY)
   private Set<SuspendedUser> suspensedList = new HashSet<>();
+  private boolean anonymousAllowed = true;
 
 }
