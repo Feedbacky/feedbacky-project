@@ -16,7 +16,7 @@ import {UiAvatar} from "ui/image";
 import {UiViewBox} from "ui/viewbox";
 import {popupError, popupNotification, prettifyEnum} from "utils/basic-utils";
 
-const ClickableHoverButton = styled.div`
+const ClickableButton = styled.div`
   cursor: pointer;
   transition: var(--hover-transition);
   
@@ -24,7 +24,6 @@ const ClickableHoverButton = styled.div`
     transform: var(--hover-transform-scale);
   }
 `;
-
 
 const ModeratorsSubroute = () => {
     const {getTheme} = useContext(AppContext);
@@ -83,7 +82,7 @@ const ModeratorsSubroute = () => {
                     return <div className={"d-inline-flex justify-content-center mr-2"} key={i}>
                         <div className={"text-center"}>
                             <UiAvatar roundedCircle user={mod.user} size={35}/>
-                            {renderModerationTools(mod, i)}
+                            {renderModerationKick(mod, i)}
                             <br/>
                             <small className={"text-truncate d-block"} style={{maxWidth: 100}}>{mod.user.username}</small>
                             <UiBadge className={"d-block"}>{prettifyEnum(mod.role)}</UiBadge>
@@ -104,10 +103,10 @@ const ModeratorsSubroute = () => {
                             <UiElementDeleteButton id={"invite_del_" + invited.user.id} tooltipName={"Invalidate"} onClick={() => setModal({open: true, type: "inviteDelete", data: invited.id})}/>
                             <br/>
                             <small className={"text-truncate d-block"} style={{maxWidth: 100}}>{invited.user.username}</small>
-                            <ClickableHoverButton onClick={() => {
+                            <ClickableButton onClick={() => {
                                 copy(process.env.REACT_APP_SERVER_IP_ADDRESS + "/moderator_invitation/" + invited.code);
                                 popupNotification("Copied", getTheme().toHexString());
-                            }}><UiBadge color={tinycolor("#0994f6")} className={"d-block"}>Copy Invite</UiBadge></ClickableHoverButton>
+                            }}><UiBadge color={tinycolor("#0994f6")} className={"d-block"}>Copy Invite</UiBadge></ClickableButton>
                         </div>
                     </div>
                 })}
@@ -120,7 +119,7 @@ const ModeratorsSubroute = () => {
             </UiCol>
         </React.Fragment>
     };
-    const renderModerationTools = (mod, i) => {
+    const renderModerationKick = (mod, i) => {
         if (mod.role.toLowerCase() === "owner") {
             return;
         }
@@ -131,11 +130,11 @@ const ModeratorsSubroute = () => {
             return;
         }
         if (mod.role.toLowerCase() === "moderator") {
-            return <ClickableHoverButton as={UiBadge} color={tinycolor("#00c851")} className={"d-block my-1"}
-                                         onClick={() => setModal({open: true, type: "promote", data: mod.userId})}>Promote</ClickableHoverButton>
+            return <ClickableButton as={UiBadge} color={tinycolor("#00c851")} className={"d-block my-1"}
+                                         onClick={() => setModal({open: true, type: "promote", data: mod.userId})}>Promote</ClickableButton>
         } else {
-            return <ClickableHoverButton as={UiBadge} color={tinycolor("#ff3547")} className={"d-block my-1"}
-                                         onClick={() => setModal({open: true, type: "demote", data: mod.userId})}>Demote</ClickableHoverButton>
+            return <ClickableButton as={UiBadge} color={tinycolor("#ff3547")} className={"d-block my-1"}
+                                         onClick={() => setModal({open: true, type: "demote", data: mod.userId})}>Demote</ClickableButton>
         }
     };
     const onPermissionsRevoke = () => {
