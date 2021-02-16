@@ -138,7 +138,6 @@ const GeneralSubroute = ({updateState}) => {
     };
     const renderDangerContent = () => {
         return <UiViewBoxBackground className={"mb-3 px-1 py-3 rounded mt-2 danger-shadow rounded-bottom"}>
-            {renderApiKeyContent()}
             <UiRow noGutters className={"m-0 p-0 px-4 my-2 mb-4"}>
                 <UiCol sm={9} xs={12}>
                     <h4 className={"mb-1"}>Anonymous Voting</h4>
@@ -149,13 +148,14 @@ const GeneralSubroute = ({updateState}) => {
                 <UiCol sm={3} xs={6} className={"text-sm-right text-left my-auto"}>
                     {conditionalButton(anonymousVoting, () => {
                         setAnonymousVoting(true);
-                        return onChangesSave();
+                        return onChangesSave(true);
                     }, () => {
                         setAnonymousVoting(false);
-                        return onChangesSave();
+                        return onChangesSave(false);
                     })}
                 </UiCol>
             </UiRow>
+            {renderApiKeyContent()}
             <UiRow noGutters className={"m-0 p-0 px-4 my-2"}>
                 <UiCol sm={9} xs={12}>
                     <h4 className={"mb-1 text-red"}>Delete Board</h4>
@@ -247,14 +247,13 @@ const GeneralSubroute = ({updateState}) => {
             popupNotification("API key regenerated.");
         });
     };
-    const onChangesSave = () => {
+    const onChangesSave = (anonymousAllowed = boardData.anonymousAllowed) => {
         const banner = bannerInput;
         const logo = logoInput;
         const name = document.getElementById("boardTextarea").value;
         const shortDescription = document.getElementById("shortDescrTextarea").value;
         const fullDescription = document.getElementById("fullDescrTextarea").value;
         const themeColor = getTheme(false).toHexString();
-        const anonymousAllowed = anonymousVoting;
         return axios.patch("/boards/" + boardData.discriminator, {
             name, shortDescription, fullDescription, themeColor, banner, logo, anonymousAllowed
         }).then(res => {
