@@ -54,3 +54,5 @@ logging:
 
 sentry:
   dsn: "sentry link"
+  enable-tracing: true
+  traces-sample-rate: 0.1

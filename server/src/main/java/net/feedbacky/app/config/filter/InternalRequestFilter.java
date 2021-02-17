@@ -1,6 +1,8 @@
 package net.feedbacky.app.config.filter;
 
 import io.jsonwebtoken.JwtException;
+import io.sentry.Sentry;
+import io.sentry.protocol.User;
 import net.feedbacky.app.config.UserAuthenticationToken;
 import net.feedbacky.app.service.FeedbackyUserDetailsService;
 import net.feedbacky.app.service.ServiceUser;
@@ -43,6 +45,9 @@ public class InternalRequestFilter extends OncePerRequestFilter {
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
+    //sentry.io user identification reset
+    Sentry.configureScope(scope -> scope.setUser(null));
+
     String tokenHeader = request.getHeader("Authorization");
 
     response.setContentType("application/json");
@@ -62,6 +67,13 @@ public class InternalRequestFilter extends OncePerRequestFilter {
       if(SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken
               && JwtTokenUtil.validateToken(jwtToken, email)) {
         ServiceUser serviceUser = userDetailsService.loadUserByEmail(email);
+
+        //sentry.io user identification
+        User sentryUser = new User();
+        sentryUser.setEmail(email);
+        sentryUser.setUsername(serviceUser.getUsername());
+        Sentry.setUser(sentryUser);
+
         UserAuthenticationToken userAuthenticationToken = new UserAuthenticationToken(serviceUser, null, serviceUser.getAuthorities());
         userAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(userAuthenticationToken);
