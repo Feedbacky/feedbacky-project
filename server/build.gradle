@@ -61,6 +61,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-cache:2.3.0.RELEASE'
     implementation 'com.cosium.spring.data:spring-data-jpa-entity-graph:2.3.0'
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.11.1'
+    implementation 'io.sentry:sentry-spring-boot-starter:4.0.0'
     implementation 'javax.cache:cache-api:1.1.1'
     implementation 'com.github.ben-manes.caffeine:caffeine:2.8.0'
     implementation 'com.github.ben-manes.caffeine:jcache:2.5.3'

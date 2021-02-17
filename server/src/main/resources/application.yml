@@ -51,3 +51,6 @@ logging:
     org:
       hibernate:
         stat: "debug"
+
+sentry:
+  dsn: "sentry link"
