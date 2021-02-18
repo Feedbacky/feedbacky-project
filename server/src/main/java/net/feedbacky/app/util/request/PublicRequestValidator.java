@@ -83,7 +83,7 @@ public class PublicRequestValidator {
     if(avatar != null) {
       user.setAvatar(avatar);
     } else {
-      user.setAvatar(System.getenv("REACT_APP_DEFAULT_USER_AVATAR"));
+      user.setAvatar(System.getenv("REACT_APP_DEFAULT_USER_AVATAR").replace("%nick%", username));
     }
     user.setFake(true);
     String userToken = board.getId() + "-" + RandomStringUtils.randomAlphanumeric(10);
@@ -95,7 +95,7 @@ public class PublicRequestValidator {
     MailPreferences preferences = new MailPreferences();
     preferences.setNotificationsEnabled(false);
     preferences.setUser(user);
-    preferences.setUnsubscribeToken("none");
+    preferences.setUnsubscribeToken("");
     user.setMailPreferences(preferences);
     return userRepository.save(user);
   }
