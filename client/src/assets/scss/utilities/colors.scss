@@ -15,7 +15,7 @@
 .text-red {
   color: hsl(355, 100%, 60%);
 }
-.text-red {
+.dark .text-red {
   color: hsl(2, 95%, 66%) !important;
 }
 
@@ -28,9 +28,9 @@
 
 .text-blurred {
   color: transparent;
-  text-shadow: 0 0 5px var(--font-color);
+  text-shadow: 0 0 5px hsl(355, 100%, 60%);
   user-select: none;
 }
 .dark .text-blurred {
-  text-shadow: 0 0 5px var(--dark-font-color) !important;
+  text-shadow: 0 0 5px hsl(2, 95%, 66%) !important;
 }
