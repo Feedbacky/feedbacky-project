@@ -96,7 +96,7 @@ public class MailBuilder {
 
     private String parsePlaceholders(String text) {
       String newText = text;
-      newText = StringUtils.replace(newText, "${host.address}", MailService.HOST_ADDRESS + "?source=Personal_Mail");
+      newText = StringUtils.replace(newText, "${host.address}", MailService.HOST_ADDRESS);
       newText = StringUtils.replace(newText, "${username}", recipient.getUsername());
       newText = StringUtils.replace(newText, "${avatar}", recipient.getAvatar());
       newText = StringUtils.replace(newText, "${unsubscribe_link}", MailService.HOST_ADDRESS + "/unsubscribe/"
