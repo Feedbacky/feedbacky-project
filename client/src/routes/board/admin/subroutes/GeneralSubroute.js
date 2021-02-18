@@ -181,7 +181,7 @@ const GeneralSubroute = ({updateState}) => {
                     </span>
                 </UiCol>
                 <UiCol sm={3} xs={6} className="text-sm-right text-left my-auto">
-                    <UiButton label={"Enable"} onClick={() => setModal({open: true, type: "apiEnable"})} color={tinycolor("#00c851")}>Enable</UiButton>
+                    <UiButton label={"Enable"} className={"mt-sm-0 mt-2"} onClick={() => setModal({open: true, type: "apiEnable"})} color={tinycolor("#00c851")}>Enable</UiButton>
                 </UiCol>
             </UiRow>
         } else {
@@ -195,11 +195,11 @@ const GeneralSubroute = ({updateState}) => {
                         <CommentInternal as={FaEyeSlash} className="ml-1" style={{cursor: "pointer"}} onClick={() => setApiKeyBlurred(!apiKeyBlurred)}/>.
                         Remember to keep it safe!<br/>
                         {/* todo hoverable */}
-                        <strong><span className="text-red" style={{cursor: "pointer"}} onClick={() => setModal({open: true, type: "apiReset"})}>Click here</span> to regenerate API key if it got compromised.</strong>
+                        <span><strong className="text-red" style={{cursor: "pointer"}} onClick={() => setModal({open: true, type: "apiReset"})}>Click here</strong> to regenerate API key if it got compromised.</span>
                     </span>
                 </UiCol>
                 <UiCol sm={3} xs={6} className="text-sm-right text-left my-auto">
-                    <UiButton label={"Disable"} color={tinycolor("#ff3547")} onClick={() => setModal({open: true, type: "apiDisable"})}>Disable</UiButton>
+                    <UiButton label={"Disable"} className={"mt-sm-0 mt-2"} color={tinycolor("#ff3547")} onClick={() => setModal({open: true, type: "apiDisable"})}>Disable</UiButton>
                 </UiCol>
             </UiRow>
         }
