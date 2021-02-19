@@ -254,8 +254,9 @@ const GeneralSubroute = ({updateState}) => {
         const shortDescription = document.getElementById("shortDescrTextarea").value;
         const fullDescription = document.getElementById("fullDescrTextarea").value;
         const themeColor = getTheme(false).toHexString();
+        const apiKey = boardData.apiKey;
         return axios.patch("/boards/" + boardData.discriminator, {
-            name, shortDescription, fullDescription, themeColor, banner, logo, anonymousAllowed
+            name, shortDescription, fullDescription, themeColor, banner, logo, anonymousAllowed, apiKey
         }).then(res => {
             if (res.status !== 200 && res.status !== 204) {
                 popupError();
