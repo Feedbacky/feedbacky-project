@@ -1,6 +1,7 @@
 package net.feedbacky.app.config.filter;
 
 import io.jsonwebtoken.JwtException;
+import net.feedbacky.app.config.UserAuthenticationToken;
 import io.sentry.Sentry;
 import io.sentry.protocol.User;
 import net.feedbacky.app.config.UserAuthenticationToken;

@@ -40,8 +40,8 @@ const GeneralSubroute = ({updateState}) => {
     const {onThemeChange, getTheme, user} = useContext(AppContext);
     const {data: boardData} = useContext(BoardContext);
     const [anonymousVoting, setAnonymousVoting] = useState(boardData.anonymousAllowed);
-    const {setCurrentNode} = useContext(PageNodesContext);
     const [apiKeyBlurred, setApiKeyBlurred] = useState(true);
+    const {setCurrentNode} = useContext(PageNodesContext);
     const [modal, setModal] = useState({open: false, type: ""});
     const [bannerInput, setBannerInput] = useState(null);
     const [logoInput, setLogoInput] = useState(null);
@@ -217,7 +217,7 @@ const GeneralSubroute = ({updateState}) => {
         });
     };
     const onApiKeyEnable = () => {
-        axios.patch("/boards/" + boardData.discriminator + "/apiKey").then(res => {
+        return axios.patch("/boards/" + boardData.discriminator + "/apiKey").then(res => {
             if (res.status !== 200 && res.status !== 204) {
                 popupError();
                 return;
@@ -227,7 +227,7 @@ const GeneralSubroute = ({updateState}) => {
         });
     };
     const onApiKeyDisable = () => {
-        axios.delete("/boards/" + boardData.discriminator + "/apiKey").then(res => {
+        return axios.delete("/boards/" + boardData.discriminator + "/apiKey").then(res => {
             if (res.status !== 200 && res.status !== 204) {
                 popupError();
                 return;
@@ -237,7 +237,7 @@ const GeneralSubroute = ({updateState}) => {
         });
     };
     const onApiKeyRegenerate = () => {
-        axios.patch("/boards/" + boardData.discriminator + "/apiKey").then(res => {
+        return axios.patch("/boards/" + boardData.discriminator + "/apiKey").then(res => {
             if (res.status !== 200 && res.status !== 204) {
                 popupError();
                 return;
@@ -290,7 +290,6 @@ const GeneralSubroute = ({updateState}) => {
         });
     };
     return <UiCol xs={12} md={9}>
-        {/* todo finish */}
         <DangerousActionModal id={"apiReset"} onHide={() => setModal({...modal, open: false})} isOpen={modal.open && modal.type === "apiReset"} onAction={onApiKeyRegenerate}
                               actionDescription={<div>API key will be regenerated and you must update it anywhere you use it.</div>} actionButtonName={"Regenerate"}/>
         <DangerousActionModal id={"apiDisable"} onHide={() => setModal({...modal, open: false})} isOpen={modal.open && modal.type === "apiDisable"} onAction={onApiKeyDisable}

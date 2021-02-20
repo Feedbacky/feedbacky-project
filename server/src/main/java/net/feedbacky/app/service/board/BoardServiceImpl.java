@@ -24,8 +24,8 @@ import net.feedbacky.app.service.board.featured.FeaturedBoardsServiceImpl;
 import net.feedbacky.app.util.Base64Util;
 import net.feedbacky.app.util.Constants;
 import net.feedbacky.app.util.PaginableRequest;
-import net.feedbacky.app.util.mailservice.MailBuilder;
 import net.feedbacky.app.util.request.InternalRequestValidator;
+import net.feedbacky.app.util.mailservice.MailBuilder;
 import net.feedbacky.app.util.mailservice.MailHandler;
 import net.feedbacky.app.util.mailservice.MailService;
 import net.feedbacky.app.util.objectstorage.ObjectStorage;
@@ -42,7 +42,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -87,6 +86,7 @@ public class BoardServiceImpl implements BoardService {
     Page<Board> pageData = boardRepository.findAll(PageRequest.of(page, pageSize), EntityGraphs.named("Board.fetch"));
     List<Board> boards = pageData.getContent();
     int totalPages = pageData.getTotalElements() == 0 ? 0 : pageData.getTotalPages() - 1;
+    //no confidential data for paginated requests
     return new PaginableRequest<>(new PaginableRequest.PageMetadata(page, totalPages, pageSize),
             boards.stream().map(board -> new FetchBoardDto().from(board)).collect(Collectors.toList()));
   }
@@ -100,7 +100,9 @@ public class BoardServiceImpl implements BoardService {
     }
     Board board = boardRepository.findByDiscriminator(discriminator, EntityGraphs.named("Board.fetch"))
             .orElseThrow(() -> new ResourceNotFoundException((MessageFormat.format("Board {0} not found.", discriminator))));
-    return new FetchBoardDto().from(board).withConfidentialData(board, board.getCreator().equals(user));
+    final User finalUser = user;
+    boolean allowConfidential = board.getCreator().equals(user) || board.getModerators().stream().anyMatch(mod -> mod.getUser().equals(finalUser));
+    return new FetchBoardDto().from(board).withConfidentialData(board, allowConfidential);
   }
 
   @Override

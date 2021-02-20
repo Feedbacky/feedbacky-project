@@ -31,8 +31,9 @@ import net.feedbacky.app.service.ServiceUser;
 import net.feedbacky.app.util.CommentBuilder;
 import net.feedbacky.app.util.PaginableRequest;
 import net.feedbacky.app.util.RandomNicknameUtils;
-import net.feedbacky.app.util.objectstorage.ObjectStorage;
 import net.feedbacky.app.util.request.InternalRequestValidator;
+import net.feedbacky.app.util.SortFilterResolver;
+import net.feedbacky.app.util.objectstorage.ObjectStorage;
 
 import com.cosium.spring.data.jpa.entity.graph.domain.EntityGraphUtils;
 import com.cosium.spring.data.jpa.entity.graph.domain.EntityGraphs;
@@ -250,17 +251,7 @@ public class IdeaServiceImpl implements IdeaService {
       user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
               .orElseThrow(() -> new InvalidAuthenticationException("Session not found. Try again with new token."));
     }
-    if(idea.getVoters().contains(user)) {
-      throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "Already upvoted.");
-    }
-    if(!user.isFake() && idea.getBoard().getSuspensedList().stream().anyMatch(suspended -> suspended.getUser().equals(user))) {
-      throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "You've been suspended, please contact board owner for more information.");
-    }
-    Set<User> voters = idea.getVoters();
-    voters.add(user);
-    idea.setVoters(voters);
-    ideaRepository.save(idea);
-    return new FetchUserDto().from(user);
+    return ideaServiceCommons.postUpvote(user, idea);
   }
 
   @Override
@@ -280,17 +271,7 @@ public class IdeaServiceImpl implements IdeaService {
       user = userRepository.findByEmail(((ServiceUser) auth.getPrincipal()).getEmail())
               .orElseThrow(() -> new InvalidAuthenticationException("Session not found. Try again with new token."));
     }
-    if(!idea.getVoters().contains(user)) {
-      throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "Not yet upvoted.");
-    }
-    if(idea.getBoard().getSuspensedList().stream().anyMatch(suspended -> suspended.getUser().equals(user))) {
-      throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "You've been suspended, please contact board owner for more information.");
-    }
-    Set<User> voters = idea.getVoters();
-    voters.remove(user);
-    idea.setVoters(voters);
-    ideaRepository.save(idea);
-    return ResponseEntity.noContent().build();
+    return ideaServiceCommons.deleteUpvote(user, idea);
   }
 
   private User createAnonymousUser(String anonymousId) {

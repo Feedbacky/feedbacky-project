@@ -2,20 +2,19 @@ package net.feedbacky.app.service.user;
 
 import net.feedbacky.app.config.UserAuthenticationToken;
 import net.feedbacky.app.data.user.MailPreferences;
+import net.feedbacky.app.data.user.User;
+import net.feedbacky.app.data.user.dto.FetchConnectedAccount;
+import net.feedbacky.app.data.user.dto.FetchUserDto;
 import net.feedbacky.app.data.user.dto.PatchMailPreferences;
+import net.feedbacky.app.data.user.dto.PatchUserDto;
 import net.feedbacky.app.exception.FeedbackyRestException;
 import net.feedbacky.app.exception.types.InvalidAuthenticationException;
 import net.feedbacky.app.exception.types.ResourceNotFoundException;
 import net.feedbacky.app.repository.UserRepository;
-import net.feedbacky.app.data.user.ConnectedAccount;
-import net.feedbacky.app.data.user.User;
-import net.feedbacky.app.data.user.dto.FetchConnectedAccount;
-import net.feedbacky.app.data.user.dto.FetchUserDto;
-import net.feedbacky.app.data.user.dto.PatchUserDto;
 import net.feedbacky.app.service.ServiceUser;
 import net.feedbacky.app.util.RandomNicknameUtils;
-import net.feedbacky.app.util.mailservice.MailBuilder;
 import net.feedbacky.app.util.request.InternalRequestValidator;
+import net.feedbacky.app.util.mailservice.MailBuilder;
 import net.feedbacky.app.util.mailservice.MailHandler;
 import net.feedbacky.app.util.mailservice.MailService;
 

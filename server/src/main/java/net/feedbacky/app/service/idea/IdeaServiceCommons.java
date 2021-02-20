@@ -153,7 +153,7 @@ public class IdeaServiceCommons {
     if(idea.getVoters().contains(user)) {
       throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "Already upvoted.");
     }
-    if(idea.getBoard().getSuspensedList().stream().anyMatch(suspended -> suspended.getUser().equals(user))) {
+    if(!user.isFake() && idea.getBoard().getSuspensedList().stream().anyMatch(suspended -> suspended.getUser().equals(user))) {
       throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "You've been suspended, please contact board owner for more information.");
     }
     Set<User> voters = idea.getVoters();
@@ -167,7 +167,7 @@ public class IdeaServiceCommons {
     if(!idea.getVoters().contains(user)) {
       throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "Not yet upvoted.");
     }
-    if(idea.getBoard().getSuspensedList().stream().anyMatch(suspended -> suspended.getUser().equals(user))) {
+    if(!user.isFake() && idea.getBoard().getSuspensedList().stream().anyMatch(suspended -> suspended.getUser().equals(user))) {
       throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "You've been suspended, please contact board owner for more information.");
     }
     Set<User> voters = idea.getVoters();

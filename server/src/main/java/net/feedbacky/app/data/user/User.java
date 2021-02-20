@@ -62,9 +62,9 @@ public class User implements Serializable {
   private MailPreferences mailPreferences;
   @CreationTimestamp
   private Date creationDate;
+  private boolean serviceStaff = false;
   private boolean fake = false;
   private String token = "";
-  private boolean serviceStaff = false;
 
   public String convertToSpecialCommentMention() {
     return "{data_user;" + id + ";" + username + "}";

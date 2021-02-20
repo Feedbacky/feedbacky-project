@@ -18,8 +18,8 @@ import net.feedbacky.app.repository.board.BoardRepository;
 import net.feedbacky.app.repository.board.InvitationRepository;
 import net.feedbacky.app.repository.board.ModeratorRepository;
 import net.feedbacky.app.service.ServiceUser;
-import net.feedbacky.app.util.mailservice.MailBuilder;
 import net.feedbacky.app.util.request.InternalRequestValidator;
+import net.feedbacky.app.util.mailservice.MailBuilder;
 import net.feedbacky.app.util.mailservice.MailHandler;
 import net.feedbacky.app.util.mailservice.MailService;
 
@@ -190,8 +190,7 @@ public class BoardModeratorServiceImpl implements BoardModeratorService {
       throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "Insufficient permissions, same permission type.");
     }
     Moderator moderator = optional.get();
-    board.getModerators().remove(moderator);
-    boardRepository.save(board);
+    moderatorRepository.delete(moderator);
     new MailBuilder()
             .withRecipient(eventUser)
             .withEventBoard(board)
