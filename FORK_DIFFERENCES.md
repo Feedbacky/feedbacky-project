@@ -11,6 +11,7 @@ This file is dedicated to show changes between self-hosted version and this fork
 * [client/public/index.html](https://github.com/Feedbacky/feedbacky-project/blob/master/client/public/index.html)
     * Includes og and twitter meta tags
     * Keywords, description and title changed for service purposes
+    * Remove env-config.js usage
 * [client/public/manifest.json](https://github.com/Feedbacky/feedbacky-project/blob/master/client/public/manifest.json)
     * Update short_name, name and keywords
 * [client/src/App.js](https://github.com/Feedbacky/feedbacky-project/blob/master/client/src/App.js)
@@ -52,6 +53,8 @@ This file is dedicated to show changes between self-hosted version and this fork
     * Include `/me/explore` page route
 * [client/src/routes/LoginRoute.js](https://github.com/Feedbacky/feedbacky-project/blob/master/client/src/routes/LoginRoute.js)
     * Include Ackee events analytics
+* [client/src/utils/env-vars.js](https://github.com/Feedbacky/feedbacky-project/blob/master/client/src/utils/env-vars.js)
+    * Remove window._env_ usage
 
 ## List of server-side changes
 **TODO**
