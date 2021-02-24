@@ -1,5 +1,12 @@
 This file is dedicated to show changes between self-hosted version and this fork which is used at https://app.feedbacky.net
 
+## List of docker changes
+* [docker-compose.yml](https://github.com/Feedbacky/feedbacky-project/blob/master/docker-compose.yml)
+    * Includes old download to compile way to use Feedbacky instead Docker Images
+* [client/Dockerfile](https://github.com/Feedbacky/feedbacky-project/blob/master/client/Dockerfile)
+    * Merged with proxy/Dockerfile
+    * Includes old download to compile way to use Feedbacky instead Docker Images
+
 ## List of client-side changes
 * [client/public/index.html](https://github.com/Feedbacky/feedbacky-project/blob/master/client/public/index.html)
     * Includes og and twitter meta tags
