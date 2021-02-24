@@ -1,10 +1,12 @@
 import styled from "@emotion/styled";
+import axios from "axios";
 import AppContext from "context/AppContext";
 import IdeaContext from "context/IdeaContext";
 import PropTypes from "prop-types";
 import React, {useContext} from "react";
 import {FiChevronsUp, FiChevronUp} from "react-icons/all";
 import {UiClassicButton} from "ui/button";
+import {popupError} from "utils/basic-utils";
 
 const VoteBtn = styled(UiClassicButton)`
   line-height: 16px;
@@ -14,13 +16,11 @@ const VoteBtn = styled(UiClassicButton)`
   margin: 0;
   box-shadow: none !important;
   background-color: transparent !important;
+  transition: .2s ease-in-out;
   &:hover, &:focus {
    background-color: transparent !important;
   }
-  
-  .to-upvote, .upvoted {
-    transition: .2s ease-in-out;
-  }
+ 
   
   &:focus {
     outline: 1px dotted black;
@@ -89,25 +89,51 @@ const ToUpvoteIcon = styled(FiChevronUp)`
   }
 `;
 
-const VoteButton = ({onVote}) => {
+const VoteButton = ({idea, onVote, animationRef}) => {
     const {getTheme, ackeeInstance} = useContext(AppContext);
     const {ideaData} = useContext(IdeaContext);
-    const onPreVote = () => {
+    let color = getTheme();
+    const doVote = () => {
         ackeeInstance.action("0c59b302-cc99-4426-8757-2c12a0f47db2", {
             key: "Vote click",
             value: 1
         });
-        onVote();
+        let request;
+        let upvoted;
+        let votersAmount;
+        if (idea.upvoted) {
+            request = "DELETE";
+            upvoted = false;
+            votersAmount = idea.votersAmount - 1;
+        } else {
+            request = "POST";
+            upvoted = true;
+            votersAmount = idea.votersAmount + 1;
+        }
+        axios({
+            method: request,
+            url: "/ideas/" + idea.id + "/voters"
+        }).then(res => {
+            if (res.status !== 200 && res.status !== 204) {
+                popupError();
+                return;
+            }
+            if (upvoted) {
+                animationRef.current.classList.add("upvote-animation");
+            } else {
+                animationRef.current.classList.remove("upvote-animation");
+            }
+            onVote(upvoted, votersAmount);
+        });
     };
-    let color = getTheme();
 
     if (!ideaData.upvoted) {
-        return <ToUpvoteBtn label={"Downvote"} onClick={onPreVote} variant={""}>
+        return <ToUpvoteBtn label={"Downvote"} onClick={doVote} variant={""}>
             <ToUpvoteIcon className={"to-upvote"}/>
             <strong className={"d-block"}>{ideaData.votersAmount}</strong>
         </ToUpvoteBtn>
     } else {
-        return <VoteBtn label={"Upvote"} onClick={onPreVote} variant={""}>
+        return <VoteBtn label={"Upvote"} onClick={doVote} variant={""}>
             <FiChevronsUp className={"upvoted"} style={{color}}/>
             <strong className={"d-block"} style={{color: color}}>{ideaData.votersAmount}</strong>
         </VoteBtn>

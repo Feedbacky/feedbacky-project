@@ -15,13 +15,14 @@ import {UiCol} from "ui/grid";
 import {UiAvatar} from "ui/image";
 import {UiViewBox} from "ui/viewbox";
 import {popupError, popupNotification, prettifyEnum} from "utils/basic-utils";
+import {getEnvVar} from "utils/env-vars";
 
 const ClickableButton = styled.div`
   cursor: pointer;
   transition: var(--hover-transition);
   
   &:hover {
-    transform: var(--hover-transform-scale);
+    transform: var(--hover-transform-scale-sm);
   }
 `;
 
@@ -32,7 +33,6 @@ const ModeratorsSubroute = () => {
     const [moderators, setModerators] = useState(boardData.moderators);
     const [invited, setInvited] = useState({data: [], loaded: false, error: false});
     const [modal, setModal] = useState({open: false, type: "", data: ""});
-    const getQuota = () => 10 - (boardData.moderators.length + invited.data.length);
     useEffect(() => setModerators(boardData.moderators), [boardData.moderators]);
     useEffect(() => {
         setCurrentNode("moderators");
@@ -47,7 +47,7 @@ const ModeratorsSubroute = () => {
     }, []);
     const renderOverview = () => {
         return <React.Fragment>
-            <UiCol xs={12} className={"text-black-60"}>Permissions Overview</UiCol>
+            <UiFormLabel as={UiCol} xs={12} className={"mb-0"}>Permissions Overview</UiFormLabel>
             <UiCol xs={12} sm={6} className={"mb-sm-2 mb-3"}>
                 <UiKeyboardInput>Owner & Administrator Permissions</UiKeyboardInput>
                 <ul className={"mb-0 pl-3"}>
@@ -75,8 +75,7 @@ const ModeratorsSubroute = () => {
         return <React.Fragment>
             <UiCol xs={12} sm={6} className={"mb-sm-0 mb-3"}>
                 <div>
-                    <UiFormLabel>Moderators Quota ({getQuota()} left)</UiFormLabel>
-                    <UiClickableTip id={"quota"} title={"Moderators Quota"} description={"Amount of moderators your board can have."}/>
+                    <UiFormLabel>Active Moderators</UiFormLabel>
                 </div>
                 {moderators.map((mod, i) => {
                     return <div className={"d-inline-flex justify-content-center mr-2"} key={i}>
@@ -104,7 +103,7 @@ const ModeratorsSubroute = () => {
                             <br/>
                             <small className={"text-truncate d-block"} style={{maxWidth: 100}}>{invited.user.username}</small>
                             <ClickableButton onClick={() => {
-                                copy(window._env_.REACT_APP_SERVER_IP_ADDRESS + "/moderator_invitation/" + invited.code);
+                                copy(getEnvVar("REACT_APP_SERVER_IP_ADDRESS") + "/moderator_invitation/" + invited.code);
                                 popupNotification("Copied", getTheme().toHexString());
                             }}><UiBadge color={tinycolor("#0994f6")} className={"d-block"}>Copy Invite</UiBadge></ClickableButton>
                         </div>

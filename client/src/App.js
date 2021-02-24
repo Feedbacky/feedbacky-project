@@ -8,7 +8,8 @@ import {FaDizzy, FaExclamationCircle} from "react-icons/fa";
 import {BrowserRouter, Route, Switch, useHistory, useLocation} from "react-router-dom";
 import ErrorRoute from "routes/ErrorRoute";
 import LoadingRouteUtil from "routes/utils/LoadingRouteUtil";
-import {getCookieOrDefault, popupError, popupWarning} from "utils/basic-utils";
+import {getCookieOrDefault, hideNotifications, popupError, popupWarning} from "utils/basic-utils";
+import {getEnvVar} from "utils/env-vars";
 import {retry} from "utils/lazy-init";
 import useAckee from "utils/useAckee";
 
@@ -25,7 +26,7 @@ const NotificationUnsubscribeRoute = lazy(() => retry(() => import("routes/Notif
 const UiTestRoute = lazy(() => retry(() => import("routes/UiTestRoute")));
 
 const CLIENT_VERSION = "1.0.0.alpha.3";
-const API_ROUTE = (window._env_.REACT_APP_SERVER_IP_ADDRESS || "https://app.feedbacky.net") + "/api/v1";
+const API_ROUTE = getEnvVar("REACT_APP_SERVER_IP_ADDRESS", "https://app.feedbacky.net") + "/api/v1";
 
 axios.interceptors.response.use(undefined, error => {
     if (error.response === undefined) {
@@ -93,6 +94,7 @@ const App = ({appearanceSettings}) => {
             axios.get("/users/@me").then(res => {
                 setUserData({...userData, data: res.data, loaded: true, loggedIn: true});
             }).catch(err => {
+                hideNotifications();
                 if (err.response === undefined || err.response.status === 401 || err.response.status === 403 || (err.response.status >= 500 && err.response.status <= 599)) {
                     startAnonymousSession();
                     setUserData({...userData, loaded: true, loggedIn: false});
