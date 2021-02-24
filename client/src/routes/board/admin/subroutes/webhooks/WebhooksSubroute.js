@@ -40,6 +40,7 @@ const WebhooksSubroute = () => {
     const [webhooks, setWebhooks] = useState({data: [], loaded: false, error: false});
     const [modal, setModal] = useState({open: false, data: -1, dataName: ""});
     useEffect(() => setCurrentNode("webhooks"), [setCurrentNode]);
+    const getQuota = () => 10 - webhooks.data.length;
     useEffect(() => {
         axios.get("/boards/" + boardData.discriminator + "/webhooks").then(res => {
             if (res.status !== 200) {
@@ -75,7 +76,8 @@ const WebhooksSubroute = () => {
         return <ComponentLoader loaded={webhooks.loaded} component={
             <UiCol xs={12} className={"mb-sm-0 mb-3"}>
                 <div>
-                    <UiFormLabel>Created Webhooks</UiFormLabel>
+                    <UiFormLabel>Webhooks Quota ({getQuota()} left)</UiFormLabel>
+                    <UiClickableTip id={"moderatorsQuota"} title={"Webhooks Quota"} description={"Amount of webhooks your board can have."}/>
                 </div>
                 {renderWebhooks()}
                 <div>

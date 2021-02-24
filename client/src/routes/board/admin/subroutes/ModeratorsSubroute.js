@@ -33,6 +33,7 @@ const ModeratorsSubroute = () => {
     const [moderators, setModerators] = useState(boardData.moderators);
     const [invited, setInvited] = useState({data: [], loaded: false, error: false});
     const [modal, setModal] = useState({open: false, type: "", data: ""});
+    const getQuota = () => 20 - (boardData.moderators.length + invited.data.length);
     useEffect(() => setModerators(boardData.moderators), [boardData.moderators]);
     useEffect(() => {
         setCurrentNode("moderators");
@@ -75,7 +76,8 @@ const ModeratorsSubroute = () => {
         return <React.Fragment>
             <UiCol xs={12} sm={6} className={"mb-sm-0 mb-3"}>
                 <div>
-                    <UiFormLabel>Active Moderators</UiFormLabel>
+                    <UiFormLabel>Moderators Quota ({getQuota()} left)</UiFormLabel>
+                    <UiClickableTip id={"quota"} title={"Moderators Quota"} description={"Amount of moderators your board can have."}/>
                 </div>
                 {moderators.map((mod, i) => {
                     return <div className={"d-inline-flex justify-content-center mr-2"} key={i}>

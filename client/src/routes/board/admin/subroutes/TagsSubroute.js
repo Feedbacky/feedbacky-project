@@ -8,11 +8,11 @@ import AppContext from "context/AppContext";
 import BoardContext from "context/BoardContext";
 import PageNodesContext from "context/PageNodesContext";
 import React, {useContext, useEffect, useState} from 'react';
-import {FaEyeSlash, FaPen, FaUserTag} from "react-icons/all";
+import {FaExclamation, FaEyeSlash, FaPen, FaUserTag} from "react-icons/all";
 import {FaTrashAlt} from "react-icons/fa";
 import tinycolor from "tinycolor2";
-import {UiBadge, UiHoverableIcon, UiTooltip} from "ui";
-import {UiLoadableButton} from "ui/button";
+import {UiBadge, UiClickableTip, UiHoverableIcon, UiTooltip} from "ui";
+import {UiButton, UiLoadableButton} from "ui/button";
 import {UiFormLabel} from "ui/form";
 import {UiCol, UiRow} from "ui/grid";
 import {UiViewBox} from "ui/viewbox";
@@ -23,18 +23,18 @@ const TagsSubroute = () => {
     const {data: boardData, updateState} = useContext(BoardContext);
     const {setCurrentNode} = useContext(PageNodesContext);
     const [modal, setModal] = useState({open: false, type: "", data: {name: ""}});
+    const getQuota = () => 25 - boardData.tags.length;
     useEffect(() => setCurrentNode("tags"), [setCurrentNode]);
     const onTagCreate = (data) => {
         updateState({...boardData, tags: boardData.tags.concat(data)});
     };
     const renderContent = () => {
         return <UiCol xs={12}>
-            <UiFormLabel>Created Tags</UiFormLabel>
+            <UiFormLabel>Tags Quota ({getQuota()} left)</UiFormLabel>
+            <UiClickableTip id={"quota"} title={"Tags Quota"} description={"Amount of tags your board can have, you're limited to 10 tags per board."}/>
             <UiRow>{renderTags()}</UiRow>
-            <UiLoadableButton label={"Add New"} className={"mt-3 float-right"} onClick={() => {
-                setModal({open: true, type: "new", data: {name: ""}});
-                return Promise.resolve();
-            }}>Add New</UiLoadableButton>
+            <br/>
+            {renderNewTagButton()}
         </UiCol>
     };
     const renderTags = () => {
@@ -61,6 +61,17 @@ const TagsSubroute = () => {
                 </UiTooltip>
             </UiCol>
         });
+    };
+    const renderNewTagButton = () => {
+        if (getQuota() <= 0) {
+            return <UiTooltip id={"quota"} text={"Quota Limit Reached"}>
+                <UiButton label={"Add New"} className={"m-0 mt-3 float-right"}><FaExclamation/> Add New</UiButton>
+            </UiTooltip>
+        }
+        return <UiLoadableButton label={"Add New"} className={"mt-3 float-right"} onClick={() => {
+            setModal({open: true, type: "new", data: {name: ""}});
+            return Promise.resolve();
+        }}>Add New</UiLoadableButton>
     };
     const onTagEdit = (tag) => {
         setModal({open: true, type: "edit", data: tag});

@@ -25,8 +25,14 @@ This file is dedicated to show changes between self-hosted version and this fork
 * [client/src/components/profile/ProfileSidebar.js](https://github.com/Feedbacky/feedbacky-project/blob/master/client/src/components/profile/ProfileSidebar.js)
     * Include `/me/explore` page route
     * Include Attribution.js
+* [client/src/routes/board/admin/subroutes/webhooks/WebhooksSubroute.js](https://github.com/Feedbacky/feedbacky-project/blob/master/client/src/routes/board/admin/subroutes/webhooks/WebhooksSubroute.js)
+    * Include webhooks quotas (from unlimited to 10)
 * [client/src/routes/board/admin/subroutes/GeneralSubroute.js](https://github.com/Feedbacky/feedbacky-project/blob/master/client/src/routes/board/admin/subroutes/GeneralSubroute.js)
     * Include API keys section to generate, enable and disable API Keys
+* [client/src/routes/board/admin/subroutes/ModeratorsSubroute.js](https://github.com/Feedbacky/feedbacky-project/blob/master/client/src/routes/board/admin/subroutes/ModeratorsSubroute.js)
+    * Include moderators quotas (from unlimited to 15)
+* [client/src/routes/board/admin/subroutes/TagsSubroute.js](https://github.com/Feedbacky/feedbacky-project/blob/master/client/src/routes/board/admin/subroutes/TagsSubroute.js)
+    * Include tags quotas (from unlimited to 25)
 * [client/src/routes/board/creator/CreatorBoardRoute.js](https://github.com/Feedbacky/feedbacky-project/blob/master/client/src/routes/board/creator/CreatorBoardRoute.js)
     * Remove isServiceAdmin check
     * Implement `You Must Be Logged To Do That` check

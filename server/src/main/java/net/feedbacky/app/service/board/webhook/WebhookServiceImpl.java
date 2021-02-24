@@ -73,6 +73,9 @@ public class WebhookServiceImpl implements WebhookService {
     if(!hasPermission(board, Moderator.Role.ADMINISTRATOR, user)) {
       throw new InvalidAuthenticationException("Insufficient permissions.");
     }
+    if(board.getWebhooks().size() >= 10) {
+      throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "Can't create more than 10 webhooks.");
+    }
     if(webhookRepository.findByUrl(dto.getUrl()).isPresent()) {
       throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "Webhook with that URL already exists.");
     }
