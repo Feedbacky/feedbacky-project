@@ -9,7 +9,7 @@ import BoardContext from "context/BoardContext";
 import PageNodesContext from "context/PageNodesContext";
 import React, {useContext, useEffect, useState} from 'react';
 import {Link} from "react-router-dom";
-import {UiBadge, UiLoadingSpinner} from "ui";
+import {UiBadge, UiClickableTip, UiLoadingSpinner} from "ui";
 import {UiButton, UiElementDeleteButton} from "ui/button";
 import {UiFormLabel} from "ui/form";
 import {UiCol} from "ui/grid";
