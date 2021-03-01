@@ -1,7 +1,6 @@
 package net.feedbacky.app.service.board.apikey;
 
 import net.feedbacky.app.data.board.dto.FetchBoardDto;
-import net.feedbacky.app.service.FeedbackyService;
 
 import org.springframework.http.ResponseEntity;
 
@@ -10,7 +9,7 @@ import org.springframework.http.ResponseEntity;
  * <p>
  * Created at 13.08.2020
  */
-public interface ApiKeyService extends FeedbackyService {
+public interface ApiKeyService {
 
   ResponseEntity<FetchBoardDto> patch(String discriminator);
 

@@ -16,6 +16,7 @@ import {UiAvatar} from "ui/image";
 import {UiViewBox} from "ui/viewbox";
 import {popupError, popupNotification, prettifyEnum} from "utils/basic-utils";
 import {getEnvVar} from "utils/env-vars";
+import {useTitle} from "utils/use-title";
 
 const ClickableButton = styled.div`
   cursor: pointer;
@@ -35,6 +36,7 @@ const ModeratorsSubroute = () => {
     const [modal, setModal] = useState({open: false, type: "", data: ""});
     const getQuota = () => 20 - (boardData.moderators.length + invited.data.length);
     useEffect(() => setModerators(boardData.moderators), [boardData.moderators]);
+    useTitle(boardData.name + " | Moderators");
     useEffect(() => {
         setCurrentNode("moderators");
         axios.get("/boards/" + boardData.discriminator + "/invitedModerators").then(res => {

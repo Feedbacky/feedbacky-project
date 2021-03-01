@@ -1,3 +1,15 @@
+### 1.0.0.alpha.4
+* **[FEATURE]** Page routes now includes browser changeable tab titles instead of hardcoded one
+* **[FEATURE]** Ideas can be filtered by tags now
+* **[IMPROVEMENT]** User will no longer receive notification emails if they made any changes to their own ideas
+* **[CHANGE/CONTROVERSIAL]** Edited light mode UI, now shadowless with improved UI elements
+* **[CHANGE]** Increased social links amount by 1 (because moved Roadmap icon to navbar)
+* **[CHANGE]** Changed navbar UI for future categories feature implementation
+* **[CHANGE]** Unified Web Content Accessibility Guidelines color contrast checking for various UI elements
+* **[CHANGE]** Filters and sorts will be now reset after each page visit (requested by [yeah idk](https://app.feedbacky.net/i/reseting-the-filtering-and-sorting-types.2006))
+* **[CHANGE]** Default sort for comments is now Newest
+* **[FIX]** Google users couldn't log-in for the first time if their avatar URL length exceeded 255 characters
+
 ### 1.0.0.alpha.3
 * **[FEATURE]** Added anonymous voting feature, toggleable in board admin panel (requested at [Feedbacky](https://app.feedbacky.net/i/anonymous-voting.730))
 * **[FEATURE]** Added administrator role that can do everything that owner can without ability to delete board
@@ -14,8 +26,6 @@ better to see random nicknames than Anonymous multiple times
 * **[CHANGE]** Replaced toast notifications with snackbar notifications
 * **[CHANGE]** Idea closed comment icon is now Lock icon not Circle X
 * **[CHANGE]** Made server-side API error messages more user friendly
-!! TODO UI CARD INNER REF https://github.com/reactjs/reactjs.org/issues/2120
-!! hover transform scale small/big
 
 ### 1.0.0.alpha.1
 * **[FEATURE]** Added MAINTENANCE.md inside client folder to describe file structure and naming for future code maintenance and contributors

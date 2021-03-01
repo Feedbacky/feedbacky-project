@@ -7,6 +7,7 @@ import net.feedbacky.app.service.idea.IdeaService;
 import net.feedbacky.app.service.idea.PublicIdeaService;
 import net.feedbacky.app.util.PaginableRequest;
 import net.feedbacky.app.util.PublicApiRequest;
+import net.feedbacky.app.util.RequestParamsParser;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,25 +44,16 @@ public class PublicIdeaRestController {
 
   @GetMapping("v1/public/boards/{discriminator}/ideas")
   public PublicApiRequest<PaginableRequest<List<FetchIdeaDto>>> getAllIdeas(@PathVariable String discriminator, @RequestParam Map<String, String> requestParams) {
-    //todo can it be shorter
-    int page = 0;
-    if(requestParams.containsKey("page") && NumberUtils.isDigits(requestParams.get("page"))) {
-      page = Integer.parseInt(requestParams.get("page"));
-      if(page < 0) {
-        page = 0;
-      }
-    }
-    int pageSize = 20;
-    if(requestParams.containsKey("pageSize") && NumberUtils.isDigits(requestParams.get("pageSize"))) {
-      pageSize = Integer.parseInt(requestParams.get("pageSize"));
-      if(pageSize < 1) {
-        pageSize = 1;
-      }
-    }
     IdeaService.FilterType filterType = IdeaService.FilterType.OPENED;
     if(requestParams.containsKey("filter")) {
       try {
-        filterType = IdeaService.FilterType.valueOf(requestParams.get("filter").toUpperCase());
+        String filterName = requestParams.get("filter").toUpperCase();
+        String[] filterData = filterName.split(":");
+        if(filterData.length == 2 && filterData[0].equals("TAG")) {
+          filterType = new IdeaService.FilterType(IdeaService.FilterType.Type.TAG, Long.parseLong(filterData[1]));
+        } else {
+          filterType = new IdeaService.FilterType(IdeaService.FilterType.Type.valueOf(requestParams.get("filter").toUpperCase()), null);
+        }
       } catch(Exception ignoredInvalid) {
       }
     }
@@ -72,7 +64,8 @@ public class PublicIdeaRestController {
       } catch(Exception ignoredInvalid) {
       }
     }
-    return publicIdeaService.getAllIdeas(discriminator, page, pageSize, filterType, sortType);
+    RequestParamsParser parser = new RequestParamsParser(requestParams);
+    return publicIdeaService.getAllIdeas(discriminator, parser.getPage(), parser.getPageSize(), filterType, sortType);
   }
 
   @GetMapping("v1/public/ideas/{id}")

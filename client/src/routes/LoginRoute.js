@@ -7,12 +7,14 @@ import {FaTimes} from "react-icons/fa";
 import {Redirect, useLocation, useParams} from "react-router-dom";
 import ErrorRoute from "routes/ErrorRoute";
 import LoadingRouteUtil from "routes/utils/LoadingRouteUtil";
+import {useTitle} from "utils/use-title";
 
 const LoginRoute = ({onLogin}) => {
     const {provider} = useParams();
     const location = useLocation();
     const {ackeeInstance} = useContext(AppContext);
     const [data, setData] = useState({loaded: false, error: false, status: 0});
+    useTitle("Logging in...");
     const logIn = () => {
         if (data.loaded) {
             return;

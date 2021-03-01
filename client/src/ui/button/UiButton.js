@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import {WCAG_AA_CONTRAST} from "App";
 import AppContext from "context/AppContext";
 import PropTypes from "prop-types";
 import React, {useContext} from "react";
@@ -18,7 +19,6 @@ export const PageButton = styled(Button)`
   
   &:hover, &:active {
     color: white;
-    box-shadow: 0 4px 6px 0 hsla(0, 0%, 0%, .3);
     transform: var(--hover-transform-scale-sm);
   }
   
@@ -29,17 +29,22 @@ export const PageButton = styled(Button)`
 
 const UiButton = (props) => {
     const {getTheme, user} = useContext(AppContext);
-    const {children, label, color = getTheme(), style, ...otherProps} = props;
+    const {children, label, color = getTheme(), style, innerRef, ...otherProps} = props;
     let buttonColor = color;
     if (user.darkMode) {
         buttonColor = buttonColor.lighten(10);
         //if still not readable, increase again
-        if (tinycolor.readability(color, "#282828") < 2.5) {
+        if (tinycolor.readability(color, "#282828") < WCAG_AA_CONTRAST) {
             buttonColor = buttonColor.lighten(25);
         }
-        return <PageButton aria-label={label} variant={""} style={{color: buttonColor, fontWeight: "bold", backgroundColor: buttonColor.clone().setAlpha(.1), style}} {...otherProps}>{children}</PageButton>
+        return <PageButton aria-label={label} variant={""} style={{color: buttonColor, fontWeight: "bold", backgroundColor: buttonColor.clone().setAlpha(.1), style}}
+                           ref={innerRef} {...otherProps}>{children}</PageButton>
+    } else {
+        if (tinycolor.readability(buttonColor, "#fff") < WCAG_AA_CONTRAST) {
+            buttonColor = buttonColor.darken(10);
+        }
     }
-    return <PageButton aria-label={label} variant={""} style={{backgroundColor: buttonColor, style}} {...otherProps}>{children}</PageButton>
+    return <PageButton aria-label={label} variant={""} style={{backgroundColor: buttonColor.clone().setAlpha(.1), color: buttonColor, fontWeight: "500", style}} ref={innerRef} {...otherProps}>{children}</PageButton>
 };
 
 UiButton.propTypes = {

@@ -18,6 +18,7 @@ import {UiCol} from "ui/grid";
 import {UiImage} from "ui/image";
 import {UiViewBox} from "ui/viewbox";
 import {popupError, popupNotification} from "utils/basic-utils";
+import {useTitle} from "utils/use-title";
 
 const SocialIcon = styled(UiImage)`
   padding: .5rem;
@@ -31,7 +32,8 @@ const SocialLinksSubroute = () => {
     const [socialLinks, setSocialLinks] = useState({data: [], loaded: false, error: false});
     const [modal, setModal] = useState({open: false, data: -1, dataName: ""});
     useEffect(() => setCurrentNode("social"), [setCurrentNode]);
-    const getQuota = () => 4 - socialLinks.data.length;
+    useTitle(boardData.name + " | Social Links");
+    const getQuota = () => 5 - socialLinks.data.length;
     useEffect(() => {
         axios.get("/boards/" + boardData.discriminator + "/socialLinks").then(res => {
             if (res.status !== 200) {
@@ -51,7 +53,7 @@ const SocialLinksSubroute = () => {
         return socialLinks.data.map(link => {
             return <div className={"d-inline-flex justify-content-center mr-2"} key={link.id}>
                 <div className={"text-center"}>
-                    <SocialIcon rounded alt={"Logo"} src={link.logoUrl} height={40} width={40}/>
+                    <SocialIcon rounded alt={"Social Link"} src={link.logoUrl} height={40} width={40}/>
                     <UiElementDeleteButton tooltipName={"Delete"} id={"social-" + link.id + "-del"}
                                            onClick={() => setModal({...modal, open: true, data: link.id, dataName: extractHostname(link.url)})}/>
                     <br/>

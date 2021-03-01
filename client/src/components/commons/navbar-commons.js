@@ -8,19 +8,20 @@ import {UiDropdown, UiDropdownElement} from "ui/dropdown";
 import {UiAvatar} from "ui/image";
 
 const LoginButton = styled(UiClassicButton)`
-  padding: 0 .75rem;
-  color: white;
+  padding: 0 .8rem;
+  color: var(--font-color);
   background-color: transparent !important;
   transition: var(--hover-transition);
   cursor: pointer;
   box-shadow: none;
   font-size: .9rem;
+  margin: .5rem 0;
   
   &:hover, &:focus {
-    color: white;
+    color: var(--font-color);
     box-shadow: none;
     background-color: transparent !important;
-    transform: var(--hover-transform-scale-lg);
+    transform: var(--hover-transform-scale-sm);
   }
 `;
 
@@ -44,8 +45,8 @@ export const renderLogIn = (onNotLoggedClick, context) => {
     }
     return <UiDropdown label={"Options"} toggleClassName={"px-0"} toggle={
         <OptionsButton>
-            <UiAvatar className={"mr-1"} roundedCircle user={context.user.data} size={24}/>
-            <FaAngleDown/>
+            <UiAvatar className={"mr-1"} roundedCircle user={context.user.data} size={28} style={{border: "1px solid " + context.getTheme()}}/>
+            <FaAngleDown color={context.getTheme()}/>
         </OptionsButton>
     }>
         <UiDropdownElement>

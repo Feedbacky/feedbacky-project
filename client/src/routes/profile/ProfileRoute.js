@@ -22,7 +22,6 @@ const ProfileRoute = () => {
     const {onThemeChange} = useContext(AppContext);
     const history = useHistory();
     useEffect(() => onThemeChange(), [onThemeChange]);
-
     return <PageNodesContext.Provider value={{setCurrentNode: setCurrentNode}}>
         <LoginModal isOpen={loginModalOpen} onHide={() => setLoginModalOpen(false)}
                     image={ServiceLogo} boardName={getEnvVar("REACT_APP_SERVICE_NAME")} redirectUrl={"me"}/>

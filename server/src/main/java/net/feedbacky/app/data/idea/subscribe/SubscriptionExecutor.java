@@ -25,6 +25,10 @@ public class SubscriptionExecutor {
       if(!user.getMailPreferences().isNotificationsEnabled()) {
         continue;
       }
+      //do not notify creator of idea if he made any changes to the idea
+      if(user.equals(event.getSource()) && idea.getCreator().equals(event.getSource())) {
+        continue;
+      }
       doNotifySubscriber(user, event);
     }
   }

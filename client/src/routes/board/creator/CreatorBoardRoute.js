@@ -14,6 +14,7 @@ import {UiProgressBar} from "ui";
 import {UiCancelButton, UiLoadableButton, UiNextStepButton, UiPreviousStepButton} from "ui/button";
 import {UiCol, UiContainer, UiRow} from "ui/grid";
 import {popupNotification, popupWarning} from "utils/basic-utils";
+import {useTitle} from "utils/use-title";
 
 const CreatorBoardRoute = () => {
     const context = useContext(AppContext);
@@ -22,6 +23,7 @@ const CreatorBoardRoute = () => {
     const history = useHistory();
     const [settings, setSettings] = useState({step: 1, name: "", discriminator: "", banner: null, logo: null, themeColor: "#2d3436"});
     useEffect(() => onThemeChange(), [onThemeChange]);
+    useTitle("Create New Board");
     if (!user.loggedIn) {
         return <ErrorRoute Icon={FaSignInAlt} message="You Must Be Logged To Do That"/>
     }

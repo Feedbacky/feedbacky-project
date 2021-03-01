@@ -14,6 +14,7 @@ import {UiCol, UiRow} from "ui/grid";
 import {UiViewBox} from "ui/viewbox";
 import {UiViewBoxDangerBackground} from "ui/viewbox/UiViewBox";
 import {popupError, popupNotification, popupWarning} from "utils/basic-utils";
+import {useTitle} from "utils/use-title";
 
 const SettingsSubroute = () => {
     const {user, getTheme} = useContext(AppContext);
@@ -24,6 +25,7 @@ const SettingsSubroute = () => {
     const [connectedAccounts, setConnectedAccounts] = useState({data: [], loaded: false, error: false});
     const [modal, setModal] = useState({open: false, type: ""});
     useEffect(() => setCurrentNode("settings"), [setCurrentNode]);
+    useTitle("Profile | Settings");
     const onChangesSave = () => {
         if (username.length < 3) {
             popupWarning("Username length should be longer than 3 characters");
@@ -96,7 +98,7 @@ const SettingsSubroute = () => {
             <UiCol xs={{span: 12, order: 1}} lg={{span: 6, order: 2}}>
                 <UiFormLabel>Avatar</UiFormLabel>
                 <br/>
-                <img alt={"avatar"} src={avatar} className={"rounded-circle"} width={100} height={100}/>
+                <img alt={"User Avatar"} src={avatar} className={"rounded-circle"} width={100} height={100}/>
                 <ComponentLoader loaded={connectedAccounts.loaded}
                                  component={<UiButton label={"Change"} color={tinycolor("#00c851")} className={"align-top mx-3 my-0"}
                                                       onClick={() => setModal({open: true, type: "avatar"})}>Change</UiButton>}

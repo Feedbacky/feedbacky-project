@@ -1,3 +1,4 @@
+import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import {DEFAULT_THEME} from "AppAppearance";
 import axios from "axios";
 import ComponentLoader from "components/ComponentLoader";
@@ -8,12 +9,11 @@ import {FaDizzy, FaExclamationCircle} from "react-icons/fa";
 import {BrowserRouter, Route, Switch, useHistory, useLocation} from "react-router-dom";
 import ErrorRoute from "routes/ErrorRoute";
 import LoadingRouteUtil from "routes/utils/LoadingRouteUtil";
-import {getCookieOrDefault, hideNotifications, popupError, popupWarning} from "utils/basic-utils";
+import {hideNotifications, popupError, popupWarning} from "utils/basic-utils";
 import {getEnvVar} from "utils/env-vars";
 import {retry} from "utils/lazy-init";
 import useAckee from "utils/useAckee";
 
-import FingerprintJS from '@fingerprintjs/fingerprintjs';
 const ProfileRoute = lazy(() => retry(() => import("routes/profile/ProfileRoute")));
 const CreateBoardRoute = lazy(() => retry(() => import("routes/board/creator/CreatorBoardRoute")));
 const ModeratorInvitationRoute = lazy(() => retry(() => import("routes/ModeratorInvitationRoute")));
@@ -25,8 +25,10 @@ const LoginRoute = lazy(() => retry(() => import("routes/LoginRoute")));
 const NotificationUnsubscribeRoute = lazy(() => retry(() => import("routes/NotificationUnsubscribeRoute")));
 const UiTestRoute = lazy(() => retry(() => import("routes/UiTestRoute")));
 
-const CLIENT_VERSION = "1.0.0.alpha.3";
-const API_ROUTE = getEnvVar("REACT_APP_SERVER_IP_ADDRESS", "https://app.feedbacky.net") + "/api/v1";
+export const CLIENT_VERSION = "1.0.0.alpha.4";
+export const API_ROUTE = getEnvVar("REACT_APP_SERVER_IP_ADDRESS", "https://app.feedbacky.net") + "/api/v1";
+// Minimum Web Content Accessibility Guidelines contrast ratio for text
+export const WCAG_AA_CONTRAST = 3.0;
 
 axios.interceptors.response.use(undefined, error => {
     if (error.response === undefined) {
@@ -46,8 +48,8 @@ const App = ({appearanceSettings}) => {
     const {appearance, setAppearance, theme, setTheme, getTheme, onAppearanceToggle} = appearanceSettings;
     const [session, setSession] = useState(Cookies.get("FSID"));
     const [localPrefs, setLocalPrefs] = useState({
-        ideas: {filter: getCookieOrDefault("prefs_searchFilter", ""), sort: getCookieOrDefault("prefs_searchSort", "")},
-        comments: {sort: getCookieOrDefault("prefs_comments_sort", "")}
+        ideas: {filter: "opened", sort: "trending"},
+        comments: {sort: "newest"}
     });
     const [serviceData, setServiceData] = useState({loaded: false, data: [], error: false});
     const [userData, setUserData] = useState({loaded: false, data: [], error: false});

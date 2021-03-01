@@ -20,6 +20,7 @@ import net.feedbacky.app.data.user.User;
 import net.feedbacky.app.data.user.dto.FetchSimpleUserDto;
 import net.feedbacky.app.data.user.dto.FetchUserDto;
 import net.feedbacky.app.exception.FeedbackyRestException;
+import net.feedbacky.app.exception.types.InsufficientPermissionsException;
 import net.feedbacky.app.exception.types.InvalidAuthenticationException;
 import net.feedbacky.app.exception.types.ResourceNotFoundException;
 import net.feedbacky.app.repository.UserRepository;
@@ -34,6 +35,7 @@ import net.feedbacky.app.util.RandomNicknameUtils;
 import net.feedbacky.app.util.request.InternalRequestValidator;
 import net.feedbacky.app.util.SortFilterResolver;
 import net.feedbacky.app.util.objectstorage.ObjectStorage;
+import net.feedbacky.app.util.request.ServiceValidator;
 
 import com.cosium.spring.data.jpa.entity.graph.domain.EntityGraphUtils;
 import com.cosium.spring.data.jpa.entity.graph.domain.EntityGraphs;
@@ -78,8 +80,8 @@ public class IdeaServiceImpl implements IdeaService {
   @Autowired
   //todo too big constructor
   public IdeaServiceImpl(IdeaRepository ideaRepository, BoardRepository boardRepository, UserRepository userRepository, TagRepository tagRepository,
-                         CommentRepository commentRepository, ObjectStorage objectStorage,
-                         SubscriptionExecutor subscriptionExecutor, IdeaServiceCommons ideaServiceCommons, RandomNicknameUtils randomNicknameUtils) {
+                         CommentRepository commentRepository, ObjectStorage objectStorage, SubscriptionExecutor subscriptionExecutor,
+                         IdeaServiceCommons ideaServiceCommons, RandomNicknameUtils randomNicknameUtils) {
     this.ideaRepository = ideaRepository;
     this.boardRepository = boardRepository;
     this.userRepository = userRepository;
@@ -148,11 +150,11 @@ public class IdeaServiceImpl implements IdeaService {
             .orElseThrow(() -> new InvalidAuthenticationException("Session not found. Try again with new token."));
     Idea idea = ideaRepository.findById(id, EntityGraphs.named("Idea.fetch"))
             .orElseThrow(() -> new ResourceNotFoundException(MessageFormat.format("Idea with id {0} not found.", id)));
-    if(dto.getOpen() != null && !hasPermission(idea.getBoard(), Moderator.Role.MODERATOR, user)) {
-      throw new InvalidAuthenticationException("Insufficient permissions.");
+    if(dto.getOpen() != null && !ServiceValidator.hasPermission(idea.getBoard(), Moderator.Role.MODERATOR, user)) {
+      throw new InsufficientPermissionsException();
     }
-    if(!idea.getCreator().equals(user) && !hasPermission(idea.getBoard(), Moderator.Role.MODERATOR, user)) {
-      throw new InvalidAuthenticationException("Insufficient permissions.");
+    if(!idea.getCreator().equals(user) && !ServiceValidator.hasPermission(idea.getBoard(), Moderator.Role.MODERATOR, user)) {
+      throw new InsufficientPermissionsException();
     }
 
     boolean edited = false;
@@ -194,7 +196,7 @@ public class IdeaServiceImpl implements IdeaService {
         WebhookDataBuilder builder = new WebhookDataBuilder().withUser(user).withIdea(idea).withComment(comment);
         idea.getBoard().getWebhookExecutor().executeWebhooks(Webhook.Event.IDEA_OPEN, builder.build());
       }
-      subscriptionExecutor.notifySubscribers(idea, new NotificationEvent(SubscriptionExecutor.Event.IDEA_STATUS_CHANGE,
+      subscriptionExecutor.notifySubscribers(idea, new NotificationEvent(SubscriptionExecutor.Event.IDEA_STATUS_CHANGE, user,
               idea, idea.getStatus().name()));
     }
     ModelMapper mapper = new ModelMapper();
@@ -219,8 +221,8 @@ public class IdeaServiceImpl implements IdeaService {
             .orElseThrow(() -> new InvalidAuthenticationException("Session not found. Try again with new token."));
     Idea idea = ideaRepository.findById(id, EntityGraphs.named("Idea.fetch"))
             .orElseThrow(() -> new ResourceNotFoundException(MessageFormat.format("Idea with id {0} not found.", id)));
-    if(!idea.getCreator().equals(user) && !hasPermission(idea.getBoard(), Moderator.Role.MODERATOR, user)) {
-      throw new InvalidAuthenticationException("Insufficient permissions.");
+    if(!idea.getCreator().equals(user) && !ServiceValidator.hasPermission(idea.getBoard(), Moderator.Role.MODERATOR, user)) {
+      throw new InsufficientPermissionsException();
     }
     idea.getAttachments().forEach(attachment -> objectStorage.deleteImage(attachment.getUrl()));
     WebhookDataBuilder builder = new WebhookDataBuilder().withUser(user).withIdea(idea);
@@ -296,8 +298,8 @@ public class IdeaServiceImpl implements IdeaService {
             .orElseThrow(() -> new InvalidAuthenticationException("Session not found. Try again with new token."));
     Idea idea = ideaRepository.findById(id, EntityGraphs.named("Idea.fetch"))
             .orElseThrow(() -> new ResourceNotFoundException(MessageFormat.format("Idea with id {0} not found.", id)));
-    if(!hasPermission(idea.getBoard(), Moderator.Role.MODERATOR, user)) {
-      throw new InvalidAuthenticationException("Insufficient permissions.");
+    if(!ServiceValidator.hasPermission(idea.getBoard(), Moderator.Role.MODERATOR, user)) {
+      throw new InsufficientPermissionsException();
     }
     if(tags.isEmpty()) {
       throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "No changes made.");
@@ -329,7 +331,7 @@ public class IdeaServiceImpl implements IdeaService {
             .withTagsChangedData(prepareTagChangeMessage(user, idea, addedTags, removedTags, false));
     idea.getBoard().getWebhookExecutor().executeWebhooks(Webhook.Event.IDEA_TAG_CHANGE, webhookBuilder.build());
 
-    subscriptionExecutor.notifySubscribers(idea, new NotificationEvent(SubscriptionExecutor.Event.IDEA_TAGS_CHANGE,
+    subscriptionExecutor.notifySubscribers(idea, new NotificationEvent(SubscriptionExecutor.Event.IDEA_TAGS_CHANGE, user,
             idea, prepareTagChangeMessage(user, idea, addedTags, removedTags, false)));
     return idea.getTags().stream().map(tag -> new FetchTagDto().from(tag)).collect(Collectors.toList());
   }

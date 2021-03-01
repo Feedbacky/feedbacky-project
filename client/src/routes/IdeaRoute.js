@@ -15,6 +15,7 @@ import LoadingRouteUtil from "routes/utils/LoadingRouteUtil";
 import {UiHorizontalRule} from "ui";
 import {UiCol, UiContainer, UiRow} from "ui/grid";
 import {convertIdeaToSlug} from "utils/basic-utils";
+import {useTitle} from "utils/use-title";
 
 const IdeaRoute = () => {
     const history = useHistory();
@@ -31,6 +32,7 @@ const IdeaRoute = () => {
     const [idea, setIdea] = useState({data: {}, loaded: false, error: false});
     const [board, setBoard] = useState({data: {}, loaded: false, error: false});
     const [modalOpen, setModalOpen] = useState(false);
+    useTitle((idea.loaded && board.loaded) ? board.data.name + " | " + idea.data.title : "Loading...");
     const loadBoardDataCascade = (ideaData) => {
         if (board.loaded) {
             return;
@@ -85,7 +87,7 @@ const IdeaRoute = () => {
             <UiContainer className={"pb-5"}>
                 <UiRow centered className={"my-4"}>
                     <ComponentLoader loaded={board.loaded} component={<IdeaInfoBox/>}/>
-                    <UiCol xs={12}><UiHorizontalRule/></UiCol>
+                    <UiCol xs={12}><UiHorizontalRule theme={context.getTheme().setAlpha(.1)}/></UiCol>
                     <ComponentLoader loaded={idea.loaded} component={<DiscussionBox/>}/>
                 </UiRow>
             </UiContainer>

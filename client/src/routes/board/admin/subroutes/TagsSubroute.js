@@ -17,6 +17,7 @@ import {UiFormLabel} from "ui/form";
 import {UiCol, UiRow} from "ui/grid";
 import {UiViewBox} from "ui/viewbox";
 import {popupError, popupNotification} from "utils/basic-utils";
+import {useTitle} from "utils/use-title";
 
 const TagsSubroute = () => {
     const {getTheme} = useContext(AppContext);
@@ -25,6 +26,7 @@ const TagsSubroute = () => {
     const [modal, setModal] = useState({open: false, type: "", data: {name: ""}});
     const getQuota = () => 25 - boardData.tags.length;
     useEffect(() => setCurrentNode("tags"), [setCurrentNode]);
+    useTitle(boardData.name + " | Tags");
     const onTagCreate = (data) => {
         updateState({...boardData, tags: boardData.tags.concat(data)});
     };
