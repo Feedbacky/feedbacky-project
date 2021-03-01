@@ -70,6 +70,8 @@ const App = ({appearanceSettings}) => {
         ignoreOwnVisits: true
     });
     useEffect(() => {
+        ackeeInstance.action('8f766730-6d63-48ed-b203-e993e14e20e7', {key: appearance.mode, value: 1});
+
         axios.defaults.baseURL = API_ROUTE;
         axios.defaults.headers.common["Authorization"] = "Bearer " + session;
         // eslint-disable-next-line

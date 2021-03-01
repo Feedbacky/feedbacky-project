@@ -33,7 +33,7 @@ const TagsSubroute = () => {
     const renderContent = () => {
         return <UiCol xs={12}>
             <UiFormLabel>Tags Quota ({getQuota()} left)</UiFormLabel>
-            <UiClickableTip id={"quota"} title={"Tags Quota"} description={"Amount of tags your board can have, you're limited to 10 tags per board."}/>
+            <UiClickableTip id={"quota"} title={"Tags Quota"} description={"Amount of tags your board can have, you're limited to 25 tags per board."}/>
             <UiRow>{renderTags()}</UiRow>
             <br/>
             {renderNewTagButton()}
