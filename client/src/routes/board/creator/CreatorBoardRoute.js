@@ -13,8 +13,7 @@ import tinycolor from "tinycolor2";
 import {UiProgressBar} from "ui";
 import {UiCancelButton, UiLoadableButton, UiNextStepButton, UiPreviousStepButton} from "ui/button";
 import {UiCol, UiContainer, UiRow} from "ui/grid";
-import {hideNotifications, isServiceAdmin, popupNotification, popupWarning} from "utils/basic-utils";
-import {popupNotification, popupWarning} from "utils/basic-utils";
+import {hideNotifications, popupNotification, popupWarning} from "utils/basic-utils";
 import {useTitle} from "utils/use-title";
 
 const CreatorBoardRoute = () => {

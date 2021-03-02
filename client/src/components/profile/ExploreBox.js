@@ -1,5 +1,4 @@
 import styled from "@emotion/styled";
-import {PROFILE_DARK_THEME_COLOR, PROFILE_LIGHT_THEME_COLOR} from "components/profile/ProfileSidebar";
 import AppContext from "context/AppContext";
 import React, {useContext} from 'react';
 import {Link} from "react-router-dom";
@@ -19,8 +18,8 @@ const ExploreCard = styled(UiCard)`
 
 const ExploreBox = (props) => {
     const {discriminator, banner, logo, name, description} = props;
-    const {user} = useContext(AppContext);
-    const border = "2px solid " + (user.darkMode ? PROFILE_DARK_THEME_COLOR : PROFILE_LIGHT_THEME_COLOR);
+    const {defaultTheme} = useContext(AppContext);
+    const border = "2px solid " + defaultTheme;
     return <Link to={"/b/" + discriminator}>
         <ExploreCard banner={banner} style={{border}}>
             <img alt='Board' src={logo} width='60px' height='60px' className="mb-1"/>
