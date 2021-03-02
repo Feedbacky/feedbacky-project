@@ -158,7 +158,7 @@ public class BoardServiceImpl implements BoardService {
   private void populateBoardWithExamples(Board board) {
     Tag tag = new Tag();
     tag.setBoard(board);
-    tag.setColor("#2d2d2d");
+    tag.setColor("#0994f6");
     tag.setName("Example");
     tag = tagRepository.save(tag);
 
