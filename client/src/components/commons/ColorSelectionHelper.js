@@ -8,6 +8,12 @@ import {UiClickableTip, UiHoverableIcon, UiLoadingSpinner} from "ui";
 import {UiFormLabel} from "ui/form";
 
 const ColorPicker = styled(ChromePicker)`
+  box-shadow: var(--box-shadow) !important;
+  border-radius: var(--border-radius) !important;
+  
+  & > div {
+    border-radius: var(--border-radius) var(--border-radius) 0 0 !important;
+  }
   .dark & {
     box-shadow: var(--dark-box-shadow) !important;
 
@@ -28,7 +34,7 @@ const ColorPicker = styled(ChromePicker)`
 `;
 
 const ColorSelectionHelper = ({title, color, setColor, colorWarning}) => {
-    const warn = colorWarning === true ? tinycolor.readability(color, "#fff") < WCAG_AA_CONTRAST || tinycolor.readability(tinycolor(color).lighten(10), "#292c30") < WCAG_AA_CONTRAST : false;
+    const warn = colorWarning === true ? tinycolor.readability(color, "#fff") < WCAG_AA_CONTRAST || tinycolor.readability(tinycolor(color).clone().lighten(10), "#292c30") < WCAG_AA_CONTRAST : false;
     const textClass = warn ? "text-red" : "";
     return <React.Fragment>
         <UiFormLabel className={textClass}>{title}</UiFormLabel>
