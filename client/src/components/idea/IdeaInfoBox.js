@@ -18,7 +18,7 @@ import {UiCol} from "ui/grid";
 import {htmlDecode, popupError, popupNotification} from "utils/basic-utils";
 
 const IdeaInfoBox = () => {
-    const {getTheme} = useContext(AppContext);
+    const {user, getTheme} = useContext(AppContext);
     const {ideaData, updateState} = useContext(IdeaContext);
     const voteRef = React.createRef();
     const history = useHistory();
@@ -38,7 +38,7 @@ const IdeaInfoBox = () => {
     }, []);
 
     const onEditApply = () => {
-        let description = document.getElementById("editorBox").value;
+        let description = editor.value;
         if (ideaData.description === description) {
             setEditor({enabled: false, value: htmlDecode(description)});
             popupNotification("Nothing changed", getTheme().toHexString());
@@ -75,7 +75,7 @@ const IdeaInfoBox = () => {
     const renderEditorMode = () => {
         return <React.Fragment>
             <UiFormControl as={TextareaAutosize} className={"bg-lighter"} id={"editorBox"} rows={4} maxRows={12}
-                           placeholder={"Write a description..."} required label={"Write a description"}
+                           placeholder={"Write a description..."} required label={"Write a description"} onChange={e => setEditor({...editor, value: e.target.value})}
                            style={{resize: "none", overflow: "hidden"}} defaultValue={htmlDecode(editor.value)}/>
             <div className={"m-0 mt-2"}>
                 <UiLoadableButton label={"Save"} size={"sm"} onClick={onEditApply}>Save</UiLoadableButton>
@@ -89,7 +89,14 @@ const IdeaInfoBox = () => {
         <UiCol sm={12} md={10}>
             <UiCol xs={12} className={"d-inline-flex mb-2 p-0"}>
                 <div className={"my-auto mr-2"} ref={voteRef}>
-                    <VoteButton idea={ideaData} animationRef={voteRef} onVote={(upvoted, votersAmount) => updateState({...ideaData, upvoted, votersAmount})}/>
+                    <VoteButton idea={ideaData} animationRef={voteRef} onVote={(upvoted, votersAmount) => {
+                        updateState({...ideaData, upvoted, votersAmount});
+                        if(upvoted) {
+                            setVoters({...voters, data: voters.data.concat(user.data)});
+                        } else {
+                            setVoters({...voters, data: voters.data.filter(voter => voter.id === user.id)});
+                        }
+                    }}/>
                 </div>
                 <TitleInfo editor={editor} setEditor={setEditor} setModal={setModal}/>
             </UiCol>
