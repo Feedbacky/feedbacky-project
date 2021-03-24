@@ -109,7 +109,7 @@ const WebhooksSubroute = () => {
             }
             const data = webhooks.data.filter(item => item.id !== modal.data);
             setWebhooks({...webhooks, data});
-            popupNotification("Webhook deleted", getTheme().toHexString());
+            popupNotification("Webhook deleted", getTheme());
         });
     };
     return <UiCol xs={12} md={9}>

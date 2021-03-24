@@ -56,7 +56,7 @@ const IdeaCreateModal = ({isOpen, onHide, onIdeaCreation}) => {
                 popupError();
                 return;
             }
-            popupNotification("Idea posted", getTheme().toHexString());
+            popupNotification("Idea posted", getTheme());
             setTitle("");
             onHide();
             ackeeInstance.action("6b74faeb-5871-453d-a04b-5d2ad9bc57a0", {
