@@ -7,6 +7,7 @@ const MarkdownBox = styled.div`
   & a {
     color: hsl(195, 100%, 30%);
     &:hover {
+    
       color: hsl(195, 100%, 15%);
     }
   }
@@ -16,6 +17,9 @@ const MarkdownBox = styled.div`
     &:hover {
       color: hsl(208, 100%, 75%) !important;
     }
+  }
+  & img {
+    width: 100%;
   }
 `;
 
