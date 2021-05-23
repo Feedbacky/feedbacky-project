@@ -48,7 +48,6 @@ const BoardChangelogBox = () => {
         if (changelog.loaded && changelog.data.length === 0 && !changelog.moreToLoad) {
             return <SvgNotice Component={UndrawNoData} title={"This Changelog Is Empty"}/>
         }
-        console.log(changelog.data);
         return <InfiniteScroll
             style={{overflow: "initial"}}
             next={onLoadRequest}
