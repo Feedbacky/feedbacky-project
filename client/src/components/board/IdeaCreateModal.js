@@ -24,10 +24,25 @@ const AttachmentButton = styled(UiClassicButton)`
   }
 `;
 
+const TagsContainer = styled.div`
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: stretch;
+`;
+
+const SelectableTag = styled.div`
+  width: 130px;
+  flex-grow: 1;
+  display: inline-block;
+  margin-right: .5rem;
+  cursor: pointer;
+`;
+
 const IdeaCreateModal = ({isOpen, onHide, onIdeaCreation}) => {
     const {getTheme, ackeeInstance} = useContext(AppContext);
     const {discriminator, tags} = useContext(BoardContext).data;
     const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
     const [attachment, setAttachment] = useState(null);
     const [attachmentName, setAttachmentName] = useState("No Attachment");
     const applicableTags = tags.filter(tag => tag.publicUse);
@@ -124,12 +139,13 @@ const IdeaCreateModal = ({isOpen, onHide, onIdeaCreation}) => {
                 Supports <strong>**basic markdown**</strong> <em>*elements*</em>.<br/>
                 Please keep under 1800 characters.
             </React.Fragment>} aria-label={"Idea description"}/>
-            <UiMarkdownFormControl label={"Write description"} as={TextareaAutosize} id={"descriptionTextarea"} rows={5} maxRows={10}
+            <UiMarkdownFormControl label={"Write description"} as={TextareaAutosize} defaultValue={description} id={"descriptionTextarea"} rows={5} maxRows={10}
                            placeholder={"Detailed and meaningful description."} minLength={10} maxLength={1800} required
                            style={{resize: "none", overflow: "hidden"}}
                            onChange={e => {
                                e.target.value = e.target.value.substring(0, 1800);
                                formatRemainingCharacters("remainingDescription", "descriptionTextarea", 1800);
+                               setDescription(e.target.value.substring(0, 1800));
                            }}/>
             <small className={"d-inline mt-1 float-left text-black-60"} id={"remainingDescription"}>
                 1800 Remaining
@@ -143,7 +159,7 @@ const IdeaCreateModal = ({isOpen, onHide, onIdeaCreation}) => {
             <div className={"my-2"}>
                 <UiFormLabel>Tags</UiFormLabel>
                 <UiClickableTip id={"ideaTags"} title={"Choosing Tags"} description={"Choose tags you wish to be used in your idea."}/>
-                <div>
+                <TagsContainer>
                     {applicableTags.map((tag, i) => {
                         const update = () => {
                             let newTags;
@@ -155,10 +171,15 @@ const IdeaCreateModal = ({isOpen, onHide, onIdeaCreation}) => {
                             // https://stackoverflow.com/a/39225750/10156191
                             setTimeout(() => setChosenTags(newTags), 0);
                         };
-                        return <UiLabelledCheckbox id={"applicableTag_" + tag.id} key={i} checked={chosenTags.includes(tag)} onChange={update} className={"mr-3"}
+                        return <SelectableTag key={i} onClick={update} className={"d-inline-block"}>
+                                <UiLabelledCheckbox id={"applicableTag_" + tag.id} checked={chosenTags.includes(tag)} onChange={update}
                                                    label={<UiBadge color={tinycolor(tag.color)}>{tag.name}</UiBadge>}/>
+                        </SelectableTag>
                     })}
-                </div>
+                    {/* for uneven amount of tags add a dummy div(s) for even flex stretch*/}
+                    {applicableTags.length % 3 === 1 || <SelectableTag/>}
+                    {applicableTags.length % 3 === 2 || <SelectableTag/>}
+                </TagsContainer>
             </div>
         </React.Fragment>
         }
