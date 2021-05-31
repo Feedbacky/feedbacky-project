@@ -1,3 +1,7 @@
+### 1.0.0.alpha.7
+* **[FEATURE]** Changelogs can now be edited
+* **[FEATURE]** User settings page is now directly tied to previous board so users won't leave currently viewed board
+
 ### 1.0.0.alpha.6
 * **[FEATURE]** Changelogs and roadmaps can now be disabled
 * **[FEATURE]** You can now share ideas using Share Box (share to Facebook, Twitter or copy link) (requested at [Feedbacky](https://app.feedbacky.net/i/share-buttons.2612))
