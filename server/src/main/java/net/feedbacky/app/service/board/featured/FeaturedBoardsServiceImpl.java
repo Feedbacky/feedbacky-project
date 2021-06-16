@@ -1,10 +1,8 @@
 package net.feedbacky.app.service.board.featured;
 
-import net.feedbacky.app.repository.board.BoardRepository;
-import net.feedbacky.app.data.board.Board;
-import net.feedbacky.app.data.board.dto.FetchBoardDto;
-
-import com.cosium.spring.data.jpa.entity.graph.domain.EntityGraphs;
+import net.feedbacky.app.data.board.dto.featured.FetchFeaturedBoardDto;
+import net.feedbacky.app.data.board.featured.FeaturedBoard;
+import net.feedbacky.app.repository.board.FeaturedBoardRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -24,22 +22,22 @@ import java.util.Optional;
 public class FeaturedBoardsServiceImpl implements FeaturedBoardsService {
 
   private List<Long> featuredBoards = new ArrayList<>();
-  private BoardRepository boardRepository;
+  private FeaturedBoardRepository featuredBoardRepository;
 
   @Autowired
-  public FeaturedBoardsServiceImpl(BoardRepository boardRepository) {
-    this.boardRepository = boardRepository;
+  public FeaturedBoardsServiceImpl(FeaturedBoardRepository featuredBoardRepository) {
+    this.featuredBoardRepository = featuredBoardRepository;
   }
 
   @Scheduled(fixedDelay = 86_400_000)
   public void scheduleFeaturedBoardsSelectionTask() {
     featuredBoards.clear();
-    Iterable<Board> iterable = boardRepository.findAll(EntityGraphs.empty());
-    List<Board> boards = new ArrayList<>();
+    Iterable<FeaturedBoard> iterable = featuredBoardRepository.findAll();
+    List<FeaturedBoard> boards = new ArrayList<>();
     iterable.forEach(boards::add);
     Collections.shuffle(boards);
     int i = 6;
-    for(Board board : boards) {
+    for(FeaturedBoard board : boards) {
       featuredBoards.add(board.getId());
       i--;
       if(i <= 0) {
@@ -49,16 +47,16 @@ public class FeaturedBoardsServiceImpl implements FeaturedBoardsService {
   }
 
   @Override
-  public List<FetchBoardDto> getAll() {
-    List<FetchBoardDto> boards = new ArrayList<>();
+  public List<FetchFeaturedBoardDto> getAll() {
+    List<FetchFeaturedBoardDto> boards = new ArrayList<>();
     for(Long id : featuredBoards) {
-      Optional<Board> board = boardRepository.findById(id);
+      Optional<FeaturedBoard> board = featuredBoardRepository.findById(id);
       //someone deleted board, reschedule and load again.
       if(!board.isPresent()) {
         scheduleFeaturedBoardsSelectionTask();
         return getAll();
       }
-      boards.add(new FetchBoardDto().from(board.get()));
+      boards.add(new FetchFeaturedBoardDto().from(board.get()));
     }
     return boards;
   }

@@ -13,7 +13,6 @@ import {getEnvVar} from "utils/env-vars";
 import {retry} from "utils/lazy-init";
 
 const SettingsSubroute = lazy(() => retry(() => import("routes/profile/subroutes/SettingsSubroute")));
-const ExploreSubroute = lazy(() => retry(() => import("routes/profile/subroutes/ExploreSubroute")));
 const AppearanceSubroute = lazy(() => retry(() => import("routes/profile/subroutes/AppearanceSubroute")));
 const NotificationsSubroute = lazy(() => retry(() => import("routes/profile/subroutes/NotificationsSubroute")));
 
@@ -50,7 +49,6 @@ const ProfileRoute = () => {
                     <Suspense fallback={<UiCol xs={12} md={9}><UiRow centered className={"mt-5 pt-5"}><UiLoadingSpinner/></UiRow></UiCol>}>
                         <Switch>
                             <Route path={"/me/settings"} component={SettingsSubroute}/>
-                            <Route path={"/me/explore"} component={ExploreSubroute}/>
                             <Route path={"/me/appearance"} component={AppearanceSubroute}/>
                             <Route path={"/me/notifications"} component={NotificationsSubroute}/>
                             <Route component={SettingsSubroute}/>

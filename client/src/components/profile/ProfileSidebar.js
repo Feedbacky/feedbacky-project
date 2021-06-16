@@ -8,7 +8,6 @@ import {UiCol} from "ui/grid";
 const ProfileSidebar = ({currentNode, reRouteTo}) => {
     const routes = [
         {settings: data => <React.Fragment><SidebarIcon as={FaRegAddressCard} style={data}/> Settings</React.Fragment>},
-        {explore: data => <React.Fragment><SidebarIcon as={FaSearch} style={data}/> Explore</React.Fragment>},
         {appearance: data => <React.Fragment><SidebarIcon as={FaRegKeyboard} style={data}/> Appearance</React.Fragment>},
         {notifications: data => <React.Fragment><SidebarIcon as={FaRegBell} style={data}/> Notifications</React.Fragment>},
     ];

@@ -49,8 +49,6 @@ This file is dedicated to show changes between self-hosted version and this fork
 * [client/src/routes/board/creator/StepSecondSubroute.js](https://github.com/Feedbacky/feedbacky-project/blob/master/client/src/routes/board/creator/StepSecondSubroute.js)
     * Remove banner and logo requirement
     * Implement default banner and logo values
-* [client/src/routes/profile/ProfileRoute.js](https://github.com/Feedbacky/feedbacky-project/blob/master/client/src/routes/profile/ProfileRoute.js)
-    * Include `/me/explore` page route
 * [client/src/routes/LoginRoute.js](https://github.com/Feedbacky/feedbacky-project/blob/master/client/src/routes/LoginRoute.js)
     * Include Ackee events analytics
 * [client/src/utils/env-vars.js](https://github.com/Feedbacky/feedbacky-project/blob/master/client/src/utils/env-vars.js)

@@ -1,6 +1,6 @@
 package net.feedbacky.app.service.board.featured;
 
-import net.feedbacky.app.data.board.dto.FetchBoardDto;
+import net.feedbacky.app.data.board.dto.featured.FetchFeaturedBoardDto;
 
 import java.util.List;
 
@@ -11,6 +11,6 @@ import java.util.List;
  */
 public interface FeaturedBoardsService {
 
-  List<FetchBoardDto> getAll();
+  List<FetchFeaturedBoardDto> getAll();
 
 }
