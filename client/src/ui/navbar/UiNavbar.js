@@ -1,12 +1,11 @@
 import styled from "@emotion/styled";
-import AppContext from "context/AppContext";
+import {AppContext} from "context";
 import React, {useContext} from 'react';
 import {Link} from "react-router-dom";
 import {UiContainer, UiRow} from "ui/grid";
 
 const StyledNavbar = styled.div`
   background-color: var(--tertiary);
-  font-weight: 300;
   padding-top: .3rem;
   z-index: 3;
   flex-flow: row nowrap;
@@ -14,11 +13,7 @@ const StyledNavbar = styled.div`
   position: relative;
   flex-wrap: wrap;
   align-items: center;
-  
-  .dark & {
-    background-color: var(--dark-tertiary);
-    box-shadow: var(--dark-box-shadow) !important;
-  }
+  box-shadow: var(--box-shadow);
 `;
 
 const Brand = styled(Link)`
@@ -45,25 +40,23 @@ const NavbarSelectedOption = styled(Link)`
   
   color: ${props => props.theme.toString()};
   margin-bottom: -4px; 
-  margin-top: .5rem;
-  margin-right: .75rem;
+  padding-top: .5rem;
+  padding-left: .4rem;
+  padding-right: .4rem;
   border-bottom: 2px solid ${props => props.border.toString()};
 `;
 
 const NavbarOption = styled(Link)`
   color: var(--font-color);
   margin-bottom: -4px;
-  margin-top: .5rem;
-  margin-right: .75rem;
+  padding-top: .5rem;
+  padding-left: .4rem;
+  padding-right: .4rem;
   transition: var(--hover-transition);
   
   &:hover {
     color: var(--font-color);
     transform: var(--hover-transform-scale-sm);
-  }
-  
-  .dark & {
-    color: var(--dark-font-color);
   }
 `;
 

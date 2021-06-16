@@ -1,8 +1,7 @@
 import IdeaCreateModal from "components/board/IdeaCreateModal";
 import Attribution from "components/commons/Attribution";
 import MarkdownContainer from "components/commons/MarkdownContainer";
-import AppContext from "context/AppContext";
-import BoardContext from "context/BoardContext";
+import {AppContext, BoardContext} from "context";
 import React, {useContext, useState} from 'react';
 import {FaAlignRight} from "react-icons/all";
 import {FaPencilAlt} from "react-icons/fa";

@@ -2,8 +2,7 @@ import ServiceLogo from "assets/img/service-logo.png";
 import LoginModal from "components/LoginModal";
 import ProfileNavbar from "components/profile/ProfileNavbar";
 import ProfileSidebar from "components/profile/ProfileSidebar";
-import AppContext from "context/AppContext";
-import PageNodesContext from "context/PageNodesContext";
+import {AppContext, PageNodesContext} from "context";
 import React, {lazy, Suspense, useContext, useEffect, useState} from "react";
 import {FaExclamationCircle} from "react-icons/all";
 import {Route, Switch, useHistory, useLocation} from "react-router-dom";
@@ -30,7 +29,7 @@ const ProfileRoute = () => {
       return location.state._boardData;
     };
     const [board, setBoard] = useState({data: getPassedBoardData(), loaded: true, error: false});
-    const {onThemeChange} = useContext(AppContext);
+    const {onThemeChange, defaultTheme} = useContext(AppContext);
     useEffect(() => {
         const data = getPassedBoardData();
         if(data !== null) {
@@ -38,7 +37,7 @@ const ProfileRoute = () => {
             return;
         }
         onThemeChange();
-    }, []);
+    }, [defaultTheme]);
     return <BoardContextedRouteUtil board={board} setBoard={setBoard} onNotLoggedClick={() => setLoginModalOpen(true)}
                                     errorMessage={"Content Not Found"} errorIcon={FaExclamationCircle}>
         <PageNodesContext.Provider value={{setCurrentNode: setCurrentNode}}>

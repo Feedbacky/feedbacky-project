@@ -1,6 +1,6 @@
 import Attribution from "components/commons/Attribution";
 import {renderSidebarRoutes, Sidebar, SidebarIcon} from "components/commons/sidebar-commons";
-import AppContext from "context/AppContext";
+import {AppContext} from "context";
 import React, {useContext} from 'react';
 import {FaAt, FaColumns, FaDiscord, FaQuestionCircle, FaRegCommentDots, FaSlidersH, FaTags, FaUserLock, FaUsersCog} from "react-icons/all";
 import {UiCol} from "ui/grid";

@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import BoardContext from "context/BoardContext";
+import {BoardContext} from "context";
 import React, {useContext} from 'react';
 import {Link} from "react-router-dom";
 import {UiCol} from "ui/grid";
@@ -18,13 +18,12 @@ export const Banner = styled.div`
   margin-bottom: .5rem;
   text-shadow: 0 0 4px black;
   background-image: url("${props => props.image}");
-  
-  .dark & {
-    box-shadow: var(--dark-box-shadow) !important;
-  }
 `;
 
 const SocialLinkContainer = styled.div`
+  &:empty {
+    display: none !important;
+  }
   @media(max-width: 576px) {
     position: relative;
     display: inline-block;

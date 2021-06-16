@@ -2,8 +2,7 @@ import styled from "@emotion/styled";
 import MarkdownContainer from "components/commons/MarkdownContainer";
 import ModeratorActionsButton from "components/commons/ModeratorActionsButton";
 import VoteButton from "components/commons/VoteButton";
-import BoardContext from "context/BoardContext";
-import IdeaContext from "context/IdeaContext";
+import {BoardContext, IdeaContext} from "context";
 import React, {useContext, useEffect, useState} from 'react';
 import {FaLock, FaRegComment} from "react-icons/fa";
 import {Link, useHistory, useLocation} from "react-router-dom";
@@ -23,10 +22,6 @@ export const CardLinkStyle = styled(UiCol)`
   padding-right: 0;
   text-decoration: none !important;
   color: var(--font-color) !important;
-  
-  .dark & {
-    color: var(--dark-font-color) !important;
-  }
 `;
 
 export const IdeaCardDescription = styled.small`
@@ -60,12 +55,13 @@ const BadgeContainer = styled.span`
 `;
 
 export const InfoContainer = styled.small`
-  color: hsla(0, 0%, 0%, .6);
+  color:  hsla(0, 0%, 0%, .6);
   float: right;
   margin-left: 0.25rem;
   transform: translateY(3px);
+  
   .dark & {
-    color: var(--dark-font-color) !important;
+    color: hsla(0, 0%, 95%, .6) !important;
   }
 `;
 

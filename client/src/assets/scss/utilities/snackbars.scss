@@ -10,7 +10,6 @@
   justify-content: space-between;
   align-items: center;
   line-height: 22px;
-  padding: 18px 24px;
   bottom: -100px;
   top: -100px;
   opacity: 0;
@@ -21,9 +20,7 @@
 }
 
 .dark .snackbar-container {
-  background-color: var(--dark-secondary);
-  color: var(--dark-font-color);
-  box-shadow: var(--dark-box-shadow) !important;
+  background-color: var(--secondary);
 }
 
 .snackbar-container .action {

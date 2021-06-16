@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import AppContext from "context/AppContext";
+import {AppContext} from "context";
 import PropTypes from "prop-types";
 import React, {useContext} from "react";
 import {Dropdown} from "react-bootstrap";
@@ -13,22 +13,21 @@ const SelectableDropdown = styled(UiClassicButton)`
   padding: 0 .5rem;
   font-weight: bold;
   color: var(--font-color);
-  box-shadow: none;
+  box-shadow: var(--box-shadow);
   text-decoration: none;
 
   &:hover {
-    box-shadow: none;
+    box-shadow: var(--box-shadow);
     text-decoration: none;
     color: var(--font-color);
   }
   
   .dark & {
-    background-color: var(--dark-tertiary);
-    box-shadow: var(--dark-box-shadow) !important;
+    background-color: var(--tertiary);
 
     &:hover {
       text-decoration: none;
-      background-color: var(--dark-hover);
+      background-color: var(--hover);
     }
   }
 `;

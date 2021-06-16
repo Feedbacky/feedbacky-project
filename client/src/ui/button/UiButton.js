@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import {WCAG_AA_CONTRAST} from "App";
-import AppContext from "context/AppContext";
+import {AppContext} from "context";
 import PropTypes from "prop-types";
 import React, {useContext} from "react";
 import tinycolor from "tinycolor2";
@@ -42,10 +42,6 @@ export const PageButton = styled(BasePageButton)`
   &:hover, &:active {
     color: white;
     transform: var(--hover-transform-scale-sm);
-  }
-  
-  .dark & {
-    box-shadow: var(--dark-box-shadow) !important;
   }
 `;
 

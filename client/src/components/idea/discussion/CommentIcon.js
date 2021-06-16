@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import AppContext from "context/AppContext";
+import {AppContext} from "context";
 import React, {useContext} from "react";
 import {FaEdit, FaLock, FaLockOpen, FaTags} from "react-icons/all";
 
@@ -11,10 +11,6 @@ const Icon = styled.div`
   transform: translateY(-3px);
   box-shadow: 0 0 0 1px var(--background), 0 0 0 2px currentColor;
   margin-right: 1rem;
-  
-  .dark & {
-    box-shadow: 0 0 0 1px var(--dark-background), 0 0 0 2px currentColor;
-  }
   
   .icon {
     vertical-align: bottom;

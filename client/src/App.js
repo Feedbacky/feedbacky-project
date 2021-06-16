@@ -2,7 +2,7 @@ import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import {DARK_THEME_COLOR, LIGHT_THEME_COLOR} from "AppAppearance";
 import axios from "axios";
 import ComponentLoader from "components/ComponentLoader";
-import AppContext from "context/AppContext";
+import {AppContext} from "context";
 import Cookies from "js-cookie";
 import React, {lazy, Suspense, useEffect, useState} from 'react';
 import {FaDizzy, FaExclamationCircle} from "react-icons/fa";
@@ -26,7 +26,7 @@ const LoginRoute = lazy(() => retry(() => import("routes/LoginRoute")));
 const NotificationUnsubscribeRoute = lazy(() => retry(() => import("routes/NotificationUnsubscribeRoute")));
 const UiTestRoute = lazy(() => retry(() => import("routes/UiTestRoute")));
 
-export const CLIENT_VERSION = "1.0.0.alpha.7";
+export const CLIENT_VERSION = "1.0.0.beta.1";
 export const API_ROUTE = getEnvVar("REACT_APP_SERVER_IP_ADDRESS", "https://app.feedbacky.net") + "/api/v1";
 // Minimum Web Content Accessibility Guidelines contrast ratio for text
 export const WCAG_AA_CONTRAST = 3.0;

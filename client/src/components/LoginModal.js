@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import AppContext from "context/AppContext";
+import {AppContext} from "context";
 import React, {useContext} from 'react';
 import {ModalDialog} from "react-bootstrap";
 import {UiClassicButton} from "ui/button";
@@ -40,7 +40,7 @@ const LoginHeader = styled(UiImage)`
   background-color: var(--secondary);
   
   .dark & {
-    background-color: var(--dark-tertiary);
+    background-color: var(--tertiary);
   }
 `;
 

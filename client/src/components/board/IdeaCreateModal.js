@@ -1,7 +1,6 @@
 import styled from "@emotion/styled";
 import axios from "axios";
-import AppContext from "context/AppContext";
-import BoardContext from "context/BoardContext";
+import {AppContext, BoardContext} from "context";
 import React, {useContext, useState} from 'react';
 import TextareaAutosize from "react-autosize-textarea";
 import {FaRegImage} from "react-icons/fa";
@@ -16,10 +15,10 @@ import {formatRemainingCharacters, getBase64FromFile, popupError, popupNotificat
 const AttachmentButton = styled(UiClassicButton)`
   max-height: 38px;
   background-color: var(--secondary);
+  color: var(--font-color);
   .dark & {
-    background-color: var(--dark-secondary);
     & * {
-      color: var(--dark-font-color);
+      color: var(--font-color);
     }
   }
 `;

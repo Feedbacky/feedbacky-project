@@ -1,6 +1,22 @@
-### 1.0.0.alpha.7
+### 1.0.0.beta.1
+* **[IMPROVEMENT]** Snackbars are updated to look like other parts of the UI (transparent background, bold full color text)
+* **[IMPROVEMENT]** Migrator is now using batch entry updates for better performance
+* **[FIX]** Show confidential board data (API keys) only to admins and owners of the board not moderators
+* **[FIX]** Profile page light theme color when switching from Dark to Light mode didn't change properly
+* **[FIX]** Board creator navbar crashed the app when leaving the creator page while using it
+* **[FIX]** Ensure error in tab title is properly set when error page shows up
+* **[FIX]** Social links container in board banner will no longer show on mobile if it's empty - empty whitespace was there before
+
+** **TODO** **
+* Make migrator more stable
+
+### 1.0.0.alpha.7 (July 12, 2021)
 * **[FEATURE]** Changelogs can now be edited
 * **[FEATURE]** User settings page is now directly tied to previous board so users won't leave currently viewed board
+* **[IMPROVEMENT]** Increase tap target of mobile navbar Feedback/Roadmap/Changelog buttons (Mobile Friendly improvement from Google Lighthouse)
+* **[CHANGE]** Removed dark mode CSS variables, they'll now override light mode variables when dark mode is enabled
+* **[FIX]** Color picker in light mode had dark background
+* **[REMOVE]** Roboto Light unused font is no longer included in CSS and won't be loaded anymore
 
 ### 1.0.0.alpha.6
 * **[FEATURE]** Changelogs and roadmaps can now be disabled

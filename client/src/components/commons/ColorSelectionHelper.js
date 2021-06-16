@@ -10,7 +10,7 @@ import {UiFormLabel} from "ui/form";
 const ColorPicker = styled(ChromePicker)`
   box-shadow: var(--box-shadow) !important;
   border-radius: var(--border-radius) !important;
-  background-color: var(--dark-secondary) !important;
+  background-color: var(--secondary) !important;
   
   & > div:first-of-type {
     border-radius: var(--border-radius) var(--border-radius) 0 0 !important;
@@ -20,21 +20,18 @@ const ColorPicker = styled(ChromePicker)`
   }
   
   .dark & {
-    box-shadow: var(--dark-box-shadow) !important;
-    background-color: var(--dark-secondary) !important;
-
     & > div {
-      background-color: var(--dark-secondary);
+      background-color: var(--secondary);
     }
 
     & svg {
-      fill: var(--dark-font-color) !important;
+      fill: var(--font-color) !important;
     }
 
     input {
-      background-color: var(--dark-quaternary);
-      box-shadow: var(--dark-box-shadow) !important;
-      color: var(--dark-font-color) !important;
+      background-color: var(--quaternary);
+      box-shadow: var(--box-shadow) !important;
+      color: var(--font-color) !important;
     }
   }
 `;

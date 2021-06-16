@@ -3,8 +3,7 @@ import axios from "axios";
 import MarkdownContainer from "components/commons/MarkdownContainer";
 import parseComment from "components/idea/discussion/comment-parser";
 import CommentIcon from "components/idea/discussion/CommentIcon";
-import AppContext from "context/AppContext";
-import BoardContext from "context/BoardContext";
+import {AppContext, BoardContext} from "context";
 import React, {useContext, useState} from "react";
 import TextareaAutosize from "react-autosize-textarea";
 import {FaHeart, FaLowVision, FaPen, FaRegHeart, FaTrashAlt, FaUserLock} from "react-icons/all";
@@ -34,10 +33,6 @@ const InternalContainer = styled(CommentContainer)`
   border-radius: var(--border-radius);
   background-color: var(--internal);
   padding: .5rem 1rem;
-  
-  .dark & {
-    background-color: var(--dark-internal);
-  }
 `;
 
 const CommentsBox = ({data, onCommentUpdate, onCommentDelete, onCommentUnlike, onCommentLike, onSuspend}) => {

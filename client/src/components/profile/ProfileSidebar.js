@@ -1,7 +1,6 @@
 import Attribution from "components/commons/Attribution";
 import {renderSidebarRoutes, Sidebar, SidebarIcon} from "components/commons/sidebar-commons";
-import AppContext from "context/AppContext";
-import BoardContext from "context/BoardContext";
+import {AppContext, BoardContext} from "context";
 import React, {useContext} from 'react';
 import {FaRegAddressCard, FaRegBell, FaRegKeyboard, FaSearch} from "react-icons/all";
 import {UiCol} from "ui/grid";

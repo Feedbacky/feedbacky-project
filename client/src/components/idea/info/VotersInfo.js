@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import IdeaContext from "context/IdeaContext";
+import {IdeaContext} from "context";
 import React, {useContext} from "react";
 import {FaRegFrown} from "react-icons/all";
 import {UiLoadingSpinner, UiTooltip} from "ui";
@@ -22,9 +22,6 @@ const Voter = styled(UiAvatar)`
   margin: 0 -12px 0 0;
   border: 2px solid var(--secondary);
   transition: .2s ease-in-out;
-  .dark & {
-    border: 2px solid var(--dark-secondary);
-  }
   &:hover {
     margin: 0 -5px 0 0;
   }

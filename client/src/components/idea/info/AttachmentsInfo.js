@@ -2,9 +2,7 @@ import styled from "@emotion/styled";
 import axios from "axios";
 import DangerousActionModal from "components/commons/DangerousActionModal";
 import SafeAnchor from "components/commons/SafeAnchor";
-import AppContext from "context/AppContext";
-import BoardContext from "context/BoardContext";
-import IdeaContext from "context/IdeaContext";
+import {AppContext, BoardContext, IdeaContext} from "context";
 import React, {useContext, useState} from "react";
 import {UiElementDeleteButton} from "ui/button";
 import {UiImage} from "ui/image";
@@ -12,7 +10,7 @@ import {popupError, popupNotification} from "utils/basic-utils";
 
 const Attachment = styled(UiImage)`
   .dark & {
-    background-color: var(--dark-tertiary);
+    background-color: var(--tertiary);
   }
 `;
 

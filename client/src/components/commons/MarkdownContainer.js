@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import AppContext from "context/AppContext";
+import {AppContext} from "context";
 import React, {useContext} from "react";
 import {truncateText} from "utils/basic-utils";
 
@@ -11,12 +11,8 @@ const MarkdownBox = styled.div`
       color: ${props => props.theme.clone().darken(10).toHexString()};
     }
   }
-  .dark & a {
-    color: ${props => props.theme.toHexString()}; !important;
-
-    &:hover {
-      color: ${props => props.theme.clone().lighten(10).toHexString()} !important;
-    }
+  .dark & a:hover {
+    color: ${props => props.theme.clone().lighten(10).toHexString()} !important;
   }
   & img {
     width: 100%;

@@ -4,9 +4,7 @@ import axios from "axios";
 import DangerousActionModal from "components/commons/DangerousActionModal";
 import {SvgNotice} from "components/commons/SvgNotice";
 import ComponentLoader from "components/ComponentLoader";
-import AppContext from "context/AppContext";
-import BoardContext from "context/BoardContext";
-import PageNodesContext from "context/PageNodesContext";
+import {AppContext, BoardContext, PageNodesContext} from "context";
 import React, {useContext, useEffect, useState} from 'react';
 import {Link} from "react-router-dom";
 import {UiBadge, UiClickableTip, UiLoadingSpinner} from "ui";
@@ -31,7 +29,7 @@ const EventsContainer = styled.div`
 
 const WebhookIcon = styled(UiImage)`
   padding: .5rem;
-  background-color: var(--dark-quaternary) !important;
+  background-color: hsl(213, 7%, 24%);
 `;
 
 const WebhooksSubroute = () => {

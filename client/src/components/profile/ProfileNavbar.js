@@ -1,7 +1,6 @@
 import {renderLogIn} from "components/commons/navbar-commons";
 import IdeaNavbar from "components/idea/IdeaNavbar";
-import AppContext from "context/AppContext";
-import BoardContext from "context/BoardContext";
+import {AppContext, BoardContext} from "context";
 import React, {useContext} from 'react';
 import {UiContainer} from "ui/grid";
 import {UiAvatar} from "ui/image";
@@ -12,7 +11,8 @@ const ProfileNavbar = ({onNotLoggedClick}) => {
     const {user, getTheme} = context;
     const {data: boardData} = useContext(BoardContext);
     const theme = getTheme(false);
-    if(boardData !== null) {
+    //neither null nor empty object
+    if(boardData !== null && Object.keys(boardData).length !== 0) {
         return <IdeaNavbar/>;
     }
     const renderHello = () => {
