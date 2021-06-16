@@ -1,6 +1,6 @@
 package net.feedbacky.app.controller;
 
-import net.feedbacky.app.data.board.dto.FetchBoardDto;
+import net.feedbacky.app.data.board.dto.featured.FetchFeaturedBoardDto;
 import net.feedbacky.app.service.board.featured.FeaturedBoardsService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ public class FeaturedBoardsRestController {
   }
 
   @GetMapping("v1/featuredBoards")
-  public List<FetchBoardDto> getAll() {
+  public List<FetchFeaturedBoardDto> getAll() {
     return featuredBoardsService.getAll();
   }
 
