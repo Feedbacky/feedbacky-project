@@ -1,5 +1,5 @@
 import axios from "axios";
-import AppContext from "context/AppContext";
+import {AppContext} from "context";
 import Cookies from "js-cookie";
 import qs from "querystringify";
 import React, {useContext, useState} from 'react';
