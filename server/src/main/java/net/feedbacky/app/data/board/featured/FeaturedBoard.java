@@ -37,6 +37,7 @@ public class FeaturedBoard {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "board_id")
   private Board board;
+  private String usage;
   private String description;
 
 
