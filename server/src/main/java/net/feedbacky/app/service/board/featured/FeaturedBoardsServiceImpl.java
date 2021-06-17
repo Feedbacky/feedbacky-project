@@ -36,7 +36,7 @@ public class FeaturedBoardsServiceImpl implements FeaturedBoardsService {
     List<FeaturedBoard> boards = new ArrayList<>();
     iterable.forEach(boards::add);
     Collections.shuffle(boards);
-    int i = 6;
+    int i = 3;
     for(FeaturedBoard board : boards) {
       featuredBoards.add(board.getId());
       i--;
