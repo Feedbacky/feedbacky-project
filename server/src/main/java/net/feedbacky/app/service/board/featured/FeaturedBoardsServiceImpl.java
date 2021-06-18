@@ -37,13 +37,8 @@ public class FeaturedBoardsServiceImpl implements FeaturedBoardsService {
     iterable.forEach(boards::add);
     Collections.shuffle(boards);
     int i = 2;
-    List<FeaturedBoard> featured = new ArrayList<>();
     for(FeaturedBoard board : boards) {
-      //do not feature boards with duplicate owners
-      if(featured.stream().anyMatch(featuredBoard -> featuredBoard.getBoard().getCreator().equals(board.getBoard().getCreator()))) {
-        continue;
-      }
-      featured.add(board);
+      featuredBoards.add(board.getId());
       i--;
       if(i <= 0) {
         return;
