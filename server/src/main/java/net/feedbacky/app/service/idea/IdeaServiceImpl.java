@@ -202,7 +202,9 @@ public class IdeaServiceImpl implements IdeaService {
     }
     idea.setDescription(StringEscapeUtils.escapeHtml4(idea.getDescription()));
     if(comment != null) {
-      idea.getComments().add(comment);
+      Set<Comment> comments = idea.getComments();
+      comments.add(comment);
+      idea.setComments(comments);
       commentRepository.save(comment);
     }
     ideaRepository.save(idea);
@@ -319,7 +321,9 @@ public class IdeaServiceImpl implements IdeaService {
       throw new FeedbackyRestException(HttpStatus.BAD_REQUEST, "No changes made.");
     }
     Comment comment = prepareTagsPatchComment(user, idea, addedTags, removedTags);
-    idea.getComments().add(comment);
+    Set<Comment> comments = idea.getComments();
+    comments.add(comment);
+    idea.setComments(comments);
     commentRepository.save(comment);
     ideaRepository.save(idea);
     WebhookDataBuilder webhookBuilder = new WebhookDataBuilder().withUser(user).withIdea(comment.getIdea())

@@ -1,3 +1,14 @@
+### 1.0.0.beta.3
+* **[IMPROVEMENT]** Trend score received an improvement, now it includes subscribers and comments amount and it's should be 1.0 by default
+to be seen at the top of ideas list
+
+### 1.0.0.beta.2
+* **[IMPROVEMENT]** Improve mails design and extended support for mail clients
+* **[FIX]** Snackbars background color was shorter than the whole snackbar
+* **[FIX]** Snackbars undo button was outside the snackbar
+* **[FIX]** Default user avatar link replaced from /generator.php?name=xyz to /generator/xyz so different avatars won't be displayed if another query string is added
+eg. ?name=Plajer?size=32 (broken, outputs Plajer?size=32)
+
 ### 1.0.0.beta.1
 * **[IMPROVEMENT]** Snackbars are updated to look like other parts of the UI (transparent background, bold full color text)
 * **[IMPROVEMENT]** Migrator is now using batch entry updates for better performance
