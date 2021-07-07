@@ -137,6 +137,7 @@ public class CommentServiceImpl implements CommentService {
     }
     commentRepository.save(comment);
     idea.recalculateTrendScore();
+    ideaRepository.save(idea);
 
     //do not publish information about private internal comments
     if(comment.getViewType() != Comment.ViewType.INTERNAL) {
@@ -209,6 +210,7 @@ public class CommentServiceImpl implements CommentService {
     comment.getIdea().getBoard().getWebhookExecutor().executeWebhooks(Webhook.Event.IDEA_COMMENT_DELETE, builder.build());
     commentRepository.delete(comment);
     comment.getIdea().recalculateTrendScore();
+    ideaRepository.save(comment.getIdea());
     return ResponseEntity.noContent().build();
   }
 
